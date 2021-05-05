@@ -1,0 +1,10 @@
+﻿@page "/"
+@using Toolbelt.Blazor.WebAssembly.PrerenderServer
+@inject BlazorWasmPrerenderingOptions BlazorWasmPrerenderingOptions
+@Html.Raw(BlazorWasmPrerenderingOptions.IndexHtmlTextFirstHalf)
+<!-- %%-PRERENDERING-BEGIN-%% -->
+<div style="opacity: 0; position: fixed; z-index: -1; top: 0; left: 0; bottom: 0; right: 0;">
+    @(await Html.RenderComponentAsync(BlazorWasmPrerenderingOptions.RootComponentType, RenderMode.Static, parameters: null))
+</div>
+<!-- %%-PRERENDERING-END-%% -->
+@Html.Raw(BlazorWasmPrerenderingOptions.IndexHtmlTextSecondHalf)

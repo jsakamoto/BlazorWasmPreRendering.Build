@@ -1,0 +1,31 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <BeforeBlazorWasmPrerendering>$(BeforeBlazorWasmPrerendering)</BeforeBlazorWasmPrerendering>
+  </PropertyGroup>
+
+  <!-- Define Properties -->
+  <Target Name="BlazorWasmPrerendering_DefineProperties" DependsOnTargets="$(BeforeBlazorWasmPrerendering)">
+    <PropertyGroup>
+      <BlazorWasmPrerenderingPublishDir Condition=" '$(BlazorWasmPrerenderingPublishDir)' == '' ">$([System.IO.Path]::GetFullPath('$(PublishDir)').TrimEnd('\').TrimEnd('/'))</BlazorWasmPrerenderingPublishDir>
+      <BlazorWasmPrerenderingAssembly Condition=" '$(BlazorWasmPrerenderingAssembly)' == '' ">$(AssemblyName)</BlazorWasmPrerenderingAssembly>
+      <BlazorWasmPrerenderingRootComponentType Condition=" '$(BlazorWasmPrerenderingRootComponentType)' == '' ">$(RootNamespace).App</BlazorWasmPrerenderingRootComponentType>
+      <BlazorWasmPrerenderingRootComponentSelector Condition=" '$(BlazorWasmPrerenderingRootComponentSelector)' == '' ">#app</BlazorWasmPrerenderingRootComponentSelector>
+      <BlazorWasmPrerenderingServerDll Condition=" '$(BlazorWasmPrerenderingServerDll)' == '' ">$(MSBuildThisFileDirectory)../tools/$(TargetFramework)/blazorwasm-prerendering-server.dll</BlazorWasmPrerenderingServerDll>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="BlazorWasmPrerendering"
+          AfterTargets="Publish"
+          DependsOnTargets="BlazorWasmPrerendering_DefineProperties"
+          Condition=" '$(BlazorWasmPrerendering)' != 'disable' ">
+    <!--
+    <Message Importance="high" Text="BlazorWasmPrerendering: [$(BlazorWasmPrerendering)]"/>
+    <Message Importance="high" Text="Publish Dir : [$(BlazorWasmPrerenderingPublishDir)]"/>
+    <Message Importance="high" Text="Assembly    : [$(BlazorWasmPrerenderingAssembly)]"/>
+    <Message Importance="high" Text="Type        : [$(BlazorWasmPrerenderingRootComponentType)]"/>
+    <Message Importance="high" Text="Selector    : [$(BlazorWasmPrerenderingRootComponentSelector)]"/>
+    -->
+    <Exec Command="dotnet &quot;$(BlazorWasmPrerenderingServerDll)&quot; -a &quot;$(BlazorWasmPrerenderingAssembly)&quot; -t &quot;$(BlazorWasmPrerenderingRootComponentType)&quot; -s &quot;$(BlazorWasmPrerenderingRootComponentSelector)&quot; -p &quot;$(BlazorWasmPrerenderingPublishDir)&quot;" />
+  </Target>
+</Project>

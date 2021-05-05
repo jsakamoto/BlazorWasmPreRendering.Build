@@ -1,0 +1,77 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <AssemblyName>blazorwasm-prerendering-server</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>0.0.1.10</Version>
+    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
+    <Authors>J.Sakamoto</Authors>
+    <PackageId>BlazorWasmPreRendering.Build</PackageId>
+    <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/jsakamoto/Toolbelt.Blazor.WebAssembly.PrerenderServer</PackageProjectUrl>
+    <PackageTags>blazor,prerender</PackageTags>
+    <PackageReleaseNotes>(Please write the package release notes in "../RELEASE-NOTES.txt")</PackageReleaseNotes>
+    <PackageOutputPath>../_dist</PackageOutputPath>
+    <Copyright>Copyright © 2021 J.Sakamoto, Mozilla Public License 2.0</Copyright>
+    <Description>Pre-render a Blazor WebAssembly app and save it as static HTML files into the published folder.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="0.15.0" />
+    <PackageReference Include="CommandLineSwitchParser" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.5" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0-preview.3.21201.13" />
+  </ItemGroup>
+
+  <!-- Pack settings -->
+  <PropertyGroup>
+    <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);PublishForPackage</GenerateNuspecDependsOn>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <NuspecFile>$(PackageId).nuspec</NuspecFile>
+  </PropertyGroup>
+
+  <Target Name="PublishForPackage">
+    <Message Importance="high" Text="[PublishForPackage]"/>
+    <Exec Command="dotnet publish -c:$(Configuration) -f:net5.0 --nologo"/>
+    <Exec Command="dotnet publish -c:$(Configuration) -f:net6.0 --nologo"/>
+  </Target>
+
+  <Target Name="SetupNuspecProperties" BeforeTargets="GenerateNuspec">
+    <ReadLinesFromFile File="../RELEASE-NOTES.txt">
+      <Output TaskParameter="Lines" ItemName="ReleaseNoteLines" />
+    </ReadLinesFromFile>
+    <PropertyGroup>
+      <PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
+      <PackageReleaseNotes>$(PackageReleaseNotes)v.0.0.0</PackageReleaseNotes>
+      <PackageReleaseNotes>$([System.Text.RegularExpressions.Regex]::Match($(PackageReleaseNotes), "^(v\.[\d\.]+.+?)v\.[\d\.]+", System.Text.RegularExpressions.RegexOptions.Singleline).Groups[1].Value)</PackageReleaseNotes>
+    </PropertyGroup>
+    <PropertyGroup>
+      <NuspecProperties>version=$(Version);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>projectDir=$(ProjectDir);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>configuration=$(Configuration);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>componentsrootdir=..\;$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>id=$(PackageId);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>authors=$(Authors);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>owners=$(Owners);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>projectUrl=$(PackageProjectUrl);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>description=$(Description);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>copyright=$(Copyright);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>license=$(PackageLicenseExpression);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>tags=$(PackageTags);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>releaseNotes=$(PackageReleaseNotes);$(NuspecProperties)</NuspecProperties>
+    </PropertyGroup>
+  </Target>
+
+</Project>

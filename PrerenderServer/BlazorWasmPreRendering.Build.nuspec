@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$owners$</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="expression">$license$</license>
+    <icon>Icon.png</icon>
+    <projectUrl>$projectUrl$</projectUrl>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <tags>$tags$</tags>
+    <releaseNotes>$releaseNotes$</releaseNotes>
+  </metadata>
+  <files>
+    <file src="..\.assets\nupkg-icon.png" target="Icon.png" />
+    <file src="build\**" target="build" />
+    <file src="$projectDir$bin\$configuration$\net5.0\publish\**\*" target="tools\net5.0" />
+    <file src="$projectDir$bin\$configuration$\net6.0\publish\**\*" target="tools\net6.0" />
+    <!--<file src="$componentsrootdir$THIRD-PARTY-NOTICES.txt" target=".\THIRD-PARTY-NOTICES.txt" />-->
+  </files>
+</package>

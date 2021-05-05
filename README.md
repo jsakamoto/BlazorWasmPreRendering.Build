@@ -1,0 +1,1 @@
+# BlazorWasmPreRendering.Build
