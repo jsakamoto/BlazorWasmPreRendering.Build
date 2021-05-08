@@ -16,7 +16,7 @@ namespace BlazorWasmApp1.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            await Task.Delay(5000);
+            await Task.Delay(1000);
             forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
         }
 

@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "README", "README", "{2765C3
 		RELEASE-NOTES.txt = RELEASE-NOTES.txt
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWasmPreRendering.Build.Test", "BlazorWasmPreRendering.Build.Test\BlazorWasmPreRendering.Build.Test.csproj", "{9A8A4185-D6CE-4A28-98F4-96A092AB0787}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{11AEF614-7677-459A-BFD5-6B4A61336644}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11AEF614-7677-459A-BFD5-6B4A61336644}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11AEF614-7677-459A-BFD5-6B4A61336644}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A8A4185-D6CE-4A28-98F4-96A092AB0787}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A8A4185-D6CE-4A28-98F4-96A092AB0787}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A8A4185-D6CE-4A28-98F4-96A092AB0787}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A8A4185-D6CE-4A28-98F4-96A092AB0787}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

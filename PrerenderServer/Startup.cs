@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.Loader;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
     public class Startup
     {
         private IConfiguration Configuration { get; }
+
         private BlazorWasmPrerenderingOptions PrerenderingOptions { get; }
 
         public Startup(IConfiguration configuration, BlazorWasmPrerenderingOptions prerenderingOptions)
@@ -71,6 +73,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             app.UseDeveloperExceptionPage();
 
+            ConfigureApplicationMiddleware(app);
+
             app.UseStaticFiles(new StaticFileOptions { ServeUnknownFileTypes = true });
             app.UseRouting();
             app.UseEndpoints(endpoints =>
@@ -78,6 +82,31 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 endpoints.MapRazorPages();
                 endpoints.MapFallbackToPage("/_Host");
             });
+        }
+
+        internal void ConfigureApplicationMiddleware(IApplicationBuilder app)
+        {
+            foreach (var pack in this.PrerenderingOptions.MiddlewarePackages)
+            {
+                var assemblyName = string.IsNullOrEmpty(pack.Assembly) ? pack.PackageIdentity : pack.Assembly;
+                var appAssembly = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(assemblyName));//.LoadFromAssemblyPath(appAssemblyPath);
+                var useMethods = appAssembly.ExportedTypes
+                    .Where(t => t.IsClass && t.IsSealed && t.IsAbstract) // means static class (https://stackoverflow.com/a/2639465/1268000)
+                    .SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Static))
+                    .Where(m =>
+                    {
+                        if (!m.Name.StartsWith("Use")) return false;
+                        var parameters = m.GetParameters();
+                        if (parameters.Length != 1) return false;
+                        if (parameters[0].ParameterType != typeof(IApplicationBuilder)) return false;
+                        return true;
+                    });
+
+                foreach (var useMethod in useMethods)
+                {
+                    useMethod.Invoke(null, new object[] { app });
+                }
+            }
         }
     }
 }

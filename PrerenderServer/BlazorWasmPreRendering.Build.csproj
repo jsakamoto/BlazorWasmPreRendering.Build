@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <AssemblyName>blazorwasm-prerendering-server</AssemblyName>
+    <RootNamespace>Toolbelt.Blazor.WebAssembly.PrerenderServer</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>

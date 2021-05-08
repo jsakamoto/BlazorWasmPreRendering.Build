@@ -12,6 +12,8 @@
       <BlazorWasmPrerenderingRootComponentType Condition=" '$(BlazorWasmPrerenderingRootComponentType)' == '' ">$(RootNamespace).App</BlazorWasmPrerenderingRootComponentType>
       <BlazorWasmPrerenderingRootComponentSelector Condition=" '$(BlazorWasmPrerenderingRootComponentSelector)' == '' ">#app</BlazorWasmPrerenderingRootComponentSelector>
       <BlazorWasmPrerenderingServerDll Condition=" '$(BlazorWasmPrerenderingServerDll)' == '' ">$(MSBuildThisFileDirectory)../tools/$(TargetFramework)/blazorwasm-prerendering-server.dll</BlazorWasmPrerenderingServerDll>
+      <BlazorWasmPrerenderingIntermediateDir Condition=" '$(BlazorWasmPrerenderingIntermediateDir)' == '' ">$(ProjectDir)$(IntermediateOutputPath).</BlazorWasmPrerenderingIntermediateDir>
+      <BlazorWasmPrerenderingMiddlewareArg Condition=" '$(BlazorWasmPrerenderingMiddlewarePackages)' == '' ">@(BlazorWasmPrerenderMiddleware->'%(Identity),%(Assembly),%(Version)')</BlazorWasmPrerenderingMiddlewareArg>
     </PropertyGroup>
   </Target>
 
@@ -26,6 +28,6 @@
     <Message Importance="high" Text="Type        : [$(BlazorWasmPrerenderingRootComponentType)]"/>
     <Message Importance="high" Text="Selector    : [$(BlazorWasmPrerenderingRootComponentSelector)]"/>
     -->
-    <Exec Command="dotnet &quot;$(BlazorWasmPrerenderingServerDll)&quot; -a &quot;$(BlazorWasmPrerenderingAssembly)&quot; -t &quot;$(BlazorWasmPrerenderingRootComponentType)&quot; -s &quot;$(BlazorWasmPrerenderingRootComponentSelector)&quot; -p &quot;$(BlazorWasmPrerenderingPublishDir)&quot;" />
+    <Exec Command="dotnet &quot;$(BlazorWasmPrerenderingServerDll)&quot; -a &quot;$(BlazorWasmPrerenderingAssembly)&quot; -t &quot;$(BlazorWasmPrerenderingRootComponentType)&quot; -s &quot;$(BlazorWasmPrerenderingRootComponentSelector)&quot; -p &quot;$(BlazorWasmPrerenderingPublishDir)&quot; -i &quot;$(BlazorWasmPrerenderingIntermediateDir)&quot; -m &quot;$(BlazorWasmPrerenderingMiddlewareArg)&quot; -f &quot;$(TargetFramework)&quot;" />
   </Target>
 </Project>

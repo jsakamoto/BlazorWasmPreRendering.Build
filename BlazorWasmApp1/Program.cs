@@ -1,13 +1,9 @@
 using System;
 using System.Net.Http;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Text;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System.Linq;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 namespace BlazorWasmApp1
 {
@@ -15,22 +11,16 @@ namespace BlazorWasmApp1
     {
         public static async Task Main(string[] args)
         {
-            var builder = CreateBuilder(args);
+            var builder = WebAssemblyHostBuilder.CreateDefault(args);
+            builder.RootComponents.Add<App>("#app");
+            ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
             await builder.Build().RunAsync();
         }
 
-        private static WebAssemblyHostBuilder CreateBuilder(string[] args)
+        private static void ConfigureServices(IServiceCollection services, string baseAddress)
         {
-            var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("#app");
-            var rootComponents = builder.RootComponents.First();
-            //rootComponents.
-
-            Console.WriteLine("builder.HostEnvironment.BaseAddress");
-            Console.WriteLine(builder.HostEnvironment.BaseAddress);
-
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-            return builder;
+            services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
+            services.AddHeadElementHelper();
         }
     }
 }
