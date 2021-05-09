@@ -75,32 +75,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var enableGZipCompression = File.Exists(indexHtmlPath + ".gz");
             var enableBrotliCompression = File.Exists(indexHtmlPath + ".br");
 
-            var indexHtmlText = File.ReadAllText(indexHtmlPath);
-            indexHtmlText = indexHtmlText.Replace("\r\n", "\n");
-
-            const string preRenderMarkerBegin = "\n<!-- %%-PRERENDERING-BEGIN-%% -->\n";
-            const string preRenderMarkerEnd = "\n<!-- %%-PRERENDERING-END-%% -->\n";
-            var indexOfPreRenderMarkerBegin = indexHtmlText.IndexOf(preRenderMarkerBegin);
-            var indexOfPreRenderMarkerEnd = indexHtmlText.IndexOf(preRenderMarkerEnd);
-            if (indexOfPreRenderMarkerBegin != -1 && indexOfPreRenderMarkerEnd != -1)
-            {
-                indexHtmlText =
-                    indexHtmlText[0..indexOfPreRenderMarkerBegin] +
-                    indexHtmlText[(indexOfPreRenderMarkerEnd + preRenderMarkerEnd.Length)..];
-            }
-
-            var parser = new HtmlParser();
-            var indexHtmlDoc = parser.ParseDocument(indexHtmlText);
-            var appRootComponentElement = indexHtmlDoc.QuerySelector(commandLineOptions.SelectorOfRootComponent);
-
-            var outerHtml = appRootComponentElement.OuterHtml;
-            var innerHtml = appRootComponentElement.InnerHtml;
-            var indexOfInner = outerHtml.IndexOf(innerHtml);
-            var marker = outerHtml.Substring(0, innerHtml.Length + indexOfInner);
-
-            var indexOfMarker = indexHtmlText.IndexOf(marker);
-            var indexHtmlTextFirstHalf = indexHtmlText[0..(indexOfMarker + marker.Length)];
-            var indexHtmlTextSecondHalf = indexHtmlText[(indexOfMarker + marker.Length)..];
+            var indexHtmlText = GetIndexHtmlText(indexHtmlPath, commandLineOptions.SelectorOfRootComponent);
 
             var appAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(appAssemblyPath);
             var appComponentType = appAssembly.GetType(commandLineOptions.TypeNameOfRootComponent);
@@ -125,8 +100,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             {
                 IntermediateDir = commandLineOptions.IntermediateDir,
                 FrameworkName = commandLineOptions.FrameworkName,
-                IndexHtmlTextFirstHalf = indexHtmlTextFirstHalf,
-                IndexHtmlTextSecondHalf = indexHtmlTextSecondHalf,
+                IndexHtmlTextFirstHalf = indexHtmlText.FirstHalf,
+                IndexHtmlTextSecondHalf = indexHtmlText.SecondHalf,
                 WebRootPath = webRootPath,
                 ApplicationAssembly = appAssembly,
                 RootComponentType = appComponentType,
@@ -135,6 +110,40 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 MiddlewarePackages = middlewarePackages
             };
             return options;
+        }
+
+        internal static (string FirstHalf, string SecondHalf) GetIndexHtmlText(string indexHtmlPath, string selectorOfRootComponent)
+        {
+            var indexHtmlText = File.ReadAllText(indexHtmlPath);
+            indexHtmlText = indexHtmlText.Replace("\r\n", "\n");
+
+            const string preRenderMarkerBegin = "\n<!-- %%-PRERENDERING-BEGIN-%% -->\n";
+            const string preRenderMarkerEnd = "\n<!-- %%-PRERENDERING-END-%% -->\n";
+            var indexOfPreRenderMarkerBegin = indexHtmlText.IndexOf(preRenderMarkerBegin);
+            var indexOfPreRenderMarkerEnd = indexHtmlText.IndexOf(preRenderMarkerEnd);
+            if (indexOfPreRenderMarkerBegin != -1 && indexOfPreRenderMarkerEnd != -1)
+            {
+                indexHtmlText =
+                    indexHtmlText[0..indexOfPreRenderMarkerBegin] +
+                    indexHtmlText[(indexOfPreRenderMarkerEnd + preRenderMarkerEnd.Length)..];
+            }
+
+            const string markerText = "%%-INSERT-PRERENDERING-HERE-%%";
+            const string markerComment = "<!--" + markerText + "-->";
+            var parser = new HtmlParser();
+            var indexHtmlDoc = parser.ParseDocument(indexHtmlText);
+            var appRootComponentElement = indexHtmlDoc.QuerySelector(selectorOfRootComponent);
+            appRootComponentElement.AppendChild(indexHtmlDoc.CreateComment(markerText));
+
+            using var stringWriter = new StringWriter();
+            indexHtmlDoc.ToHtml(stringWriter, new CustomHtmlMarkupFormatter());
+            indexHtmlText = stringWriter.ToString();
+
+            var indexOfMarker = indexHtmlText.IndexOf(markerComment);
+            var indexHtmlTextFirstHalf = indexHtmlText[0..indexOfMarker];
+            var indexHtmlTextSecondHalf = indexHtmlText[(indexOfMarker + markerComment.Length)..];
+
+            return (indexHtmlTextFirstHalf, indexHtmlTextSecondHalf);
         }
 
         private static void SetupCustomAssemblyLoader(BlazorWasmPrerenderingOptions options)
