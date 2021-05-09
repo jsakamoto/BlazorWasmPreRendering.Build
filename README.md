@@ -1,4 +1,4 @@
-# BlazorWasmPreRendering.Build
+# BlazorWasmPreRendering.Build [![NuGet Package](https://img.shields.io/nuget/v/BlazorWasmPreRendering.Build.svg)](https://www.nuget.org/packages/BlazorWasmPreRendering.Build/)
 
 ## Summary
 
