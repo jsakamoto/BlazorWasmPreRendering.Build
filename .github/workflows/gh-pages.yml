@@ -1,0 +1,31 @@
+name: github pages
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - uses: actions/checkout@v2
+
+      # Install .NET Core SDK
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.202
+
+      # Publish the site
+      - name: Publish
+        run: dotnet publish BlazorWasmApp1/BlazorWasmApp1.csproj -c:Release -o:public -p:GHPages=true --nologo
+
+      # Deploy the site
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: public/wwwroot
+          force_orphan: true
