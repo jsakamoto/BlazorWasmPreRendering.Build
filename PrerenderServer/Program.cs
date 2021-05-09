@@ -200,7 +200,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 using var buildProcess = Process.Start(new ProcessStartInfo
                 {
                     FileName = "dotnet",
-                    ArgumentList = { "build", "-c:Release", "--nologo" },
+                    ArgumentList = { "build", "-c:Release", "-v:q", "--nologo" },
                     WorkingDirectory = projectDir
                 });
                 if (buildProcess == null) throw new Exception("Starting \"dotnet build\" for retreive middle ware dlls was failed.");
