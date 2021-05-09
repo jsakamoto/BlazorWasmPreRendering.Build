@@ -13,9 +13,11 @@
     <copyright>$copyright$</copyright>
     <tags>$tags$</tags>
     <releaseNotes>$releaseNotes$</releaseNotes>
+    <readme>README.md</readme>
   </metadata>
   <files>
     <file src="..\.assets\nupkg-icon.png" target="Icon.png" />
+    <file src="..\README.md" target="README.md" />
     <file src="build\**" target="build" />
     <file src="$projectDir$bin\$configuration$\net5.0\publish\**\*" target="tools\net5.0" />
     <file src="$projectDir$bin\$configuration$\net6.0\publish\**\*" target="tools\net6.0" />

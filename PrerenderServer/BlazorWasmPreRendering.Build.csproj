@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.0.1.10</Version>
+    <Version>1.0.0-preview.1</Version>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Authors>J.Sakamoto</Authors>
     <PackageId>BlazorWasmPreRendering.Build</PackageId>
@@ -19,7 +19,7 @@
     <PackageReleaseNotes>(Please write the package release notes in "../RELEASE-NOTES.txt")</PackageReleaseNotes>
     <PackageOutputPath>../_dist</PackageOutputPath>
     <Copyright>Copyright © 2021 J.Sakamoto, Mozilla Public License 2.0</Copyright>
-    <Description>Pre-render a Blazor WebAssembly app and save it as static HTML files into the published folder.</Description>
+    <Description>When you publish your Blazor Wasm app, this package pre-renders and saves the app as static HTML files in your public folder.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
