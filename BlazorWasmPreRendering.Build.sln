@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31220.234
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWasmApp1", "BlazorWasmApp1\BlazorWasmApp1.csproj", "{3BD225B6-9F9D-4F46-8BB3-748FF3CBCE1C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWasmPreRendering.Build", "PrerenderServer\BlazorWasmPreRendering.Build.csproj", "{11AEF614-7677-459A-BFD5-6B4A61336644}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWasmPreRendering.Build", "BlazorWasmPreRendering.Build\BlazorWasmPreRendering.Build.csproj", "{11AEF614-7677-459A-BFD5-6B4A61336644}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "README", "README", "{2765C3AD-EDA3-487A-B8DC-B4FA4E6FCD18}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\gh-pages.yml = .github\workflows\gh-pages.yml
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SampleApp", "SampleApp", "{9D3D3493-8160-467E-BC93-A22DB08E3014}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3BD225B6-9F9D-4F46-8BB3-748FF3CBCE1C} = {9D3D3493-8160-467E-BC93-A22DB08E3014}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4C791317-9445-491F-A918-CFF172E49260}
