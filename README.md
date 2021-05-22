@@ -4,11 +4,13 @@
 
 When you publish your Blazor WebAssembly app, this package pre-renders and saves the app as static HTML files in your public folder.
 
+This will help make the contents of your Blazor WebAssembly static apps findable in internet search and be visible from the OGP client.
+
 **An output of "dotnet publish" before installing this package:**  
-![fig.1 - before](.assets/fig01.before.png)
+![fig.1 - before](https://raw.githubusercontent.com/jsakamoto/BlazorWasmPreRendering.Build/master/.assets/fig01.before.png)
 
 **And after installing this package:**  
-![fig.2 - after](.assets/fig02.after.png)
+![fig.2 - after](https://raw.githubusercontent.com/jsakamoto/BlazorWasmPreRendering.Build/master/.assets/fig02.after.png)
 
 ## Usage
 
