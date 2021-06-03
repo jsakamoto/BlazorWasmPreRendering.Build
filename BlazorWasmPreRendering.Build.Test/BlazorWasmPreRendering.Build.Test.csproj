@@ -10,14 +10,15 @@
   <ItemGroup>
     <PackageReference Include="ChainingAssertion-NUnit.Bin" Version="1.8.0.3" />
     <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-    <PackageReference Include="Toolbelt.Blazor.HeadElement.ServerPrerendering" Version="1.5.1" />
+    <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Include="Toolbelt.Blazor.HeadElement.ServerPrerendering" Version="1.5.2" />
+    <PackageReference Include="XProcess" Version="1.0.0-beta.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PrerenderServer\BlazorWasmPreRendering.Build.csproj" />
+    <ProjectReference Include="..\BlazorWasmPreRendering.Build\BlazorWasmPreRendering.Build.csproj" />
   </ItemGroup>
 
   <ItemGroup>
