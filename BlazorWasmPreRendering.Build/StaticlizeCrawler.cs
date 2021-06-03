@@ -19,7 +19,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         private string BaseUrl { get; }
 
-        private HttpClient HttpClient { get; }
+        private HttpClient HttpClient { get; } = new();
 
         private string WebRootPath { get; }
 
@@ -29,16 +29,14 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         public StaticlizeCrawler(
             string baseUrl,
-            HttpClient httpClient,
             string webRootPath,
             bool enableGZipCompression,
             bool enableBrotliCompression)
         {
-            BaseUrl = baseUrl;
-            this.HttpClient = httpClient;
-            WebRootPath = webRootPath;
-            EnableGZipCompression = enableGZipCompression;
-            EnableBrotliCompression = enableBrotliCompression;
+            this.BaseUrl = baseUrl.TrimEnd('/');
+            this.WebRootPath = webRootPath;
+            this.EnableGZipCompression = enableGZipCompression;
+            this.EnableBrotliCompression = enableBrotliCompression;
         }
 
         public Task SaveToStaticFileAsync() => SaveToStaticFileAsync("/");
@@ -72,7 +70,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             RecompressStaticFile(indexHtmlPath);
 
-            var htmlDoc = this.HtmlParser.ParseDocument(htmlContent);
+            using var htmlDoc = this.HtmlParser.ParseDocument(htmlContent);
             var links = htmlDoc.Links
                 .OfType<IHtmlAnchorElement>()
                 .Where(link => string.IsNullOrEmpty(link.Origin))

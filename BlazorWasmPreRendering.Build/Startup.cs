@@ -27,6 +27,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(this.PrerenderingOptions);
+
             var baseAddress = this.Configuration["urls"].Split(';').First(url => !string.IsNullOrWhiteSpace(url));
             this.ConfigureApplicationServices(services, baseAddress);
 
