@@ -2,14 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using CommandLineSwitchParser;
 using Microsoft.AspNetCore.Hosting;
@@ -33,22 +30,19 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             Console.WriteLine("Start fetching...");
 
-            var path = "/";
-            var htmlParser = new HtmlParser();
             var httpClient = new HttpClient();
-            var savedPathSet = new HashSet<string>();
-            var prerenderingHostUrl = configuration["urls"]
+            var baseUrl = configuration["urls"]
                 .Split(';')
                 .First(url => !string.IsNullOrWhiteSpace(url))
                 .TrimEnd('/');
 
-            await SaveToStaticFileAsync(
-                path,
+            var crawler = new StaticlizeCrawler(
+                baseUrl,
                 httpClient,
-                htmlParser,
-                savedPathSet,
-                prerenderingHostUrl,
-                prerenderingOptions);
+                prerenderingOptions.WebRootPath,
+                prerenderingOptions.EnableGZipCompression,
+                prerenderingOptions.EnableBrotliCompression);
+            await crawler.SaveToStaticFileAsync();
 
             Console.WriteLine("Fetching complete.");
 
@@ -244,86 +238,6 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var webHost = hostBuilder.Build();
             await webHost.StartAsync();
             return webHost;
-        }
-
-        public static async Task SaveToStaticFileAsync(
-            string path,
-            HttpClient httpClient,
-            IHtmlParser htmlParser,
-            HashSet<string> savedPathSet,
-            string prerenderingHostUrl,
-            BlazorWasmPrerenderingOptions options
-        )
-        {
-            if (savedPathSet.Contains(path)) return;
-            savedPathSet.Add(path);
-
-            var requestUrl = prerenderingHostUrl + path;
-            Console.WriteLine($"Getting {requestUrl}...");
-            var response = await httpClient.GetAsync(requestUrl);
-
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                Console.WriteLine($"  The HTTP status code was not OK. (it was {response.StatusCode}.)");
-                return;
-            }
-            var mediaType = response.Content.Headers.ContentType?.MediaType;
-            if (mediaType != "text/html")
-            {
-                Console.WriteLine($"  The content type was not text/html. (it was {mediaType}.)");
-                return;
-            }
-
-            var htmlContent = await response.Content.ReadAsStringAsync();
-            var targetDir = Path.Combine(options.WebRootPath, Path.Combine(path.Split('/')));
-            Directory.CreateDirectory(targetDir);
-            var indexHtmlPath = Path.Combine(targetDir, "index.html");
-            File.WriteAllText(indexHtmlPath, htmlContent);
-
-            RecompressStaticFile(options, indexHtmlPath);
-
-            var htmlDoc = htmlParser.ParseDocument(htmlContent);
-            var links = htmlDoc.Links
-                .OfType<IHtmlAnchorElement>()
-                .Where(link => string.IsNullOrEmpty(link.Origin))
-                .Where(link => string.IsNullOrEmpty(link.Target))
-                .Where(link => !string.IsNullOrEmpty(link.PathName))
-                .Select(link => link.PathName)
-                .ToArray();
-
-            foreach (var link in links)
-            {
-                await SaveToStaticFileAsync(
-                    link,
-                    httpClient,
-                    htmlParser,
-                    savedPathSet,
-                    prerenderingHostUrl,
-                    options);
-            }
-        }
-
-        private static void RecompressStaticFile(BlazorWasmPrerenderingOptions options, string indexHtmlPath)
-        {
-            if (!options.EnableGZipCompression && !options.EnableBrotliCompression) return;
-
-            using var sourceStream = File.OpenRead(indexHtmlPath);
-
-            if (options.EnableGZipCompression)
-            {
-                using var outputStream = File.Create(indexHtmlPath + ".gz");
-                using var compressingStream = new GZipStream(outputStream, CompressionLevel.Optimal);
-                sourceStream.Seek(0, SeekOrigin.Begin);
-                sourceStream.CopyTo(compressingStream);
-            }
-
-            if (options.EnableBrotliCompression)
-            {
-                using var outputStream = File.Create(indexHtmlPath + ".br");
-                using var compressingStream = new BrotliStream(outputStream, CompressionLevel.Optimal);
-                sourceStream.Seek(0, SeekOrigin.Begin);
-                sourceStream.CopyTo(compressingStream);
-            }
         }
     }
 }
