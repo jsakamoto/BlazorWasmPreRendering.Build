@@ -77,7 +77,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             var indexHtmlText = GetIndexHtmlText(indexHtmlPath, commandLineOptions.SelectorOfRootComponent);
 
-            var appAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(appAssemblyPath);
+            var appAssembly = AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(File.ReadAllBytes(appAssemblyPath)));
             var appComponentType = appAssembly.GetType(commandLineOptions.TypeNameOfRootComponent);
             if (appComponentType == null) throw new ArgumentException($"The component type \"{commandLineOptions.TypeNameOfRootComponent}\" was not found.");
 
@@ -165,7 +165,9 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                     .Select(dir => Path.Combine(dir, name.Name + ".dll"))
                     .FirstOrDefault(path => File.Exists(path));
                 if (asemblyPath == null) return null;
-                return context.LoadFromAssemblyPath(asemblyPath);
+
+                var assemblyBytes = File.ReadAllBytes(asemblyPath);
+                return context.LoadFromStream(new MemoryStream(assemblyBytes));
             };
         }
 

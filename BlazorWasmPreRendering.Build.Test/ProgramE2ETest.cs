@@ -57,8 +57,8 @@ namespace BlazorWasmPreRendering.Build.Test
             File.Exists(aboutIndexHtmlPath).IsTrue();
 
             var htmlParser = new HtmlParser();
-            using var rootIndexHtml = htmlParser.ParseDocument(File.OpenRead(rootIndexHtmlPath));
-            using var aboutIndexHtml = htmlParser.ParseDocument(File.OpenRead(aboutIndexHtmlPath));
+            using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
+            using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
 
             rootIndexHtml.Title.Is("Home | Blazor Wasm App 0");
             aboutIndexHtml.Title.Is("About | Blazor Wasm App 0");
