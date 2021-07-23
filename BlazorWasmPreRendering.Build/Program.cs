@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -55,17 +56,14 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             var webRootPath = Path.Combine(commandLineOptions.PublishedDir, "wwwroot");
             var indexHtmlPath = Path.Combine(webRootPath, "index.html");
-            var appAssemblyPath = Path.Combine(webRootPath, "_framework", commandLineOptions.AssemblyName);
-            if (!appAssemblyPath.ToLower().EndsWith(".dll")) appAssemblyPath += ".dll";
+            var appAssemblyDir = Path.Combine(webRootPath, "_framework");
 
             var enableGZipCompression = File.Exists(indexHtmlPath + ".gz");
             var enableBrotliCompression = File.Exists(indexHtmlPath + ".br");
 
             var indexHtmlText = GetIndexHtmlText(indexHtmlPath, commandLineOptions.SelectorOfRootComponent);
-
-            var appAssembly = AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(File.ReadAllBytes(appAssemblyPath)));
-            var appComponentType = appAssembly.GetType(commandLineOptions.TypeNameOfRootComponent);
-            if (appComponentType == null) throw new ArgumentException($"The component type \"{commandLineOptions.TypeNameOfRootComponent}\" was not found.");
+            var appAssembly = LoadAssemblyFrom(appAssemblyDir, commandLineOptions.AssemblyName);
+            var appComponentType = GetAppComponentType(commandLineOptions.TypeNameOfRootComponent, appAssemblyDir, appAssembly);
 
             var middlewarePackages = Enumerable.Empty<MiddlewarePackageReference>();
             if (!string.IsNullOrEmpty(commandLineOptions.MiddlewarePackages))
@@ -96,6 +94,14 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 MiddlewarePackages = middlewarePackages
             };
             return options;
+        }
+
+        private static Assembly LoadAssemblyFrom(string appAssemblyDir, string assemblyName)
+        {
+            var assemblyPath = Path.Combine(appAssemblyDir, assemblyName);
+            if (!assemblyPath.ToLower().EndsWith(".dll")) assemblyPath += ".dll";
+            var assembly = AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(File.ReadAllBytes(assemblyPath)));
+            return assembly;
         }
 
         internal static (string FirstHalf, string SecondHalf) GetIndexHtmlText(string indexHtmlPath, string selectorOfRootComponent)
@@ -130,6 +136,19 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var indexHtmlTextSecondHalf = indexHtmlText[(indexOfMarker + markerComment.Length)..];
 
             return (indexHtmlTextFirstHalf, indexHtmlTextSecondHalf);
+        }
+
+        private static Type GetAppComponentType(string typeNameOfRootComponent, string appAssemblyDir, Assembly appAssembly)
+        {
+            var rootComponentAssembly = appAssembly;
+            var rootComponentTypeNameParts = typeNameOfRootComponent.Split(',');
+            var rootComponentTypeName = rootComponentTypeNameParts[0].Trim();
+            var rootComponentAssemblyName = rootComponentTypeNameParts.Length > 1 ? rootComponentTypeNameParts[1].Trim() : "";
+            if (rootComponentAssemblyName != "") rootComponentAssembly = LoadAssemblyFrom(appAssemblyDir, rootComponentAssemblyName);
+
+            var appComponentType = rootComponentAssembly.GetType(rootComponentTypeName);
+            if (appComponentType == null) throw new ArgumentException($"The component type \"{typeNameOfRootComponent}\" was not found.");
+            return appComponentType;
         }
 
         private static void SetupCustomAssemblyLoader(BlazorWasmPrerenderingOptions options)
