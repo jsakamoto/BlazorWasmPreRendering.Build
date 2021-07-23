@@ -111,7 +111,7 @@ namespace BlazorWasmPreRendering.Build.Test
             using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
             using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
 
-            rootIndexHtml.QuerySelector("h1").TextContent.Trim().Is("Welcome to Blazor!");
+            rootIndexHtml.QuerySelector("h1").TextContent.Trim().Is("Welcome to Blazor Wasm App 2!");
             aboutIndexHtml.QuerySelector("h1").TextContent.Trim().Is("About Page");
         }
 
@@ -159,7 +159,7 @@ namespace BlazorWasmPreRendering.Build.Test
             using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
             using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
 
-            rootIndexHtml.QuerySelector("h1").TextContent.Trim().Is("Welcome to Blazor!");
+            rootIndexHtml.QuerySelector("h1").TextContent.Trim().Is("Welcome to Blazor Wasm App 2!");
             aboutIndexHtml.QuerySelector("h1").TextContent.Trim().Is("About Page");
         }
     }

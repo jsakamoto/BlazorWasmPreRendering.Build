@@ -31,7 +31,7 @@ namespace BlazorWasmPreRendering.Build.Test
                       destFileName: Path.Combine(cmdlineOptions.PublishedDir, "wwwroot", "index.html"));
 
             // When
-            var options = Program.BuildPrerenderingOptions(cmdlineOptions);
+            var options = Program.BuildPrerenderingOptions(new CustomAssemblyLoader(), cmdlineOptions);
 
             // Then
             options.IntermediateDir.Is(cmdlineOptions.IntermediateDir);

@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using AngleSharp.Html.Parser;
@@ -21,9 +20,11 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
         public static async Task<int> Main(string[] args)
         {
             var commandLineOptions = CommandLineSwitch.Parse<CommandLineOptions>(ref args);
-            var prerenderingOptions = BuildPrerenderingOptions(commandLineOptions);
+            var assemblyLoader = new CustomAssemblyLoader();
 
-            SetupCustomAssemblyLoader(prerenderingOptions);
+            var prerenderingOptions = BuildPrerenderingOptions(assemblyLoader, commandLineOptions);
+
+            SetupCustomAssemblyLoader(assemblyLoader, prerenderingOptions);
 
             using var webHost = await StartWebHostAsync(prerenderingOptions);
             var serverAddresses = webHost.ServerFeatures.Get<IServerAddressesFeature>()!;
@@ -46,7 +47,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             return 0;
         }
 
-        internal static BlazorWasmPrerenderingOptions BuildPrerenderingOptions(CommandLineOptions commandLineOptions)
+        internal static BlazorWasmPrerenderingOptions BuildPrerenderingOptions(CustomAssemblyLoader assemblyLoader, CommandLineOptions commandLineOptions)
         {
             if (string.IsNullOrEmpty(commandLineOptions.IntermediateDir)) throw new ArgumentException("The -i|--intermediatedir parameter is required.");
             if (string.IsNullOrEmpty(commandLineOptions.PublishedDir)) throw new ArgumentException("The -p|--publisheddir parameter is required.");
@@ -58,14 +59,15 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var webRootPath = Path.Combine(commandLineOptions.PublishedDir, "wwwroot");
             var indexHtmlPath = Path.Combine(webRootPath, "index.html");
             var appAssemblyDir = Path.Combine(webRootPath, "_framework");
+            assemblyLoader.AddSerachDir(appAssemblyDir);
 
             var enableGZipCompression = File.Exists(indexHtmlPath + ".gz");
             var enableBrotliCompression = File.Exists(indexHtmlPath + ".br");
 
             var indexHtmlText = GetIndexHtmlText(indexHtmlPath, commandLineOptions.SelectorOfRootComponent);
-            var appAssembly = LoadAssemblyFrom(appAssemblyDir, commandLineOptions.AssemblyName);
+            var appAssembly = assemblyLoader.LoadAssembly(commandLineOptions.AssemblyName);
             if (appAssembly == null) throw new ArgumentException($"The application assembly \"{commandLineOptions.AssemblyName}\" colud not load.");
-            var appComponentType = GetAppComponentType(commandLineOptions.TypeNameOfRootComponent, appAssemblyDir, appAssembly);
+            var appComponentType = GetAppComponentType(assemblyLoader, commandLineOptions.TypeNameOfRootComponent, appAssembly);
 
             var middlewarePackages = Enumerable.Empty<MiddlewarePackageReference>();
             if (!string.IsNullOrEmpty(commandLineOptions.MiddlewarePackages))
@@ -132,7 +134,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             return (indexHtmlTextFirstHalf, indexHtmlTextSecondHalf);
         }
 
-        private static Type GetAppComponentType(string typeNameOfRootComponent, string appAssemblyDir, Assembly appAssembly)
+        private static Type GetAppComponentType(CustomAssemblyLoader assemblyLoader, string typeNameOfRootComponent, Assembly appAssembly)
         {
             var rootComponentAssembly = appAssembly;
 
@@ -141,7 +143,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var rootComponentAssemblyName = rootComponentTypeNameParts.Length > 1 ? rootComponentTypeNameParts[1].Trim() : "";
             if (rootComponentAssemblyName != "")
             {
-                rootComponentAssembly = LoadAssemblyFrom(appAssemblyDir, rootComponentAssemblyName);
+                rootComponentAssembly = assemblyLoader.LoadAssembly(rootComponentAssemblyName);
                 if (rootComponentAssembly == null) throw new ArgumentException($"The assembly that has component type \"{typeNameOfRootComponent}\" colud not load.");
             }
 
@@ -153,7 +155,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                     .Where(asmname => !string.IsNullOrEmpty(asmname.Name))
                     .Where(asmname => !asmname.Name!.StartsWith("Microsoft."))
                     .Where(asmname => !asmname.Name!.StartsWith("System."))
-                    .Select(asmname => LoadAssemblyFrom(appAssemblyDir, asmname.Name!))
+                    .Select(asmname => assemblyLoader.LoadAssembly(asmname.Name!))
                     .Where(asm => asm != null)
                     .Prepend(appAssembly) as IEnumerable<Assembly>;
 
@@ -168,36 +170,13 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             return appComponentType;
         }
 
-        private static Assembly? LoadAssemblyFrom(string assemblyDir, string assemblyName)
+        private static void SetupCustomAssemblyLoader(CustomAssemblyLoader assemblyLoader, BlazorWasmPrerenderingOptions options)
         {
-            var assemblyPath = Path.Combine(assemblyDir, assemblyName);
-            if (!assemblyPath.ToLower().EndsWith(".dll")) assemblyPath += ".dll";
-            if (!File.Exists(assemblyPath)) return null;
-            var assembly = AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(File.ReadAllBytes(assemblyPath)));
-            return assembly;
-        }
-
-        private static void SetupCustomAssemblyLoader(BlazorWasmPrerenderingOptions options)
-        {
-            var searchDirectories = new List<string> {
-                Path.Combine(options.WebRootPath, "_framework")
-            };
-
             var projectDir = GenerateProjectToGetMiddleware(options);
-            if (projectDir != null)
-            {
-                var middlewareDllsDir = GetMiddlewareDlls(projectDir, options.FrameworkName);
-                searchDirectories.Add(middlewareDllsDir);
-            }
+            if (projectDir == null) return;
 
-            AssemblyLoadContext.Default.Resolving += (context, name) =>
-            {
-                if (name.Name == null) return null;
-                return searchDirectories
-                    .Select(dir => LoadAssemblyFrom(dir, name.Name))
-                    .Where(asm => asm != null)
-                    .FirstOrDefault();
-            };
+            var middlewareDllsDir = GetMiddlewareDlls(projectDir, options.FrameworkName);
+            assemblyLoader.AddSerachDir(middlewareDllsDir);
         }
 
         internal static string? GenerateProjectToGetMiddleware(BlazorWasmPrerenderingOptions option)

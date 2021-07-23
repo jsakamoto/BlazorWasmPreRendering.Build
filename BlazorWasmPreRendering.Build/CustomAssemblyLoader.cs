@@ -1,0 +1,44 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Loader;
+
+namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
+{
+    internal class CustomAssemblyLoader
+    {
+        private readonly List<string> _AssemblySearchDirs = new List<string>();
+
+        public CustomAssemblyLoader()
+        {
+            AssemblyLoadContext.Default.Resolving += (context, name) =>
+            {
+                if (name.Name == null) return null;
+                return this._AssemblySearchDirs
+                    .Select(dir => this.LoadAssemblyFrom(dir, name.Name))
+                    .Where(asm => asm != null)
+                    .FirstOrDefault();
+            };
+        }
+
+        private Assembly? LoadAssemblyFrom(string assemblyDir, string assemblyName)
+        {
+            var assemblyPath = Path.Combine(assemblyDir, assemblyName);
+            if (!assemblyPath.ToLower().EndsWith(".dll")) assemblyPath += ".dll";
+            if (!File.Exists(assemblyPath)) return null;
+            var assembly = AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(File.ReadAllBytes(assemblyPath)));
+            return assembly;
+        }
+
+        public void AddSerachDir(string searchDir)
+        {
+            this._AssemblySearchDirs.Add(searchDir);
+        }
+
+        public Assembly? LoadAssembly(string assemblyName)
+        {
+            return AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(assemblyName));
+        }
+    }
+}

@@ -1,7 +1,8 @@
 ﻿@page "/"
+@inject IAppTitle AppTitle
 
 <h1>
-    Welcome to Blazor!
+    Welcome to @AppTitle.GetAppTitle()!
 </h1>
 
 <div>
