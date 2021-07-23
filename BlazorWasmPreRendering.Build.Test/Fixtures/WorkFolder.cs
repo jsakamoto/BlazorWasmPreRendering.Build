@@ -1,10 +1,19 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace BlazorWasmPreRendering.Build.Test.Fixtures
 {
     public class WorkFolder : IDisposable
     {
+        public static string GetSolutionDir()
+        {
+            var slnDir = AppDomain.CurrentDomain.BaseDirectory;
+            while (slnDir != null && !Directory.GetFiles(slnDir, "*.sln", SearchOption.TopDirectoryOnly).Any()) slnDir = Path.GetDirectoryName(slnDir);
+            if (slnDir == null) throw new Exception("The solution dir could not found.");
+            return slnDir;
+        }
+
         private string _Dir { get; }
 
         public WorkFolder()
@@ -19,7 +28,7 @@ namespace BlazorWasmPreRendering.Build.Test.Fixtures
             return folder._Dir;
         }
 
-        public override string ToString() => _Dir;
+        public override string ToString() => this._Dir;
 
         public void Dispose()
         {

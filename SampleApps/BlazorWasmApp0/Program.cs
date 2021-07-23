@@ -12,7 +12,7 @@ namespace BlazorWasmApp0
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("#app");
+            builder.RootComponents.Add<App>("app");
 
             var services = builder.Services;
             var baseAddress = builder.HostEnvironment.BaseAddress;

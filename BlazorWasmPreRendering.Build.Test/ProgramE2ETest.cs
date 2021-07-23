@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -19,10 +17,7 @@ namespace BlazorWasmPreRendering.Build.Test
             // Given
 
             // Publish the sample app
-            var slnDir = AppDomain.CurrentDomain.BaseDirectory;
-            while (slnDir != null && !Directory.GetFiles(slnDir, "*.sln", SearchOption.TopDirectoryOnly).Any()) slnDir = Path.GetDirectoryName(slnDir);
-            if (slnDir == null) throw new Exception("The solution dir could not found.");
-            var sampleAppProjectDir = Path.Combine(slnDir, "SampleApps", "BlazorWasmApp0");
+            var sampleAppProjectDir = Path.Combine(WorkFolder.GetSolutionDir(), "SampleApps", "BlazorWasmApp0");
             using var publishDir = new WorkFolder();
 
             var publishProcess = XProcess.Start(
@@ -38,7 +33,7 @@ namespace BlazorWasmPreRendering.Build.Test
             var exitCode = await Program.Main(new[] {
                 "-a", "BlazorWasmApp0",
                 "-t", "BlazorWasmApp0.App",
-                "-s", "#app",
+                "-s", "#app,app",
                 "-p", publishDir,
                 "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
                 "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
