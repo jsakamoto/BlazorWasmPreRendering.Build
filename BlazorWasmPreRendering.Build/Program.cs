@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using AngleSharp.Html.Parser;
 using CommandLineSwitchParser;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Hosting;
@@ -63,6 +64,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             var indexHtmlText = GetIndexHtmlText(indexHtmlPath, commandLineOptions.SelectorOfRootComponent);
             var appAssembly = LoadAssemblyFrom(appAssemblyDir, commandLineOptions.AssemblyName);
+            if (appAssembly == null) throw new ArgumentException($"The application assembly \"{commandLineOptions.AssemblyName}\" colud not load.");
             var appComponentType = GetAppComponentType(commandLineOptions.TypeNameOfRootComponent, appAssemblyDir, appAssembly);
 
             var middlewarePackages = Enumerable.Empty<MiddlewarePackageReference>();
@@ -94,14 +96,6 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 MiddlewarePackages = middlewarePackages
             };
             return options;
-        }
-
-        private static Assembly LoadAssemblyFrom(string appAssemblyDir, string assemblyName)
-        {
-            var assemblyPath = Path.Combine(appAssemblyDir, assemblyName);
-            if (!assemblyPath.ToLower().EndsWith(".dll")) assemblyPath += ".dll";
-            var assembly = AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(File.ReadAllBytes(assemblyPath)));
-            return assembly;
         }
 
         internal static (string FirstHalf, string SecondHalf) GetIndexHtmlText(string indexHtmlPath, string selectorOfRootComponent)
@@ -141,14 +135,46 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
         private static Type GetAppComponentType(string typeNameOfRootComponent, string appAssemblyDir, Assembly appAssembly)
         {
             var rootComponentAssembly = appAssembly;
+
             var rootComponentTypeNameParts = typeNameOfRootComponent.Split(',');
             var rootComponentTypeName = rootComponentTypeNameParts[0].Trim();
             var rootComponentAssemblyName = rootComponentTypeNameParts.Length > 1 ? rootComponentTypeNameParts[1].Trim() : "";
-            if (rootComponentAssemblyName != "") rootComponentAssembly = LoadAssemblyFrom(appAssemblyDir, rootComponentAssemblyName);
+            if (rootComponentAssemblyName != "")
+            {
+                rootComponentAssembly = LoadAssemblyFrom(appAssemblyDir, rootComponentAssemblyName);
+                if (rootComponentAssembly == null) throw new ArgumentException($"The assembly that has component type \"{typeNameOfRootComponent}\" colud not load.");
+            }
 
             var appComponentType = rootComponentAssembly.GetType(rootComponentTypeName);
+
+            if (appComponentType == null)
+            {
+                var assemblies = appAssembly.GetReferencedAssemblies()
+                    .Where(asmname => !string.IsNullOrEmpty(asmname.Name))
+                    .Where(asmname => !asmname.Name!.StartsWith("Microsoft."))
+                    .Where(asmname => !asmname.Name!.StartsWith("System."))
+                    .Select(asmname => LoadAssemblyFrom(appAssemblyDir, asmname.Name!))
+                    .Where(asm => asm != null)
+                    .Prepend(appAssembly) as IEnumerable<Assembly>;
+
+                appComponentType = assemblies
+                    .SelectMany(asm => asm.GetTypes())
+                    .Where(t => t.Name == "App")
+                    .Where(t => t.IsSubclassOf(typeof(ComponentBase)))
+                    .FirstOrDefault();
+            }
+
             if (appComponentType == null) throw new ArgumentException($"The component type \"{typeNameOfRootComponent}\" was not found.");
             return appComponentType;
+        }
+
+        private static Assembly? LoadAssemblyFrom(string assemblyDir, string assemblyName)
+        {
+            var assemblyPath = Path.Combine(assemblyDir, assemblyName);
+            if (!assemblyPath.ToLower().EndsWith(".dll")) assemblyPath += ".dll";
+            if (!File.Exists(assemblyPath)) return null;
+            var assembly = AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(File.ReadAllBytes(assemblyPath)));
+            return assembly;
         }
 
         private static void SetupCustomAssemblyLoader(BlazorWasmPrerenderingOptions options)
@@ -166,13 +192,11 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             AssemblyLoadContext.Default.Resolving += (context, name) =>
             {
-                var asemblyPath = searchDirectories
-                    .Select(dir => Path.Combine(dir, name.Name + ".dll"))
-                    .FirstOrDefault(path => File.Exists(path));
-                if (asemblyPath == null) return null;
-
-                var assemblyBytes = File.ReadAllBytes(asemblyPath);
-                return context.LoadFromStream(new MemoryStream(assemblyBytes));
+                if (name.Name == null) return null;
+                return searchDirectories
+                    .Select(dir => LoadAssemblyFrom(dir, name.Name))
+                    .Where(asm => asm != null)
+                    .FirstOrDefault();
             };
         }
 
