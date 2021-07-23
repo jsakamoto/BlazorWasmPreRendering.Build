@@ -1,2 +1,7 @@
-v.1.0.0
+v.1.0.0-preview.5
+- The default root component selector will find both "&lt;div id='app'&gt;...&lt;/div&gt;" and "&lt;app&gt;...&lt;/app&gt;".
+- The root component type specification can include an assembly name.
+- Find root component type from all assemblies if the specified type is not found.
+
+v.1.0.0-preview.4.1
 - 1st release.
