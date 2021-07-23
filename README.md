@@ -75,7 +75,7 @@ This is important to your Blazor WebAssembly components work fine in the pre-ren
 
 ### Root component type and selector
 
-In some cases, suppose the type and selector of the root component of your Blazor WebAssembly app are not "{RootNamespace}.App" and "#app". 
+In some cases, suppose the type and selector of the root component of your Blazor WebAssembly app are not `{RootNamespace}.App` and `#app` or `app`. 
 
 In that case, you have to describe that information explicitly in the project file (.csproj) of your Blazor WebAssembly app, like this.
 
@@ -89,6 +89,21 @@ In that case, you have to describe that information explicitly in the project fi
   </PropertyGroup>
   ...
 ```
+
+If the root component doesn't live in the application assembly, you can specify assembly name in the `<BlazorWasmPrerenderingRootComponentType>` peoperty value, like this.
+
+```xml
+<!-- This is the .csproj file of your Blazor WebAssembly app -->
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  ...
+  <PropertyGroup>
+    <BlazorWasmPrerenderingRootComponentType>My.Custom.RootComponentClass, My.CustomAssembly</BlazorWasmPrerenderingRootComponentType>
+    ...
+```
+
+### Note: If the specified type was not found...
+
+If the specified type was not found, as a fallback behavior, this package tries to find the root component type (which has the type name "App" and inherits `ComponentBase` type) **from all assemblies that referenced from the application assembly**.
 
 ## Appendix
 
