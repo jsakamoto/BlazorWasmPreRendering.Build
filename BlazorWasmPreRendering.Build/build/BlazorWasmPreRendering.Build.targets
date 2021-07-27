@@ -7,11 +7,13 @@
   <!-- Define Properties -->
   <Target Name="BlazorWasmPrerendering_DefineProperties" DependsOnTargets="$(BeforeBlazorWasmPrerendering)">
     <PropertyGroup>
+      <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net5')) ">net5.0</BlazorWasmPrerenderingTFM>
+      <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net6')) ">net6.0</BlazorWasmPrerenderingTFM>
       <BlazorWasmPrerenderingPublishDir Condition=" '$(BlazorWasmPrerenderingPublishDir)' == '' ">$([System.IO.Path]::GetFullPath('$(PublishDir)').TrimEnd('\').TrimEnd('/'))</BlazorWasmPrerenderingPublishDir>
       <BlazorWasmPrerenderingAssembly Condition=" '$(BlazorWasmPrerenderingAssembly)' == '' ">$(AssemblyName)</BlazorWasmPrerenderingAssembly>
       <BlazorWasmPrerenderingRootComponentType Condition=" '$(BlazorWasmPrerenderingRootComponentType)' == '' ">$(RootNamespace).App</BlazorWasmPrerenderingRootComponentType>
       <BlazorWasmPrerenderingRootComponentSelector Condition=" '$(BlazorWasmPrerenderingRootComponentSelector)' == '' ">#app,app</BlazorWasmPrerenderingRootComponentSelector>
-      <BlazorWasmPrerenderingServerDll Condition=" '$(BlazorWasmPrerenderingServerDll)' == '' ">$(MSBuildThisFileDirectory)../tools/$(TargetFramework)/blazorwasm-prerendering-server.dll</BlazorWasmPrerenderingServerDll>
+      <BlazorWasmPrerenderingServerDll Condition=" '$(BlazorWasmPrerenderingServerDll)' == '' ">$(MSBuildThisFileDirectory)../tools/$(BlazorWasmPrerenderingTFM)/blazorwasm-prerendering-server.dll</BlazorWasmPrerenderingServerDll>
       <BlazorWasmPrerenderingIntermediateDir Condition=" '$(BlazorWasmPrerenderingIntermediateDir)' == '' ">$(ProjectDir)$(IntermediateOutputPath).</BlazorWasmPrerenderingIntermediateDir>
       <BlazorWasmPrerenderingMiddlewareArg Condition=" '$(BlazorWasmPrerenderingMiddlewarePackages)' == '' ">@(BlazorWasmPrerenderMiddleware->'%(Identity),%(Assembly),%(Version)')</BlazorWasmPrerenderingMiddlewareArg>
     </PropertyGroup>
@@ -30,6 +32,6 @@
           AfterTargets="Publish"
           DependsOnTargets="BlazorWasmPrerendering_DefineProperties"
           Condition=" '$(BlazorWasmPrerendering)' != 'disable' ">
-    <Exec Command="dotnet &quot;$(BlazorWasmPrerenderingServerDll)&quot; -a &quot;$(BlazorWasmPrerenderingAssembly)&quot; -t &quot;$(BlazorWasmPrerenderingRootComponentType)&quot; -s &quot;$(BlazorWasmPrerenderingRootComponentSelector)&quot; -p &quot;$(BlazorWasmPrerenderingPublishDir)&quot; -i &quot;$(BlazorWasmPrerenderingIntermediateDir)&quot; -m &quot;$(BlazorWasmPrerenderingMiddlewareArg)&quot; -f &quot;$(TargetFramework)&quot;" />
+    <Exec Command="dotnet &quot;$(BlazorWasmPrerenderingServerDll)&quot; -a &quot;$(BlazorWasmPrerenderingAssembly)&quot; -t &quot;$(BlazorWasmPrerenderingRootComponentType)&quot; -s &quot;$(BlazorWasmPrerenderingRootComponentSelector)&quot; -p &quot;$(BlazorWasmPrerenderingPublishDir)&quot; -i &quot;$(BlazorWasmPrerenderingIntermediateDir)&quot; -m &quot;$(BlazorWasmPrerenderingMiddlewareArg)&quot; -f &quot;$(BlazorWasmPrerenderingTFM)&quot;" />
   </Target>
 </Project>
