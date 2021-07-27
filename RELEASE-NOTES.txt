@@ -1,3 +1,6 @@
+v.1.0.0-preview.6
+- Improved support for various target framework monikers.
+
 v.1.0.0-preview.5
 - The default root component selector will find both "&lt;div id='app'&gt;...&lt;/div&gt;" and "&lt;app&gt;...&lt;/app&gt;".
 - The root component type specification can include an assembly name.
