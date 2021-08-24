@@ -13,11 +13,7 @@ namespace BlazorWasmApp0
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
-
-            var services = builder.Services;
-            var baseAddress = builder.HostEnvironment.BaseAddress;
-            ConfigureServices(services, baseAddress);
-
+            ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
             await builder.Build().RunAsync();
         }
 

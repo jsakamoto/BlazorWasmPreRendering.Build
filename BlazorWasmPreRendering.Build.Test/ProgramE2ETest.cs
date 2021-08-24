@@ -55,6 +55,7 @@ namespace BlazorWasmPreRendering.Build.Test
             using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
             using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
 
+            // NOTICE: The document title was rendered by the "Head Element Helper" server-side renderer middleware.
             rootIndexHtml.Title.Is("Home | Blazor Wasm App 0");
             aboutIndexHtml.Title.Is("About | Blazor Wasm App 0");
 
