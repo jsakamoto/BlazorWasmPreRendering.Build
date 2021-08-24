@@ -35,7 +35,7 @@ namespace BlazorWasmPreRendering.Build.Test
                 "-t", "BlazorWasmApp0.App",
                 "-s", "#app,app",
                 "-p", publishDir,
-                "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
+                "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net6.0"),
                 "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
                 "-f", "net5.0"
             });
