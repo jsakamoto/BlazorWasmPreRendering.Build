@@ -21,8 +21,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         public Startup(IConfiguration configuration, BlazorWasmPrerenderingOptions prerenderingOptions)
         {
-            Configuration = configuration;
-            PrerenderingOptions = prerenderingOptions;
+            this.Configuration = configuration;
+            this.PrerenderingOptions = prerenderingOptions;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -40,10 +40,14 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         private void ConfigureApplicationServices(IServiceCollection services, string baseAddress)
         {
-            var programClass = this.PrerenderingOptions.ApplicationAssembly.GetTypes().FirstOrDefault(t => t.Name == "Program");
+            var programClass = this.PrerenderingOptions.ApplicationAssembly
+                .GetTypes()
+                .FirstOrDefault(t => t.Name == "Program" || t.Name == "<Program>$");
             if (programClass == null) return;
 
-            var configureServicesMethod = programClass.GetMethod("ConfigureServices", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            var configureServicesMethod = programClass
+                .GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                .FirstOrDefault(m => m.Name == "ConfigureServices" || m.Name.Split('|').First().EndsWith(">g__ConfigureServices"));
             if (configureServicesMethod == null) return;
 
             var arguments = new List<object?>();
@@ -75,7 +79,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             app.UseDeveloperExceptionPage();
 
-            ConfigureApplicationMiddleware(app);
+            this.ConfigureApplicationMiddleware(app);
 
             app.UseStaticFiles(new StaticFileOptions { ServeUnknownFileTypes = true });
             app.UseRouting();
