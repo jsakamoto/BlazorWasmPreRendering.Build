@@ -69,7 +69,31 @@ public class Program
 }
 ```
 
-This package calls the `ConfigureServices()` static method inside of your Blazor WebAssembly app when pre-renders it if that method exists.
+And, if you implement the entry point as C# 9 top-level statement style, then you have to also extract the service-registration process to the static local function named `static void ConfigureServices(IServiceCollection services, string baseAddress)`.
+
+> _**NOTICE:** The "ConfigureServices" local function must be **"static"** local function._
+
+```csharp
+// The "Program.cs" that is C# 9 top-level statement style entry point.
+
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+
+ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
+
+await builder.Build().RunAsync();
+
+// 👇 extract the service-registration process to the static local function.
+static void ConfigureServices(IServiceCollection services, string baseAddress)
+{
+  services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
+  services.AddScoped<IFoo, MyFoo>();
+}
+```
+
+> _Aside: C# 9 top-level statement style entry point can be used for only .NET6 or above._
+
+This package calls the `ConfigureServices()` static method (or static local function) inside of your Blazor WebAssembly app when pre-renders it if that method exists.
 
 This is important to your Blazor WebAssembly components work fine in the pre-rendering process.
 
