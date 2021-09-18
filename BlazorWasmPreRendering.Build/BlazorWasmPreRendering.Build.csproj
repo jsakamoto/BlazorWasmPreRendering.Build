@@ -6,6 +6,7 @@
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <AssemblyName>blazorwasm-prerendering-server</AssemblyName>
     <RootNamespace>Toolbelt.Blazor.WebAssembly.PrerenderServer</RootNamespace>
+    <DefineConstants Condition=" '$(TargetFramework)' == 'net6.0' ">$(DefineConstants);ENABLE_HEADOUTLET;</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -33,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0-preview.3.21201.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0-preview.7.21378.6" />
   </ItemGroup>
 
   <!-- Pack settings -->

@@ -33,7 +33,8 @@ namespace BlazorWasmPreRendering.Build.Test
             var exitCode = await Program.Main(new[] {
                 "-a", "BlazorWasmApp0",
                 "-t", "BlazorWasmApp0.App",
-                "-s", "#app,app",
+                "--selectorofrootcomponent", "#app,app",
+                "--selectorofheadoutletcomponent", "head::after",
                 "-p", publishDir,
                 "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net6.0"),
                 "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
@@ -90,7 +91,8 @@ namespace BlazorWasmPreRendering.Build.Test
             var exitCode = await Program.Main(new[] {
                 "-a", "BlazorWasmApp2.Client",
                 "-t", "BlazorWasmApp2.Components.App, BlazorWasmApp2.Components", // INCLUDES ASSEMBLY NAME
-                "-s", "#app,app",
+                "--selectorofrootcomponent", "#app,app",
+                "--selectorofheadoutletcomponent", "head::after",
                 "-p", publishDir,
                 "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
                 "-m", "",
@@ -138,7 +140,8 @@ namespace BlazorWasmPreRendering.Build.Test
             var exitCode = await Program.Main(new[] {
                 "-a", "BlazorWasmApp2.Client",
                 "-t", "BlazorWasmApp2.Client.App", // INVALID TYPE NAME OF ROOT COMPONENT
-                "-s", "#app,app",
+                "--selectorofrootcomponent", "#app,app",
+                "--selectorofheadoutletcomponent", "head::after",
                 "-p", publishDir,
                 "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
                 "-m", "",

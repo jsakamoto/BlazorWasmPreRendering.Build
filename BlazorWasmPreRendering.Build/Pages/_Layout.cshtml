@@ -1,0 +1,13 @@
+@using Toolbelt.Blazor.WebAssembly.PrerenderServer
+@inject BlazorWasmPrerenderingOptions BlazorWasmPrerenderingOptions
+@Html.Raw(BlazorWasmPrerenderingOptions.IndexHtmlFragments.FirstPart)
+<!-- %%-PRERENDERING-HEADOUTLET-BEGIN-%% -->
+@if (BlazorWasmPrerenderingOptions.HeadOutletComponentType != null) { await Html.RenderComponentAsync(BlazorWasmPrerenderingOptions.HeadOutletComponentType, RenderMode.Static, parameters: null); }
+<!-- %%-PRERENDERING-HEADOUTLET-END-%% -->
+@Html.Raw(BlazorWasmPrerenderingOptions.IndexHtmlFragments.MiddlePart)
+<!-- %%-PRERENDERING-BEGIN-%% -->
+<div style="opacity: 0; position: fixed; z-index: -1; top: 0; left: 0; bottom: 0; right: 0;">
+    @RenderBody()
+</div>
+<!-- %%-PRERENDERING-END-%% -->
+@Html.Raw(BlazorWasmPrerenderingOptions.IndexHtmlFragments.LastPart)
