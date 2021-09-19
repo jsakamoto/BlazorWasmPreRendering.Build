@@ -1,8 +1,9 @@
 @using Toolbelt.Blazor.WebAssembly.PrerenderServer
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @inject BlazorWasmPrerenderingOptions BlazorWasmPrerenderingOptions
 @Html.Raw(BlazorWasmPrerenderingOptions.IndexHtmlFragments.FirstPart)
 <!-- %%-PRERENDERING-HEADOUTLET-BEGIN-%% -->
-@if (BlazorWasmPrerenderingOptions.HeadOutletComponentType != null) { await Html.RenderComponentAsync(BlazorWasmPrerenderingOptions.HeadOutletComponentType, RenderMode.Static, parameters: null); }
+@if (BlazorWasmPrerenderingOptions.HeadOutletComponentType != null) {<component type="BlazorWasmPrerenderingOptions.HeadOutletComponentType" render-mode="Static" />}
 <!-- %%-PRERENDERING-HEADOUTLET-END-%% -->
 @Html.Raw(BlazorWasmPrerenderingOptions.IndexHtmlFragments.MiddlePart)
 <!-- %%-PRERENDERING-BEGIN-%% -->
