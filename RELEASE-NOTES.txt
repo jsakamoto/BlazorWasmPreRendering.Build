@@ -1,3 +1,6 @@
+v.1.0.0-preview.8
+- Improve: The .NET6 "PageTitle" and "HeadContnet" components are also pre-rendered statically.
+
 v.1.0.0-preview.7
 - Add support to the implementation that is C# 9 top-level statement style.
 
