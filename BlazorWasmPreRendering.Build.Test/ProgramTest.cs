@@ -107,25 +107,5 @@ namespace BlazorWasmPreRendering.Build.Test
             var targetAssemblyPath = Path.Combine(outputDir, "Toolbelt.Blazor.HeadElement.ServerPrerendering.dll");
             File.Exists(targetAssemblyPath).IsTrue();
         }
-
-        [Test]
-        public void GetIndexHtmlText_Test()
-        {
-            // Given
-            var indexHtmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "index (2).html");
-
-            // When
-            var indexHtmlText = Program.GetIndexHtmlText(indexHtmlPath, "#app");
-
-            // Then
-            indexHtmlText.FirstHalf.Is(
-                "<!DOCTYPE html><html><head></head><body>\n" +
-                "    <div id=\"app\">\n" +
-                "        <div>Loading...</div>\n" +
-                "        <img src=\"foo.png\"/>\n" +
-                "    ");
-            indexHtmlText.SecondHalf.Is(
-                "</div>\n\n</body></html>");
-        }
     }
 }

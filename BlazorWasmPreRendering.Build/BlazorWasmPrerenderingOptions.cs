@@ -11,11 +11,15 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         public Assembly ApplicationAssembly { get; init; } = null!;
 
+
+
         public Type RootComponentType { get; init; } = null!;
 
-        public string IndexHtmlTextFirstHalf { get; init; } = "";
+        public Type? HeadOutletComponentType { get; init; } = null;
 
-        public string IndexHtmlTextSecondHalf { get; init; } = "";
+        public IndexHtmlFragments IndexHtmlFragments { get; init; } = null!;
+
+
 
         public bool EnableGZipCompression { get; init; }
 

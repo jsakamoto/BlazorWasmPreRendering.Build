@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using AngleSharp.Html.Parser;
 using CommandLineSwitchParser;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -53,7 +52,10 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             if (string.IsNullOrEmpty(commandLineOptions.PublishedDir)) throw new ArgumentException("The -p|--publisheddir parameter is required.");
             if (string.IsNullOrEmpty(commandLineOptions.AssemblyName)) throw new ArgumentException("The -a|--assemblyname parameter is required.");
             if (string.IsNullOrEmpty(commandLineOptions.TypeNameOfRootComponent)) throw new ArgumentException("The -t|--typenameofrootcomponent parameter is required.");
-            if (string.IsNullOrEmpty(commandLineOptions.SelectorOfRootComponent)) throw new ArgumentException("The -s|--selectorofrootcomponent parameter is required.");
+            if (string.IsNullOrEmpty(commandLineOptions.SelectorOfRootComponent)) throw new ArgumentException("The --selectorofrootcomponent parameter is required.");
+#if ENABLE_HEADOUTLET
+            if (string.IsNullOrEmpty(commandLineOptions.SelectorOfHeadOutletComponent)) throw new ArgumentException("The --selectorofheadoutletcomponent parameter is required.");
+#endif
             if (string.IsNullOrEmpty(commandLineOptions.FrameworkName)) throw new ArgumentException("The -f|--frameworkname parameter is required.");
 
             var webRootPath = Path.Combine(commandLineOptions.PublishedDir, "wwwroot");
@@ -64,7 +66,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var enableGZipCompression = File.Exists(indexHtmlPath + ".gz");
             var enableBrotliCompression = File.Exists(indexHtmlPath + ".br");
 
-            var indexHtmlText = GetIndexHtmlText(indexHtmlPath, commandLineOptions.SelectorOfRootComponent);
+
             var appAssembly = assemblyLoader.LoadAssembly(commandLineOptions.AssemblyName);
             if (appAssembly == null) throw new ArgumentException($"The application assembly \"{commandLineOptions.AssemblyName}\" colud not load.");
             var appComponentType = GetAppComponentType(assemblyLoader, commandLineOptions.TypeNameOfRootComponent, appAssembly);
@@ -84,54 +86,25 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                     .ToArray();
             }
 
+            var htmlFragment = IndexHtmlFragments.Load(indexHtmlPath, commandLineOptions.SelectorOfRootComponent, commandLineOptions.SelectorOfHeadOutletComponent);
             var options = new BlazorWasmPrerenderingOptions
             {
                 IntermediateDir = commandLineOptions.IntermediateDir,
                 FrameworkName = commandLineOptions.FrameworkName,
-                IndexHtmlTextFirstHalf = indexHtmlText.FirstHalf,
-                IndexHtmlTextSecondHalf = indexHtmlText.SecondHalf,
                 WebRootPath = webRootPath,
                 ApplicationAssembly = appAssembly,
+
                 RootComponentType = appComponentType,
+#if ENABLE_HEADOUTLET
+                HeadOutletComponentType = typeof(Microsoft.AspNetCore.Components.Web.HeadOutlet),
+#endif
+                IndexHtmlFragments = htmlFragment,
+
                 EnableGZipCompression = enableGZipCompression,
                 EnableBrotliCompression = enableBrotliCompression,
                 MiddlewarePackages = middlewarePackages
             };
             return options;
-        }
-
-        internal static (string FirstHalf, string SecondHalf) GetIndexHtmlText(string indexHtmlPath, string selectorOfRootComponent)
-        {
-            var indexHtmlText = File.ReadAllText(indexHtmlPath);
-            indexHtmlText = indexHtmlText.Replace("\r\n", "\n");
-
-            const string preRenderMarkerBegin = "\n<!-- %%-PRERENDERING-BEGIN-%% -->\n";
-            const string preRenderMarkerEnd = "\n<!-- %%-PRERENDERING-END-%% -->\n";
-            var indexOfPreRenderMarkerBegin = indexHtmlText.IndexOf(preRenderMarkerBegin);
-            var indexOfPreRenderMarkerEnd = indexHtmlText.IndexOf(preRenderMarkerEnd);
-            if (indexOfPreRenderMarkerBegin != -1 && indexOfPreRenderMarkerEnd != -1)
-            {
-                indexHtmlText =
-                    indexHtmlText[0..indexOfPreRenderMarkerBegin] +
-                    indexHtmlText[(indexOfPreRenderMarkerEnd + preRenderMarkerEnd.Length)..];
-            }
-
-            const string markerText = "%%-INSERT-PRERENDERING-HERE-%%";
-            const string markerComment = "<!--" + markerText + "-->";
-            var parser = new HtmlParser();
-            var indexHtmlDoc = parser.ParseDocument(indexHtmlText);
-            var appRootComponentElement = indexHtmlDoc.QuerySelector(selectorOfRootComponent);
-            appRootComponentElement.AppendChild(indexHtmlDoc.CreateComment(markerText));
-
-            using var stringWriter = new StringWriter();
-            indexHtmlDoc.ToHtml(stringWriter, new CustomHtmlMarkupFormatter());
-            indexHtmlText = stringWriter.ToString();
-
-            var indexOfMarker = indexHtmlText.IndexOf(markerComment);
-            var indexHtmlTextFirstHalf = indexHtmlText[0..indexOfMarker];
-            var indexHtmlTextSecondHalf = indexHtmlText[(indexOfMarker + markerComment.Length)..];
-
-            return (indexHtmlTextFirstHalf, indexHtmlTextSecondHalf);
         }
 
         private static Type GetAppComponentType(CustomAssemblyLoader assemblyLoader, string typeNameOfRootComponent, Assembly appAssembly)

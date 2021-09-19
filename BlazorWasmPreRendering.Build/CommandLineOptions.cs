@@ -12,7 +12,9 @@
 
         public string? SelectorOfRootComponent { get; set; } = "#app";
 
-        public string? MiddlewarePackages { get; set; }
+        public string? SelectorOfHeadOutletComponent { get; set; } = "head::after";
+
+		public string? MiddlewarePackages { get; set; }
 
         public string? FrameworkName { get; set; }
 
