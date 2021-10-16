@@ -1,3 +1,7 @@
+v.1.0.0-preview.9
+- Upgrade .NET6 support to RC2.
+- Fix: in .NET 6 SDK that wasm-tools workload is installed, the transformation runs twice.
+
 v.1.0.0-preview.8
 - Improve: The .NET6 "PageTitle" and "HeadContnet" components are also pre-rendered statically.
 
