@@ -20,13 +20,13 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="PrepareBlazorWasmPrerendering"
-          AfterTargets="Build"
-          DependsOnTargets="BlazorWasmPrerendering_DefineProperties"
-          Condition=" '$(BlazorWasmPrerendering)' != 'disable' ">
-    <Delete Files="$(BlazorWasmPrerenderingPublishDir)/wwwroot/index.html" />
-    <Delete Files="$(BlazorWasmPrerenderingPublishDir)/wwwroot/index.html.br" />
-    <Delete Files="$(BlazorWasmPrerenderingPublishDir)/wwwroot/index.html.gz" />
+  <Target Name="PrepareBlazorWasmPrerendering" AfterTargets="Build" Condition=" '$(BlazorWasmPrerendering)' != 'disable' ">
+    <PropertyGroup>
+      <BlazorWasmPrerenderingPrevPublishDir Condition=" '$(BlazorWasmPrerenderingPrevPublishDir)' == '' ">$([System.IO.Path]::GetFullPath('$(PublishDir)').TrimEnd('\').TrimEnd('/'))</BlazorWasmPrerenderingPrevPublishDir>
+    </PropertyGroup>
+    <Delete Files="$(BlazorWasmPrerenderingPrevPublishDir)/wwwroot/index.html" />
+    <Delete Files="$(BlazorWasmPrerenderingPrevPublishDir)/wwwroot/index.html.br" />
+    <Delete Files="$(BlazorWasmPrerenderingPrevPublishDir)/wwwroot/index.html.gz" />
   </Target>
 
   <!--
