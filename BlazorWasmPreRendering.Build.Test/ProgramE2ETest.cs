@@ -4,6 +4,7 @@ using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using BlazorWasmPreRendering.Build.Test.Fixtures;
 using NUnit.Framework;
+using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer;
 using Toolbelt.Diagnostics;
 
@@ -22,7 +23,7 @@ namespace BlazorWasmPreRendering.Build.Test
 
             var publishProcess = XProcess.Start(
                 "dotnet",
-                $"publish -c:Debug -p:BlazorEnableCompression=false -o:\"{publishDir}\"",
+                $"publish -c:Debug -p:BlazorEnableCompression=false -p:BlazorWasmPrerendering=disable -o:\"{publishDir}\"",
                 workingDirectory: sampleAppProjectDir);
             await publishProcess.WaitForExitAsync();
             publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);
@@ -45,28 +46,8 @@ namespace BlazorWasmPreRendering.Build.Test
             // Then
 
             // Validate prerendered contents.
-
             var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-            var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
-            var aboutIndexHtmlPath = Path.Combine(wwwrootDir, "about", "index.html");
-            File.Exists(rootIndexHtmlPath).IsTrue();
-            File.Exists(aboutIndexHtmlPath).IsTrue();
-
-            var htmlParser = new HtmlParser();
-            using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
-            using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
-
-            // NOTICE: The document title was rendered by the <HeadOutlet> component of .NET 6.
-            rootIndexHtml.Title.Is("Home | Blazor Wasm App 0");
-            aboutIndexHtml.Title.Is("About | Blazor Wasm App 0");
-
-            rootIndexHtml.QuerySelector("h1").TextContent.Is("Home");
-            aboutIndexHtml.QuerySelector("h1").TextContent.Is("About");
-
-            rootIndexHtml.QuerySelector("a").TextContent.Is("about");
-            (rootIndexHtml.QuerySelector("a") as IHtmlAnchorElement)!.Href.Is("about:///about");
-            aboutIndexHtml.QuerySelector("a").TextContent.Is("home");
-            (aboutIndexHtml.QuerySelector("a") as IHtmlAnchorElement)!.Href.Is("about:///");
+            ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
         }
 
         [Test]
@@ -223,6 +204,69 @@ namespace BlazorWasmPreRendering.Build.Test
 
             rootIndexHtml.QuerySelector("h1").TextContent.Trim().Is("Welcome to Blazor Wasm App 2!");
             aboutIndexHtml.QuerySelector("h1").TextContent.Trim().Is("About Page");
+        }
+
+        [Test]
+        public async Task Publish_Test()
+        {
+            // Given
+            var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
+            var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
+            using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
+
+            // When
+            var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Debug -p:BlazorEnableCompression=false -o:bin/publish", workDir).WaitForExitAsync();
+            dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
+
+            // Then
+
+            // Validate prerendered contents.
+            var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
+            ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
+        }
+
+        [Test]
+        public async Task Publish_by_msbuild_Test()
+        {
+            // Given
+            var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
+            var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
+            using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
+
+            // When
+            await XProcess.Start("dotnet", "restore", workDir).WaitForExitAsync();
+            var dotnetCLI = await XProcess.Start("dotnet", "msbuild -p:Configuration=Debug -p:BlazorEnableCompression=false -p:DeployOnBuild=true -p:PublishUrl=bin/publish", workDir).WaitForExitAsync();
+            dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
+
+            // Then
+
+            // Validate prerendered contents.
+            var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
+            ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
+        }
+
+        private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir)
+        {
+            var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
+            var aboutIndexHtmlPath = Path.Combine(wwwrootDir, "about", "index.html");
+            File.Exists(rootIndexHtmlPath).IsTrue();
+            File.Exists(aboutIndexHtmlPath).IsTrue();
+
+            var htmlParser = new HtmlParser();
+            using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
+            using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
+
+            // NOTICE: The document title was rendered by the <HeadOutlet> component of .NET 6.
+            rootIndexHtml.Title.Is("Home | Blazor Wasm App 0");
+            aboutIndexHtml.Title.Is("About | Blazor Wasm App 0");
+
+            rootIndexHtml.QuerySelector("h1").TextContent.Is("Home");
+            aboutIndexHtml.QuerySelector("h1").TextContent.Is("About");
+
+            rootIndexHtml.QuerySelector("a").TextContent.Is("about");
+            (rootIndexHtml.QuerySelector("a") as IHtmlAnchorElement)!.Href.Is("about:///about");
+            aboutIndexHtml.QuerySelector("a").TextContent.Is("home");
+            (aboutIndexHtml.QuerySelector("a") as IHtmlAnchorElement)!.Href.Is("about:///");
         }
     }
 }
