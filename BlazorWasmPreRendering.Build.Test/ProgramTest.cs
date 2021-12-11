@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
-using BlazorWasmPreRendering.Build.Test.Fixtures;
 using NUnit.Framework;
+using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer;
 
 namespace BlazorWasmPreRendering.Build.Test
@@ -13,7 +13,7 @@ namespace BlazorWasmPreRendering.Build.Test
         public void BuildPrerenderingOptions_Test()
         {
             // Given
-            using var workFolder = new WorkFolder();
+            using var workFolder = new WorkDirectory();
             var cmdlineOptions = new CommandLineOptions
             {
                 IntermediateDir = workFolder,
@@ -46,7 +46,7 @@ namespace BlazorWasmPreRendering.Build.Test
         public void GenerateProjectToGetMiddleware_Test()
         {
             // Given
-            using var workFolder = new WorkFolder();
+            using var workFolder = new WorkDirectory();
             var option = new BlazorWasmPrerenderingOptions
             {
                 IntermediateDir = workFolder,
@@ -75,7 +75,7 @@ namespace BlazorWasmPreRendering.Build.Test
         public void GenerateProjectToGetMiddleware_IfEmpty_Test()
         {
             // Given
-            using var workFolder = new WorkFolder();
+            using var workFolder = new WorkDirectory();
             var option = new BlazorWasmPrerenderingOptions
             {
                 IntermediateDir = workFolder,
@@ -94,7 +94,7 @@ namespace BlazorWasmPreRendering.Build.Test
         public void GetMiddlewareDlls_Test()
         {
             // Given
-            using var workFolder = new WorkFolder();
+            using var workFolder = new WorkDirectory();
             var templateProjectFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "ExpectedProjectFile.xml");
             var targetProjectFilePath = Path.Combine(workFolder, "Project.csproj");
             File.Copy(templateProjectFilePath, targetProjectFilePath);

@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
-using BlazorWasmPreRendering.Build.Test.Fixtures;
 using NUnit.Framework;
 using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer;
@@ -18,8 +17,9 @@ namespace BlazorWasmPreRendering.Build.Test
             // Given
 
             // Publish the sample app which sets its titles by .NET 6 <PageTitle>.
-            var sampleAppProjectDir = Path.Combine(WorkFolder.GetSolutionDir(), "SampleApps", "BlazorWasmApp0");
-            using var publishDir = new WorkFolder();
+            var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
+            var sampleAppProjectDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
+            using var publishDir = new WorkDirectory();
 
             var publishProcess = XProcess.Start(
                 "dotnet",
@@ -56,8 +56,9 @@ namespace BlazorWasmPreRendering.Build.Test
             // Given
 
             // Publish the sample app which sets its titles by Toolbelt.Blazor.HeadElement
-            var sampleAppProjectDir = Path.Combine(WorkFolder.GetSolutionDir(), "SampleApps", "BlazorWasmApp1");
-            using var publishDir = new WorkFolder();
+            var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
+            var sampleAppProjectDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp1");
+            using var publishDir = new WorkDirectory();
 
             var publishProcess = XProcess.Start(
                 "dotnet",
@@ -114,8 +115,9 @@ namespace BlazorWasmPreRendering.Build.Test
             // Given
 
             // Publish the sample app
-            var sampleAppProjectDir = Path.Combine(WorkFolder.GetSolutionDir(), "SampleApps", "BlazorWasmApp2", "Client");
-            using var publishDir = new WorkFolder();
+            var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
+            var sampleAppProjectDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp2", "Client");
+            using var publishDir = new WorkDirectory();
 
             var publishProcess = XProcess.Start(
                 "dotnet",
@@ -163,8 +165,9 @@ namespace BlazorWasmPreRendering.Build.Test
             // Given
 
             // Publish the sample app
-            var sampleAppProjectDir = Path.Combine(WorkFolder.GetSolutionDir(), "SampleApps", "BlazorWasmApp2", "Client");
-            using var publishDir = new WorkFolder();
+            var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
+            var sampleAppProjectDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp2", "Client");
+            using var publishDir = new WorkDirectory();
 
             var publishProcess = XProcess.Start(
                 "dotnet",
