@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -38,7 +39,16 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         public Assembly? LoadAssembly(string assemblyName)
         {
-            return AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(assemblyName));
+            try
+            {
+                return AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(assemblyName));
+            }
+            catch (Exception ex)
+            {
+                var pwd = Environment.CurrentDirectory;
+                var searchDirs = string.Join('\n', _AssemblySearchDirs);
+                throw new Exception($"Could not load the assembly \"{assemblyName}\" in search directories below.\n{searchDirs}\n(pwd: {pwd})", ex);
+            }
         }
     }
 }
