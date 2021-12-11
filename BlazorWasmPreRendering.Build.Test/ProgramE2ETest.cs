@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -217,15 +218,20 @@ namespace BlazorWasmPreRendering.Build.Test
             var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
             using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
 
-            // When
-            var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Debug -p:BlazorEnableCompression=false -o:bin/publish", workDir).WaitForExitAsync();
-            dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
+            for (var i = 0; i < 2; i++)
+            {
+                Console.WriteLine($"{(i == 0 ? "1st" : "2nd")} time publishing...");
 
-            // Then
+                // When
+                var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Debug -p:BlazorEnableCompression=false -o:bin/publish", workDir).WaitForExitAsync();
+                dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
 
-            // Validate prerendered contents.
-            var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
-            ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
+                // Then
+
+                // Validate prerendered contents.
+                var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
+                ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
+            }
         }
 
         [Test]
@@ -236,16 +242,21 @@ namespace BlazorWasmPreRendering.Build.Test
             var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
             using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
 
-            // When
-            await XProcess.Start("dotnet", "restore", workDir).WaitForExitAsync();
-            var dotnetCLI = await XProcess.Start("dotnet", "msbuild -p:Configuration=Debug -p:BlazorEnableCompression=false -p:DeployOnBuild=true -p:PublishUrl=bin/publish", workDir).WaitForExitAsync();
-            dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
+            for (var i = 0; i < 2; i++)
+            {
+                Console.WriteLine($"{(i == 0 ? "1st" : "2nd")} time publishing...");
 
-            // Then
+                // When
+                await XProcess.Start("dotnet", "restore", workDir).WaitForExitAsync();
+                var dotnetCLI = await XProcess.Start("dotnet", "msbuild -p:Configuration=Debug -p:BlazorEnableCompression=false -p:DeployOnBuild=true -p:PublishUrl=bin/publish", workDir).WaitForExitAsync();
+                dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
 
-            // Validate prerendered contents.
-            var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
-            ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
+                // Then
+
+                // Validate prerendered contents.
+                var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
+                ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
+            }
         }
 
         private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir)
