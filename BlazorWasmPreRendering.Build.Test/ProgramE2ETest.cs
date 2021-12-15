@@ -105,9 +105,9 @@ namespace BlazorWasmPreRendering.Build.Test
             counterIndexHtml.Title.Is("Counter");
             fetchdataIndexHtml.Title.Is("Weather forecast");
 
-            rootIndexHtml.QuerySelector("h1").TextContent.Is("Hello, world!");
-            counterIndexHtml.QuerySelector("h1").TextContent.Is("Counter");
-            fetchdataIndexHtml.QuerySelector("h1").TextContent.Is("Weather forecast");
+            rootIndexHtml.QuerySelector("h1")!.TextContent.Is("Hello, world!");
+            counterIndexHtml.QuerySelector("h1")!.TextContent.Is("Counter");
+            fetchdataIndexHtml.QuerySelector("h1")!.TextContent.Is("Weather forecast");
         }
 
         [Test]
@@ -156,8 +156,8 @@ namespace BlazorWasmPreRendering.Build.Test
             using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
             using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
 
-            rootIndexHtml.QuerySelector("h1").TextContent.Trim().Is("Welcome to Blazor Wasm App 2!");
-            aboutIndexHtml.QuerySelector("h1").TextContent.Trim().Is("About Page");
+            rootIndexHtml.QuerySelector("h1")!.TextContent.Trim().Is("Welcome to Blazor Wasm App 2!");
+            aboutIndexHtml.QuerySelector("h1")!.TextContent.Trim().Is("About Page");
         }
 
         [Test]
@@ -206,8 +206,8 @@ namespace BlazorWasmPreRendering.Build.Test
             using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
             using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
 
-            rootIndexHtml.QuerySelector("h1").TextContent.Trim().Is("Welcome to Blazor Wasm App 2!");
-            aboutIndexHtml.QuerySelector("h1").TextContent.Trim().Is("About Page");
+            rootIndexHtml.QuerySelector("h1")!.TextContent.Trim().Is("Welcome to Blazor Wasm App 2!");
+            aboutIndexHtml.QuerySelector("h1")!.TextContent.Trim().Is("About Page");
         }
 
         [Test]
@@ -274,12 +274,12 @@ namespace BlazorWasmPreRendering.Build.Test
             rootIndexHtml.Title.Is("Home | Blazor Wasm App 0");
             aboutIndexHtml.Title.Is("About | Blazor Wasm App 0");
 
-            rootIndexHtml.QuerySelector("h1").TextContent.Is("Home");
-            aboutIndexHtml.QuerySelector("h1").TextContent.Is("About");
+            rootIndexHtml.QuerySelector("h1")!.TextContent.Is("Home");
+            aboutIndexHtml.QuerySelector("h1")!.TextContent.Is("About");
 
-            rootIndexHtml.QuerySelector("a").TextContent.Is("about");
+            rootIndexHtml.QuerySelector("a")!.TextContent.Is("about");
             (rootIndexHtml.QuerySelector("a") as IHtmlAnchorElement)!.Href.Is("about:///about");
-            aboutIndexHtml.QuerySelector("a").TextContent.Is("home");
+            aboutIndexHtml.QuerySelector("a")!.TextContent.Is("home");
             (aboutIndexHtml.QuerySelector("a") as IHtmlAnchorElement)!.Href.Is("about:///");
         }
     }
