@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.0-preview.10.1</Version>
+    <Version>1.0.0-preview.11.0</Version>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Authors>J.Sakamoto</Authors>
     <PackageId>BlazorWasmPreRendering.Build</PackageId>
@@ -45,9 +45,9 @@
   </PropertyGroup>
 
   <Target Name="PublishForPackage">
-    <Message Importance="high" Text="[PublishForPackage]"/>
-    <Exec Command="dotnet publish -c:$(Configuration) -f:net5.0 --nologo"/>
-    <Exec Command="dotnet publish -c:$(Configuration) -f:net6.0 --nologo"/>
+    <Message Importance="high" Text="[PublishForPackage]" />
+    <Exec Command="dotnet publish -c:$(Configuration) -f:net5.0 --nologo" />
+    <Exec Command="dotnet publish -c:$(Configuration) -f:net6.0 --nologo" />
   </Target>
 
   <Target Name="SetupNuspecProperties" BeforeTargets="GenerateNuspec">

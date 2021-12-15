@@ -1,3 +1,6 @@
+v.1.0.0-preview.11.0
+- Improve: an IConfiguration object will be provided to the application's "ConfigureServices()" method as an argument.
+
 v.1.0.0-preview.10.1
 Fix: the pre-rendering process crashed at executing publishing on Visual Studio.
 

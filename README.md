@@ -17,7 +17,7 @@ This will help make the contents of your Blazor WebAssembly static apps findable
 Install this package to your Blazor WebAssembly project.
 
 ```
-dotnet add package BlazorWasmPreRendering.Build --version 1.0.0-preview.10.1
+dotnet add package BlazorWasmPreRendering.Build --version 1.0.0-preview.11.0
 ```
 
 Basically, **that's all**.
@@ -96,6 +96,10 @@ static void ConfigureServices(IServiceCollection services, string baseAddress)
 This package calls the `ConfigureServices()` static method (or static local function) inside of your Blazor WebAssembly app when pre-renders it if that method exists.
 
 This is important to your Blazor WebAssembly components work fine in the pre-rendering process.
+
+#### Appendix
+
+The `ConfigureServices()` method can also have an `IConfiguration` argument reflected with the contents of the `wwwroot/appsetting.json` JSON file.
 
 ### Root component type and selector
 
