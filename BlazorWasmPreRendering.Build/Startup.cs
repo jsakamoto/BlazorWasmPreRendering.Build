@@ -58,6 +58,10 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 {
                     arguments.Add(services);
                 }
+                else if (methodParameter.ParameterType == typeof(IConfiguration))
+                {
+                    arguments.Add(this.Configuration);
+                }
                 else if (methodParameter.ParameterType == typeof(string) && string.Equals(methodParameter.Name, nameof(baseAddress), StringComparison.InvariantCultureIgnoreCase))
                 {
                     arguments.Add(baseAddress);

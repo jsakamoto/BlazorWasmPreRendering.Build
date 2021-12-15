@@ -10,6 +10,7 @@ using CommandLineSwitchParser;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
@@ -210,7 +211,13 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         private static async Task<IWebHost> StartWebHostAsync(BlazorWasmPrerenderingOptions prerenderingOptions)
         {
+            var appsettingsPath = Path.Combine(prerenderingOptions.WebRootPath, "appsettings.json");
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile(appsettingsPath, optional: true)
+                .Build();
+
             var hostBuilder = new WebHostBuilder()
+                .UseConfiguration(configuration)
                 .UseKestrel()
                 .UseUrls("http://127.0.0.1:5050")
                 .UseWebRoot(prerenderingOptions.WebRootPath)
