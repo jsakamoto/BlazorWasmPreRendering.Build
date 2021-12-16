@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AngleSharp.Dom;
@@ -25,12 +26,12 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             indexHtmlText = indexHtmlText.Replace("\r\n", "\n");
 
             // Sweep the pre-rendered contents inside the index.html that was rendered when the last time publishing.
-			var prerenderMarkers = new[] {
-				(Begin:"<!-- %%-PRERENDERING-BEGIN-%% -->\n", End:"\n<!-- %%-PRERENDERING-END-%% -->\n"),
-				(Begin:"<!-- %%-PRERENDERING-HEADOUTLET-BEGIN-%% -->\n", End:"\n<!-- %%-PRERENDERING-HEADOUTLET-END-%% -->\n")
-			};
-			foreach (var prerenderMarker in prerenderMarkers)
-			{
+            var prerenderMarkers = new[] {
+                (Begin:"<!-- %%-PRERENDERING-BEGIN-%% -->\n", End:"\n<!-- %%-PRERENDERING-END-%% -->\n"),
+                (Begin:"<!-- %%-PRERENDERING-HEADOUTLET-BEGIN-%% -->\n", End:"\n<!-- %%-PRERENDERING-HEADOUTLET-END-%% -->\n")
+            };
+            foreach (var prerenderMarker in prerenderMarkers)
+            {
                 var indexOfPreRenderMarkerBegin = indexHtmlText.IndexOf(prerenderMarker.Begin);
                 var indexOfPreRenderMarkerEnd = indexHtmlText.IndexOf(prerenderMarker.End);
                 if (indexOfPreRenderMarkerBegin != -1 && indexOfPreRenderMarkerEnd != -1)
@@ -51,17 +52,18 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             {
                 var selector = eachSelector;
                 var insertPosition = AdjacentPosition.BeforeEnd;
-				foreach (var pseudoSelector in new[] {"::before","::after" })
-				{
+                foreach (var pseudoSelector in new[] { "::before", "::after" })
+                {
                     if (selector.EndsWith(pseudoSelector))
                     {
-                        if(pseudoSelector == "::before")
-                        insertPosition = AdjacentPosition.AfterBegin;
+                        if (pseudoSelector == "::before")
+                            insertPosition = AdjacentPosition.AfterBegin;
                         selector = selector.Substring(0, selector.Length - pseudoSelector.Length);
                     }
-				}
+                }
 
                 var componentElement = indexHtmlDoc.QuerySelector(selector);
+                if (componentElement == null) throw new Exception($"The element matches with selector \"{selector}\" was not found in the index.html.");
                 componentElement.Insert(insertPosition, markerComment);
             }
 
@@ -78,8 +80,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             }
 
             return new IndexHtmlFragments(
-                firstPart: fragments.First(), 
-                middlePart: fragments.Skip(1).FirstOrDefault() ?? "", 
+                firstPart: fragments.First(),
+                middlePart: fragments.Skip(1).FirstOrDefault() ?? "",
                 lastPart: indexHtmlText);
         }
     }
