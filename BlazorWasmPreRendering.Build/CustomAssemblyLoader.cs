@@ -37,7 +37,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             this._AssemblySearchDirs.Add(searchDir);
         }
 
-        public Assembly? LoadAssembly(string assemblyName)
+        public Assembly LoadAssembly(string assemblyName)
         {
             try
             {
@@ -46,7 +46,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             catch (Exception ex)
             {
                 var pwd = Environment.CurrentDirectory;
-                var searchDirs = string.Join('\n', _AssemblySearchDirs);
+                var searchDirs = string.Join('\n', this._AssemblySearchDirs);
                 throw new Exception($"Could not load the assembly \"{assemblyName}\" in search directories below.\n{searchDirs}\n(pwd: {pwd})", ex);
             }
         }

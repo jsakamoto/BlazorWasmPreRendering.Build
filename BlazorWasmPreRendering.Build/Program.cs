@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
@@ -26,7 +27,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             SetupCustomAssemblyLoader(assemblyLoader, prerenderingOptions);
 
-            using var webHost = await StartWebHostAsync(prerenderingOptions);
+            using var webHost = await StartWebHostAsync(assemblyLoader, prerenderingOptions);
             var serverAddresses = webHost.ServerFeatures.Get<IServerAddressesFeature>()!;
             var baseUrl = serverAddresses.Addresses.First();
 
@@ -209,7 +210,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             return Path.Combine(projectDir, "bin", "Release", frameworkName);
         }
 
-        private static async Task<IWebHost> StartWebHostAsync(BlazorWasmPrerenderingOptions prerenderingOptions)
+        private static async Task<IWebHost> StartWebHostAsync(CustomAssemblyLoader assemblyLoader, BlazorWasmPrerenderingOptions prerenderingOptions)
         {
             var appsettingsPath = Path.Combine(prerenderingOptions.WebRootPath, "appsettings.json");
             var configuration = new ConfigurationBuilder()
@@ -221,6 +222,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 .UseKestrel()
                 .UseUrls("http://127.0.0.1:5050")
                 .UseWebRoot(prerenderingOptions.WebRootPath)
+                .ConfigureServices(services => services.AddSingleton(assemblyLoader))
                 .UseStartup(context => new Startup(context.Configuration, prerenderingOptions));
             var webHost = hostBuilder.Build();
             await webHost.StartAsync();

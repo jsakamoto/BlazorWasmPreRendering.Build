@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Runtime.Loader;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -96,10 +95,11 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         internal void ConfigureApplicationMiddleware(IApplicationBuilder app)
         {
+            var assemblyLoader = app.ApplicationServices.GetRequiredService<CustomAssemblyLoader>();
             foreach (var pack in this.PrerenderingOptions.MiddlewarePackages)
             {
                 var assemblyName = string.IsNullOrEmpty(pack.Assembly) ? pack.PackageIdentity : pack.Assembly;
-                var appAssembly = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(assemblyName));//.LoadFromAssemblyPath(appAssemblyPath);
+                var appAssembly = assemblyLoader.LoadAssembly(assemblyName);//.LoadFromAssemblyPath(appAssemblyPath);
                 var useMethods = appAssembly.ExportedTypes
                     .Where(t => t.IsClass && t.IsSealed && t.IsAbstract) // means static class (https://stackoverflow.com/a/2639465/1268000)
                     .SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Static))

@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.0-preview.11.1</Version>
+    <Version>1.0.0-preview.11.4</Version>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Authors>J.Sakamoto</Authors>
     <PackageId>BlazorWasmPreRendering.Build</PackageId>
@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.15.0" />
+    <PackageReference Include="AngleSharp" Version="0.16.1" />
     <PackageReference Include="CommandLineSwitchParser" Version="1.0.0" />
   </ItemGroup>
 
@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0-rc.2.21480.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0" />
   </ItemGroup>
 
   <!-- Pack settings -->
