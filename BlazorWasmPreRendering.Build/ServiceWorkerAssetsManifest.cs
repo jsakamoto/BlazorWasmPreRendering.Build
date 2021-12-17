@@ -13,9 +13,10 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 {
     internal class ServiceWorkerAssetsManifest
     {
-        public static async ValueTask UpdateAsync(string wwwrootDir)
+        public static async ValueTask UpdateAsync(string wwwrootDir, string? serviceWorkerAssetsManifest)
         {
-            var serviceWorkerAssetsJsPath = Path.Combine(wwwrootDir, "service-worker-assets.js");
+            if (serviceWorkerAssetsManifest == null) return;
+            var serviceWorkerAssetsJsPath = Path.Combine(wwwrootDir, serviceWorkerAssetsManifest);
             if (!File.Exists(serviceWorkerAssetsJsPath)) return;
 
             var serviceWorkerAssetsJs = await File.ReadAllTextAsync(serviceWorkerAssetsJsPath);

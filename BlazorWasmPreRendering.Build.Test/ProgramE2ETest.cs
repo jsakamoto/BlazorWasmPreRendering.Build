@@ -242,7 +242,7 @@ namespace BlazorWasmPreRendering.Build.Test
                 using var sha256 = SHA256.Create();
                 var hash = "sha256-" + Convert.ToBase64String(sha256.ComputeHash(indexHtmlBytes));
 
-                var serviceWorkerAssetsJs = File.ReadAllText(Path.Combine(wwwrootDir, "service-worker-assets.js"));
+                var serviceWorkerAssetsJs = File.ReadAllText(Path.Combine(wwwrootDir, "my-assets.js"));
                 serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, @"^self\.assetsManifest\s*=\s*", "");
                 serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, ";\\s*$", "");
                 var assetsManifestFile = JsonSerializer.Deserialize<AssetsManifestFile>(serviceWorkerAssetsJs);

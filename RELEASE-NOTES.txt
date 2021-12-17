@@ -1,3 +1,6 @@
+v.1.0.0-preview.12.0
+- Improve: PWA support.
+
 v.1.0.0-preview.11.4
 - Improve: an IConfiguration object will be provided to the application's "ConfigureServices()" method as an argument.
 
