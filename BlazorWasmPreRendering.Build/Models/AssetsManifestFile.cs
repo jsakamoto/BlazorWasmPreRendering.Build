@@ -1,6 +1,6 @@
 ﻿namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.Models
 {
-    internal class AssetsManifestFile
+    public class AssetsManifestFile
     {
         public string? version { get; set; }
 
