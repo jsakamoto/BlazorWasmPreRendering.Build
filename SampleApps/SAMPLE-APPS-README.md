@@ -6,6 +6,7 @@
 - The root component DOM element tag is `<app>`.
 - It is referenced from the End-to-End test.
 - Set page titles by .NET6 `<PageTitle>`.
+- PWA
 
 
 ## BlazorWasmApp1
