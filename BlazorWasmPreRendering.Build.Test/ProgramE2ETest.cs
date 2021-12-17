@@ -259,7 +259,28 @@ namespace BlazorWasmPreRendering.Build.Test
             }
         }
 
-        private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir)
+        [Test]
+        public async Task AppSettings_Test()
+        {
+            // Given
+            var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
+            var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
+            using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
+
+            File.WriteAllText(Path.Combine(workDir, "wwwroot", "appsettings.json"), @"{""HomeTitle"":""127.0.0.1""}");
+
+            // When
+            var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Debug -p:BlazorEnableCompression=false -o:bin/publish", workDir).WaitForExitAsync();
+            dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
+
+            // Then
+
+            // Validate prerendered contents.
+            var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
+            ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, homeTitle: "127.0.0.1");
+        }
+
+        private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir, string homeTitle = "Home")
         {
             var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
             var aboutIndexHtmlPath = Path.Combine(wwwrootDir, "about", "index.html");
@@ -271,10 +292,10 @@ namespace BlazorWasmPreRendering.Build.Test
             using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
 
             // NOTICE: The document title was rendered by the <HeadOutlet> component of .NET 6.
-            rootIndexHtml.Title.Is("Home | Blazor Wasm App 0");
+            rootIndexHtml.Title.Is($"{homeTitle} | Blazor Wasm App 0");
             aboutIndexHtml.Title.Is("About | Blazor Wasm App 0");
 
-            rootIndexHtml.QuerySelector("h1")!.TextContent.Is("Home");
+            rootIndexHtml.QuerySelector("h1")!.TextContent.Is(homeTitle);
             aboutIndexHtml.QuerySelector("h1")!.TextContent.Is("About");
 
             rootIndexHtml.QuerySelector("a")!.TextContent.Is("about");

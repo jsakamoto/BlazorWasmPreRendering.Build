@@ -1,8 +1,19 @@
 ﻿@page "/"
-<PageTitle>Home | Blazor Wasm App 0</PageTitle>
+@inject IConfiguration Configuration
 
-<h1>Home</h1>
+<PageTitle>@_Title | Blazor Wasm App 0</PageTitle>
+
+<h1>@_Title</h1>
 
 <div>
 	<a href="/about">about</a>
 </div>
+
+@code {
+	private string _Title = "";
+
+	protected override void OnInitialized()
+	{
+		_Title = Configuration.GetValue("HomeTitle", "");
+	}
+}
