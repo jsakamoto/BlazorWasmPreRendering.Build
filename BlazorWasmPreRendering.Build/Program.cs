@@ -42,6 +42,10 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             Console.WriteLine("Fetching complete.");
 
+            await ServiceWorkerAssetsManifest.UpdateAsync(
+                prerenderingOptions.WebRootPath,
+                commandLineOptions.ServiceWorkerAssetsManifest);
+
             if (!commandLineOptions.KeepRunning) await webHost.StopAsync();
 
             await webHost.WaitForShutdownAsync();

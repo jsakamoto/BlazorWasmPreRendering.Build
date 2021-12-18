@@ -1,11 +1,16 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using NUnit.Framework;
 using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer;
+using Toolbelt.Blazor.WebAssembly.PrerenderServer.Models;
 using Toolbelt.Diagnostics;
 
 namespace BlazorWasmPreRendering.Build.Test
@@ -231,6 +236,19 @@ namespace BlazorWasmPreRendering.Build.Test
                 // Validate prerendered contents.
                 var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
                 ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
+
+                // Validate PWA assets manifest.
+                var indexHtmlBytes = File.ReadAllBytes(Path.Combine(wwwrootDir, "index.html"));
+                using var sha256 = SHA256.Create();
+                var hash = "sha256-" + Convert.ToBase64String(sha256.ComputeHash(indexHtmlBytes));
+
+                var serviceWorkerAssetsJs = File.ReadAllText(Path.Combine(wwwrootDir, "my-assets.js"));
+                serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, @"^self\.assetsManifest\s*=\s*", "");
+                serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, ";\\s*$", "");
+                var assetsManifestFile = JsonSerializer.Deserialize<AssetsManifestFile>(serviceWorkerAssetsJs);
+                var assetManifestEntry = assetsManifestFile?.assets?.First(a => a.url == "index.html");
+                assetManifestEntry.IsNotNull();
+                assetManifestEntry!.hash.Is(hash);
             }
         }
 
