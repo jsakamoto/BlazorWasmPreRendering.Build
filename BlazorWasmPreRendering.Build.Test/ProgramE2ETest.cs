@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -223,19 +224,28 @@ namespace BlazorWasmPreRendering.Build.Test
             var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
             using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
 
-            for (var i = 0; i < 2; i++)
+            var expectedHomeTitles = new Dictionary<int, string> { [1] = "Home", [2] = "My Home" };
+            var expectedEnvNames = new Dictionary<int, string> { [1] = "Prerendering", [2] = "Foo" };
+            for (var i = 1; i <= 2; i++)
             {
-                Console.WriteLine($"{(i == 0 ? "1st" : "2nd")} time publishing...");
+                Console.WriteLine($"{(i == 1 ? "1st" : "2nd")} time publishing...");
 
                 // When
-                var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Debug -p:BlazorEnableCompression=false -o:bin/publish", workDir).WaitForExitAsync();
+                var arg = "publish -c:Debug -p:BlazorEnableCompression=false -o:bin/publish";
+                // if 2nd time publishing, override the environment name.
+                if (i == 2) arg += " -p:BlazorWasmPrerenderingEnvironment=" + expectedEnvNames[2];
+
+                var dotnetCLI = await XProcess.Start("dotnet", arg, workDir).WaitForExitAsync();
                 dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
 
                 // Then
 
                 // Validate prerendered contents.
                 var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
-                ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
+                ValidatePrerenderedContents_of_BlazorWasmApp0(
+                    wwwrootDir,
+                    homeTitle: expectedHomeTitles[i],
+                    environment: expectedEnvNames[i]);
 
                 // Validate PWA assets manifest.
                 var indexHtmlBytes = File.ReadAllBytes(Path.Combine(wwwrootDir, "index.html"));
@@ -298,7 +308,7 @@ namespace BlazorWasmPreRendering.Build.Test
             ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, homeTitle: "127.0.0.1");
         }
 
-        private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir, string homeTitle = "Home")
+        private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir, string homeTitle = "Home", string environment = "Prerendering")
         {
             var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
             var aboutIndexHtmlPath = Path.Combine(wwwrootDir, "about", "index.html");
@@ -320,6 +330,8 @@ namespace BlazorWasmPreRendering.Build.Test
             (rootIndexHtml.QuerySelector("a") as IHtmlAnchorElement)!.Href.Is("about:///about");
             aboutIndexHtml.QuerySelector("a")!.TextContent.Is("home");
             (aboutIndexHtml.QuerySelector("a") as IHtmlAnchorElement)!.Href.Is("about:///");
+
+            rootIndexHtml.QuerySelector(".environment")!.TextContent.Trim().Is($"Environment: {environment}");
         }
     }
 }

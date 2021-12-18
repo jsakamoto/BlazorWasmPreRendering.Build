@@ -20,6 +20,8 @@
 
         public string? ServiceWorkerAssetsManifest { get; set; }
 
+        public string? Environment { get; set; }
+
         public bool KeepRunning { get; init; }
     }
 }

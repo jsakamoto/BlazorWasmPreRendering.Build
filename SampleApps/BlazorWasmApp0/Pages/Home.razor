@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject IConfiguration Configuration
+@inject IWebAssemblyHostEnvironment HostEnv
 
 <PageTitle>@_Title | Blazor Wasm App 0</PageTitle>
 
@@ -7,6 +8,10 @@
 
 <div>
 	<a href="/about">about</a>
+</div>
+
+<div class="environment">
+	Environment: @HostEnv.Environment
 </div>
 
 @code {

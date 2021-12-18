@@ -4,23 +4,30 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
+namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost
 {
     public class Startup
     {
         private IConfiguration Configuration { get; }
 
+        private Uri BaseAddress { get; }
+
+        private IWebAssemblyHostEnvironment HostEnvironment { get; }
+
         private BlazorWasmPrerenderingOptions PrerenderingOptions { get; }
 
-        public Startup(IConfiguration configuration, BlazorWasmPrerenderingOptions prerenderingOptions)
+        public Startup(IConfiguration configuration, Uri baseAddress, IWebAssemblyHostEnvironment hostEnvironment, BlazorWasmPrerenderingOptions prerenderingOptions)
         {
             this.Configuration = configuration;
+            this.BaseAddress = baseAddress;
+            this.HostEnvironment = hostEnvironment;
             this.PrerenderingOptions = prerenderingOptions;
         }
 
@@ -28,16 +35,15 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
         {
             services.AddSingleton(this.PrerenderingOptions);
 
-            var baseAddress = this.Configuration["urls"].Split(';').First(url => !string.IsNullOrWhiteSpace(url));
-            this.ConfigureApplicationServices(services, baseAddress);
+            this.ConfigureApplicationServices(services);
 
-            services.TryAddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
+            services.TryAddScoped(sp => new HttpClient { BaseAddress = this.BaseAddress });
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
         }
 
-        private void ConfigureApplicationServices(IServiceCollection services, string baseAddress)
+        private void ConfigureApplicationServices(IServiceCollection services)
         {
             var programClass = this.PrerenderingOptions.ApplicationAssembly
                 .GetTypes()
@@ -61,9 +67,17 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 {
                     arguments.Add(this.Configuration);
                 }
-                else if (methodParameter.ParameterType == typeof(string) && string.Equals(methodParameter.Name, nameof(baseAddress), StringComparison.InvariantCultureIgnoreCase))
+                else if (methodParameter.ParameterType == typeof(string) && string.Equals(methodParameter.Name, "baseAddress", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    arguments.Add(baseAddress);
+                    arguments.Add(this.BaseAddress.ToString().TrimEnd('/'));
+                }
+                else if (methodParameter.ParameterType == typeof(Uri))
+                {
+                    arguments.Add(this.BaseAddress);
+                }
+                else if (methodParameter.ParameterType == typeof(IWebAssemblyHostEnvironment))
+                {
+                    arguments.Add(this.HostEnvironment);
                 }
                 else
                 {

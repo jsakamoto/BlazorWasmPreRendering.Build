@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer;
+using Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost;
 
 namespace BlazorWasmPreRendering.Build.Test
 {
@@ -27,6 +29,8 @@ namespace BlazorWasmPreRendering.Build.Test
                 .AddSingleton(config as IConfiguration)
                 .AddSingleton(option)
                 .AddSingleton(new CustomAssemblyLoader())
+                .AddSingleton(new Uri("http://127.0.0.1:5000"))
+                .AddSingleton(new HostEnvironment("http://127.0.0.1:5000", "Prerendering") as IWebAssemblyHostEnvironment)
                 .AddSingleton<Startup>()
                 .BuildServiceProvider();
             var startUp = services.GetRequiredService<Startup>();

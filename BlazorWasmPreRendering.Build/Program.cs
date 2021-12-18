@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using CommandLineSwitchParser;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost;
 
 namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 {
@@ -27,9 +27,12 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             SetupCustomAssemblyLoader(assemblyLoader, prerenderingOptions);
 
-            using var webHost = await StartWebHostAsync(assemblyLoader, prerenderingOptions);
-            var serverAddresses = webHost.ServerFeatures.Get<IServerAddressesFeature>()!;
-            var baseUrl = serverAddresses.Addresses.First();
+            using var webHost = await ServerSideRenderingWebHost.StartWebHostAsync(
+                assemblyLoader,
+                commandLineOptions.Environment,
+                prerenderingOptions);
+            var hostEnvironment = webHost.Services.GetRequiredService<IWebAssemblyHostEnvironment>();
+            var baseUrl = hostEnvironment.BaseAddress;
 
             Console.WriteLine("Start fetching...");
 
@@ -212,25 +215,6 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             }
 
             return Path.Combine(projectDir, "bin", "Release", frameworkName);
-        }
-
-        private static async Task<IWebHost> StartWebHostAsync(CustomAssemblyLoader assemblyLoader, BlazorWasmPrerenderingOptions prerenderingOptions)
-        {
-            var appsettingsPath = Path.Combine(prerenderingOptions.WebRootPath, "appsettings.json");
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile(appsettingsPath, optional: true)
-                .Build();
-
-            var hostBuilder = new WebHostBuilder()
-                .UseConfiguration(configuration)
-                .UseKestrel()
-                .UseUrls("http://127.0.0.1:5050")
-                .UseWebRoot(prerenderingOptions.WebRootPath)
-                .ConfigureServices(services => services.AddSingleton(assemblyLoader))
-                .UseStartup(context => new Startup(context.Configuration, prerenderingOptions));
-            var webHost = hostBuilder.Build();
-            await webHost.StartAsync();
-            return webHost;
         }
     }
 }
