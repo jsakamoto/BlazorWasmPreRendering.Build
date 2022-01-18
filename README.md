@@ -17,7 +17,7 @@ This will help make the contents of your Blazor WebAssembly static apps findable
 Install this package to your Blazor WebAssembly project.
 
 ```
-dotnet add package BlazorWasmPreRendering.Build --version 1.0.0-preview.13.0
+dotnet add package BlazorWasmPreRendering.Build --version 1.0.0-preview.14.0
 ```
 
 Basically, **that's all**.
@@ -97,7 +97,7 @@ This package calls the `ConfigureServices()` static method (or static local func
 
 This is important to your Blazor WebAssembly components work fine in the pre-rendering process.
 
-#### Appendix
+#### Note: other arguments of ConfigureServices() method
 
 The `ConfigureServices()` method can also have an `IConfiguration` argument reflected with the contents of the `wwwroot/appsetting.json` JSON file.
 
@@ -129,6 +129,10 @@ If the root component doesn't live in the application assembly, you can specify 
     ...
 ```
 
+#### Note: If the specified type was not found...
+
+If the specified type was not found, as a fallback behavior, this package tries to find the root component type (which has the type name "App" and inherits `ComponentBase` type) **from all assemblies that referenced from the application assembly**.
+
 ### Hosting Environment
 
 The host environment returns the environment name "Prerendering" during the pre-rendering process.
@@ -145,15 +149,30 @@ If you want to customize the host environment name during the pre-rendering proc
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
   ...
   <PropertyGroup>
-    <!-- 👇 If If you want to make the environment name is "Production" 
+    <!-- 👇 If you want to make the environment name is "Production" 
             even while pre-rendering, set the MSBuild property like this. -->
     <BlazorWasmPrerenderingEnvironment>Production</BlazorWasmPrerenderingEnvironment>
     ...
 ```
 
-### Note: If the specified type was not found...
+### Output style
 
-If the specified type was not found, as a fallback behavior, this package tries to find the root component type (which has the type name "App" and inherits `ComponentBase` type) **from all assemblies that referenced from the application assembly**.
+By default, all staticalized output HTML files are named "index.html" and are placed in subfolders in the same hierarchy as a request URL path.
+
+But if you **set the `BlazorWasmPrerenderingOutputStyle` MSBuild property to `AppendHtmlExtension`** when you publish the project, the staticalized files are named with **each request URL path appended ".html" file extension.**
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  ...
+  <PropertyGroup>
+    <!--
+    👇 If you set this, then outut HTML files are named with
+    each request URL path appended ".html" file extension.
+    (ex. "http://host/foo/bar" ⇒ "./foo/bar.html")-->
+    <BlazorWasmPrerenderingOutputStyle>AppendHtmlExtension</BlazorWasmPrerenderingOutputStyle>
+    ...
+```
+
 
 ## Appendix
 
@@ -170,6 +189,10 @@ We can expect this package will work fine with a simple Blazor WebAssembly proje
 But I'm not sure this package works fine even with a complicated real-world Blazor WebAssembly project at this time.
 
 I welcome to fork and improve this project on your hand.
+
+## Release notes
+
+[Release notes](https://j.mp/3KlvH2k)
 
 ## License
 
