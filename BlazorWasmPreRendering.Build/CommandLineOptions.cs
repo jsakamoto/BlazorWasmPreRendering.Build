@@ -22,6 +22,8 @@
 
         public string? Environment { get; set; }
 
+        public OutputStyle OutputStyle { get; set; } = OutputStyle.IndexHtmlInSubFolders;
+
         public bool KeepRunning { get; init; }
     }
 }

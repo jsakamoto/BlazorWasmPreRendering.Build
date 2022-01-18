@@ -23,6 +23,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         private string WebRootPath { get; }
 
+        private OutputStyle OutputStyle { get; }
+
         private bool EnableGZipCompression { get; }
 
         private bool EnableBrotliCompression { get; }
@@ -30,11 +32,13 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
         public StaticlizeCrawler(
             string baseUrl,
             string webRootPath,
+            OutputStyle outputStyle,
             bool enableGZipCompression,
             bool enableBrotliCompression)
         {
             this.BaseUrl = baseUrl.TrimEnd('/');
             this.WebRootPath = webRootPath;
+            this.OutputStyle = outputStyle;
             this.EnableGZipCompression = enableGZipCompression;
             this.EnableBrotliCompression = enableBrotliCompression;
         }
@@ -63,12 +67,10 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             }
 
             var htmlContent = await response.Content.ReadAsStringAsync();
-            var targetDir = Path.Combine(this.WebRootPath, Path.Combine(path.Split('/')));
-            Directory.CreateDirectory(targetDir);
-            var indexHtmlPath = Path.Combine(targetDir, "index.html");
-            File.WriteAllText(indexHtmlPath, htmlContent);
+            var outputPath = GetOutputPath(path);
 
-            RecompressStaticFile(indexHtmlPath);
+            File.WriteAllText(outputPath, htmlContent);
+            RecompressStaticFile(outputPath);
 
             using var htmlDoc = this.HtmlParser.ParseDocument(htmlContent);
             var links = htmlDoc.Links
@@ -83,6 +85,29 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             {
                 await SaveToStaticFileAsync(link);
             }
+        }
+
+        private string GetOutputPath(string path)
+        {
+            var indexHtmlPath = default(string);
+            if (this.OutputStyle == OutputStyle.IndexHtmlInSubFolders)
+            {
+                indexHtmlPath = Path.Combine(this.WebRootPath, Path.Combine(path.Split('/')), "index.html");
+            }
+            else if (this.OutputStyle == OutputStyle.AppendHtmlExtension)
+            {
+                indexHtmlPath = path is "" or "/" ?
+                    Path.Combine(this.WebRootPath, "index.html") :
+                    Path.Combine(this.WebRootPath, Path.Combine(path.Split('/'))) + ".html";
+            }
+            if (indexHtmlPath == null) throw new NullReferenceException();
+
+            var targetDir = Path.GetDirectoryName(indexHtmlPath);
+            if (string.IsNullOrEmpty(targetDir)) throw new NullReferenceException();
+
+            if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
+
+            return indexHtmlPath;
         }
 
         private void RecompressStaticFile(string indexHtmlPath)

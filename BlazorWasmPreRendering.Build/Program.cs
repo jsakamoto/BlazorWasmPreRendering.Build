@@ -20,7 +20,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
     {
         public static async Task<int> Main(string[] args)
         {
-            var commandLineOptions = CommandLineSwitch.Parse<CommandLineOptions>(ref args);
+            var commandLineOptions = CommandLineSwitch.Parse<CommandLineOptions>(ref args, options => options.EnumParserStyle = EnumParserStyle.OriginalCase);
             var assemblyLoader = new CustomAssemblyLoader();
 
             var prerenderingOptions = BuildPrerenderingOptions(assemblyLoader, commandLineOptions);
@@ -39,6 +39,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var crawler = new StaticlizeCrawler(
                 baseUrl,
                 prerenderingOptions.WebRootPath,
+                commandLineOptions.OutputStyle,
                 prerenderingOptions.EnableGZipCompression,
                 prerenderingOptions.EnableBrotliCompression);
             await crawler.SaveToStaticFileAsync();
