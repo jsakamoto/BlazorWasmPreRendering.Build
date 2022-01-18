@@ -54,7 +54,7 @@ namespace BlazorWasmPreRendering.Build.Test
 
             // Validate prerendered contents.
             var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-            ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
+            ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, outputStyle: OutputStyle.IndexHtmlInSubFolders);
         }
 
         [Test]
@@ -308,10 +308,12 @@ namespace BlazorWasmPreRendering.Build.Test
             ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, homeTitle: "127.0.0.1");
         }
 
-        private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir, string homeTitle = "Home", string environment = "Prerendering")
+        private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir, string homeTitle = "Home", string environment = "Prerendering", OutputStyle outputStyle = OutputStyle.AppendHtmlExtension)
         {
             var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
-            var aboutIndexHtmlPath = Path.Combine(wwwrootDir, "about", "index.html");
+            var aboutIndexHtmlPath = outputStyle == OutputStyle.AppendHtmlExtension ?
+                Path.Combine(wwwrootDir, "about.html") :
+                Path.Combine(wwwrootDir, "about", "index.html");
             File.Exists(rootIndexHtmlPath).IsTrue();
             File.Exists(aboutIndexHtmlPath).IsTrue();
 

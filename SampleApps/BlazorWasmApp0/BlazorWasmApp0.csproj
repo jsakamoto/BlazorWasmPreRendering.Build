@@ -4,10 +4,11 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <ServiceWorkerAssetsManifest>my-assets.js</ServiceWorkerAssetsManifest>
+    <BlazorWasmPrerenderingOutputStyle>AppendHtmlExtension</BlazorWasmPrerenderingOutputStyle>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorWasmPreRendering.Build" Version="1.0.0-preview.13.0" />
+    <PackageReference Include="BlazorWasmPreRendering.Build" Version="1.0.0-preview.14.0" />
     <PackageReference Include="PublishSPAforGitHubPages.Build" Version="1.3.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.0" PrivateAssets="all" />
