@@ -41,6 +41,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddSingleton<ResetHeadOutletScript>();
         }
 
         private void ConfigureApplicationServices(IServiceCollection services)

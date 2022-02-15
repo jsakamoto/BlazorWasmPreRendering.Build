@@ -1,3 +1,6 @@
+v.1.0.0-preview.15.0
+- Fix: "HeadContent" rendered twice when Blazor runs
+
 v.1.0.0-preview.14.0
 - Imporve: added "OutputStyle" option ("IndexHtmlInSubFolders" style is default, and "AppendHtmlExtension" style can be chosen).
 
