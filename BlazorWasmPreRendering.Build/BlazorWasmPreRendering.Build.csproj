@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net5.0;net6.0;net7.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <AssemblyName>blazorwasm-prerendering-server</AssemblyName>
@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.0-preview.15.0</Version>
+    <Version>1.0.0-preview.16.0</Version>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Authors>J.Sakamoto</Authors>
     <PackageId>BlazorWasmPreRendering.Build</PackageId>
@@ -46,6 +46,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0-preview.1.22109.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.0-preview.1.22109.13" />
+  </ItemGroup>
+
   <!-- Pack settings -->
   <PropertyGroup>
     <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);PublishForPackage</GenerateNuspecDependsOn>
@@ -57,6 +62,7 @@
     <Message Importance="high" Text="[PublishForPackage]" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net5.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net6.0 --nologo" />
+    <Exec Command="dotnet publish -c:$(Configuration) -f:net7.0 --nologo" />
   </Target>
 
   <Target Name="SetupNuspecProperties" BeforeTargets="GenerateNuspec">
