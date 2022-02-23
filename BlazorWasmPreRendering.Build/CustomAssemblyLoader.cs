@@ -27,7 +27,12 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
         {
             var assemblyPath = Path.Combine(assemblyDir, assemblyName);
             if (!assemblyPath.ToLower().EndsWith(".dll")) assemblyPath += ".dll";
-            if (!File.Exists(assemblyPath)) return null;
+            if (!File.Exists(assemblyPath))
+            {
+                // TODO: Console.WriteLine($"{assemblyName} in {assemblyDir} - not found.");
+                return null;
+            }
+            // TODO: Console.WriteLine($"{assemblyName} in {assemblyDir} - FOUND.");
             var assembly = AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(File.ReadAllBytes(assemblyPath)));
             return assembly;
         }

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -17,10 +18,13 @@ namespace BlazorWasmApp1
             await builder.Build().RunAsync();
         }
 
-        private static void ConfigureServices(IServiceCollection services, string baseAddress)
+        private static void ConfigureServices(IServiceCollection services, string baseAddress, IWebAssemblyHostEnvironment? hostEnvironment = null)
         {
-            services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
-            services.AddHeadElementHelper();
+            if (hostEnvironment?.Environment != "NoWay")
+            {
+                services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
+                services.AddHeadElementHelper();
+            }
         }
     }
 }

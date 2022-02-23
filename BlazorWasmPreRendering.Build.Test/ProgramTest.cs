@@ -21,7 +21,7 @@ namespace BlazorWasmPreRendering.Build.Test
                 AssemblyName = "BlazorWasmApp1",
                 TypeNameOfRootComponent = "BlazorWasmApp1.App",
                 SelectorOfRootComponent = "#app",
-                MiddlewarePackages = "Foo.Bar,,1.2.0.3;Fizz.Buzz,FizzBuzz,",
+                MiddlewarePackages = "",
                 FrameworkName = "net5.0",
             };
             Directory.CreateDirectory(Path.Combine(cmdlineOptions.PublishedDir, "wwwroot", "_framework"));
@@ -34,12 +34,7 @@ namespace BlazorWasmPreRendering.Build.Test
             var options = Program.BuildPrerenderingOptions(new CustomAssemblyLoader(), cmdlineOptions);
 
             // Then
-            options.IntermediateDir.Is(cmdlineOptions.IntermediateDir);
-            options.FrameworkName.Is(cmdlineOptions.FrameworkName);
-            options.MiddlewarePackages
-                .Select(p => $"{p.PackageIdentity},{p.Assembly},{p.Version}")
-                .Is("Foo.Bar,,1.2.0.3",
-                    "Fizz.Buzz,FizzBuzz,");
+            options.RootComponentType.FullName.Is("BlazorWasmApp1.App");
         }
 
         [Test]
@@ -47,17 +42,12 @@ namespace BlazorWasmPreRendering.Build.Test
         {
             // Given
             using var workFolder = new WorkDirectory();
-            var option = new BlazorWasmPrerenderingOptions
-            {
-                IntermediateDir = workFolder,
-                FrameworkName = "net5.0",
-                MiddlewarePackages = new[] {
-                    new MiddlewarePackageReference { PackageIdentity = "Toolbelt.Blazor.HeadElement.ServerPrerendering", Assembly = "", Version = "1.5.1" }
-                }
+            var middlewarePackages = new MiddlewarePackageReference[] {
+                new() { PackageIdentity = "Toolbelt.Blazor.HeadElement.ServerPrerendering", Assembly = "", Version = "1.5.1" }
             };
 
             // When
-            var outputDir = Program.GenerateProjectToGetMiddleware(option);
+            var outputDir = Program.GenerateProjectToGetMiddleware(middlewarePackages, workFolder, "net5.0");
 
             // Then
             outputDir.IsNotNull();
@@ -76,15 +66,10 @@ namespace BlazorWasmPreRendering.Build.Test
         {
             // Given
             using var workFolder = new WorkDirectory();
-            var option = new BlazorWasmPrerenderingOptions
-            {
-                IntermediateDir = workFolder,
-                FrameworkName = "net5.0",
-                MiddlewarePackages = Enumerable.Empty<MiddlewarePackageReference>()
-            };
+            var middlewarePackages = Enumerable.Empty<MiddlewarePackageReference>();
 
             // When
-            var outputDir = Program.GenerateProjectToGetMiddleware(option);
+            var outputDir = Program.GenerateProjectToGetMiddleware(middlewarePackages, workFolder, "net5.0");
 
             // Then
             outputDir.IsNull();

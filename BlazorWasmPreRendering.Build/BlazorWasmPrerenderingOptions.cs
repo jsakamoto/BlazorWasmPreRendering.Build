@@ -25,10 +25,6 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         public bool EnableBrotliCompression { get; init; }
 
-        public string IntermediateDir { get; init; } = "";
-
-        public string FrameworkName { get; init; } = "";
-
         public IEnumerable<MiddlewarePackageReference> MiddlewarePackages { get; init; } = Enumerable.Empty<MiddlewarePackageReference>();
     }
 }

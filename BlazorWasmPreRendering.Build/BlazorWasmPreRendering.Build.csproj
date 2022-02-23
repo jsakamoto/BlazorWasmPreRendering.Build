@@ -6,11 +6,11 @@
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <AssemblyName>blazorwasm-prerendering-server</AssemblyName>
     <RootNamespace>Toolbelt.Blazor.WebAssembly.PrerenderServer</RootNamespace>
-    <DefineConstants Condition=" '$(TargetFramework)' == 'net6.0' ">$(DefineConstants);ENABLE_HEADOUTLET;</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFramework)' != 'net5.0' ">$(DefineConstants);ENABLE_HEADOUTLET;</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.0-preview.16.0</Version>
+    <Version>1.0.0-preview.17.0</Version>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Authors>J.Sakamoto</Authors>
     <PackageId>BlazorWasmPreRendering.Build</PackageId>
@@ -37,18 +37,15 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0-preview.1.22109.13" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.0-preview.1.22109.13" />
   </ItemGroup>
 
   <!-- Pack settings -->
@@ -63,6 +60,12 @@
     <Exec Command="dotnet publish -c:$(Configuration) -f:net5.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net6.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net7.0 --nologo" />
+    <ItemGroup>
+      <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\Microsoft.*.dll" />
+      <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\web.config" />
+      <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\*.deps.json" />
+    </ItemGroup>
+    <Delete Files="@(_ExcludeForNupkg)" />
   </Target>
 
   <Target Name="SetupNuspecProperties" BeforeTargets="GenerateNuspec">

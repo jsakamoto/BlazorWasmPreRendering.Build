@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using CommandLineSwitchParser;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost;
@@ -22,19 +23,23 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
         {
             var commandLineOptions = CommandLineSwitch.Parse<CommandLineOptions>(ref args, options => options.EnumParserStyle = EnumParserStyle.OriginalCase);
             var assemblyLoader = new CustomAssemblyLoader();
-
             var prerenderingOptions = BuildPrerenderingOptions(assemblyLoader, commandLineOptions);
 
-            SetupCustomAssemblyLoader(assemblyLoader, prerenderingOptions);
+            await PreRenderToStaticFilesAsync(commandLineOptions, assemblyLoader, prerenderingOptions);
+            return 0;
+        }
 
+        private static async Task PreRenderToStaticFilesAsync(CommandLineOptions commandLineOptions, CustomAssemblyLoader assemblyLoader, BlazorWasmPrerenderingOptions prerenderingOptions)
+        {
             using var webHost = await ServerSideRenderingWebHost.StartWebHostAsync(
                 assemblyLoader,
                 commandLineOptions.Environment,
                 prerenderingOptions);
-            var hostEnvironment = webHost.Services.GetRequiredService<IWebAssemblyHostEnvironment>();
-            var baseUrl = hostEnvironment.BaseAddress;
+            var server = webHost.Services.GetRequiredService<IServer>();
+            var baseAddresses = server.Features.Get<IServerAddressesFeature>()!.Addresses;
+            var baseUrl = baseAddresses.First();
 
-            Console.WriteLine("Start fetching...");
+            Console.WriteLine($"Start fetching...[{baseUrl}]");
 
             var crawler = new StaticlizeCrawler(
                 baseUrl,
@@ -53,7 +58,6 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             if (!commandLineOptions.KeepRunning) await webHost.StopAsync();
 
             await webHost.WaitForShutdownAsync();
-            return 0;
         }
 
         internal static BlazorWasmPrerenderingOptions BuildPrerenderingOptions(CustomAssemblyLoader assemblyLoader, CommandLineOptions commandLineOptions)
@@ -69,38 +73,22 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             if (string.IsNullOrEmpty(commandLineOptions.FrameworkName)) throw new ArgumentException("The -f|--frameworkname parameter is required.");
 
             var webRootPath = Path.Combine(commandLineOptions.PublishedDir, "wwwroot");
-            var indexHtmlPath = Path.Combine(webRootPath, "index.html");
-            var appAssemblyDir = Path.Combine(webRootPath, "_framework");
-            assemblyLoader.AddSerachDir(appAssemblyDir);
 
-            var enableGZipCompression = File.Exists(indexHtmlPath + ".gz");
-            var enableBrotliCompression = File.Exists(indexHtmlPath + ".br");
-
+            var middlewarePackages = MiddlewarePackageReference.Parse(commandLineOptions.MiddlewarePackages);
+            var middlewareDllsDir = PrepareMiddlewareDlls(middlewarePackages, commandLineOptions.IntermediateDir, commandLineOptions.FrameworkName);
+            SetupCustomAssemblyLoader(assemblyLoader, webRootPath, middlewareDllsDir);
 
             var appAssembly = assemblyLoader.LoadAssembly(commandLineOptions.AssemblyName);
             if (appAssembly == null) throw new ArgumentException($"The application assembly \"{commandLineOptions.AssemblyName}\" colud not load.");
             var appComponentType = GetAppComponentType(assemblyLoader, commandLineOptions.TypeNameOfRootComponent, appAssembly);
 
-            var middlewarePackages = Enumerable.Empty<MiddlewarePackageReference>();
-            if (!string.IsNullOrEmpty(commandLineOptions.MiddlewarePackages))
-            {
-                middlewarePackages = commandLineOptions.MiddlewarePackages
-                    .Split(';')
-                    .Select(pack => pack.Split(','))
-                    .Select(parts => new MiddlewarePackageReference
-                    {
-                        PackageIdentity = parts.First(),
-                        Assembly = parts.Skip(1).FirstOrDefault() ?? "",
-                        Version = parts.Skip(2).FirstOrDefault() ?? ""
-                    })
-                    .ToArray();
-            }
+            var indexHtmlPath = Path.Combine(webRootPath, "index.html");
+            var enableGZipCompression = File.Exists(indexHtmlPath + ".gz");
+            var enableBrotliCompression = File.Exists(indexHtmlPath + ".br");
 
             var htmlFragment = IndexHtmlFragments.Load(indexHtmlPath, commandLineOptions.SelectorOfRootComponent, commandLineOptions.SelectorOfHeadOutletComponent);
             var options = new BlazorWasmPrerenderingOptions
             {
-                IntermediateDir = commandLineOptions.IntermediateDir,
-                FrameworkName = commandLineOptions.FrameworkName,
                 WebRootPath = webRootPath,
                 ApplicationAssembly = appAssembly,
 
@@ -153,31 +141,40 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             return appComponentType;
         }
 
-        private static void SetupCustomAssemblyLoader(CustomAssemblyLoader assemblyLoader, BlazorWasmPrerenderingOptions options)
+        private static void SetupCustomAssemblyLoader(CustomAssemblyLoader assemblyLoader, string webRootPath, string middlewareDllsDir)
         {
-            var projectDir = GenerateProjectToGetMiddleware(options);
-            if (projectDir == null) return;
+            var appAssemblyDir = Path.Combine(webRootPath, "_framework");
+            assemblyLoader.AddSerachDir(appAssemblyDir);
 
-            var middlewareDllsDir = GetMiddlewareDlls(projectDir, options.FrameworkName);
-            assemblyLoader.AddSerachDir(middlewareDllsDir);
+            if (!string.IsNullOrEmpty(middlewareDllsDir))
+                assemblyLoader.AddSerachDir(middlewareDllsDir);
         }
 
-        internal static string? GenerateProjectToGetMiddleware(BlazorWasmPrerenderingOptions option)
+        private static string PrepareMiddlewareDlls(IEnumerable<MiddlewarePackageReference> middlewarePackages, string intermediateDir, string frameworkName)
         {
-            if (!option.MiddlewarePackages.Any()) return null;
+            var projectDir = GenerateProjectToGetMiddleware(middlewarePackages, intermediateDir, frameworkName);
+            if (projectDir == null) return "";
 
-            var projectFileDir = Path.Combine(option.IntermediateDir, "BlazorWasmPrerendering", "Middleware");
+            var middlewareDllsDir = GetMiddlewareDlls(projectDir, frameworkName);
+            return middlewareDllsDir;
+        }
+
+        internal static string? GenerateProjectToGetMiddleware(IEnumerable<MiddlewarePackageReference> middlewarePackages, string intermediateDir, string frameworkName)
+        {
+            if (!middlewarePackages.Any()) return null;
+
+            var projectFileDir = Path.Combine(intermediateDir, "BlazorWasmPrerendering", "Middleware");
             if (!Directory.Exists(projectFileDir)) Directory.CreateDirectory(projectFileDir);
             var projectFilePath = Path.Combine(projectFileDir, "Project.csproj");
 
             var project = new XElement("Project", new XAttribute("Sdk", "Microsoft.NET.Sdk"));
 
             var propertyGroup = new XElement("PropertyGroup",
-                new XElement("TargetFramework", option.FrameworkName),
+                new XElement("TargetFramework", frameworkName),
                 new XElement("CopyLocalLockFileAssemblies", "true"));
 
             var itemGroup = new XElement("ItemGroup");
-            foreach (var package in option.MiddlewarePackages)
+            foreach (var package in middlewarePackages)
             {
                 var packageRef = new XElement("PackageReference", new XAttribute("Include", package.PackageIdentity));
                 if (!string.IsNullOrEmpty(package.Version)) packageRef.Add(new XAttribute("Version", package.Version));

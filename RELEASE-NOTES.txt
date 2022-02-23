@@ -1,3 +1,7 @@
+v.1.0.0-preview.17.0
+- Fix: "PageTitle" and "HeadContnet" were not rendered on .NET 7.
+- Fix: Prerendering was failed if the target project references minor upgraded ASP.NET Core NuGet packages.
+
 v.1.0.0-preview.16.0
 - Add support for .NET 7
 
