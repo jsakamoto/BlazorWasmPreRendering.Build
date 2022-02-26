@@ -173,6 +173,26 @@ But if you **set the `BlazorWasmPrerenderingOutputStyle` MSBuild property to `Ap
     ...
 ```
 
+### Url path to explicit fetch
+
+By default, this package follows all of `<a>` links recursively inside the contents starting from the root index (`/`) page to save them statically.
+
+However, in some cases, there are pages that are not linked from anywhere, such as an "Easter Egg" page.
+
+To support that case, please **set the URL path list that you want to fetch explicitly to the `BlazorWasmPrerenderingUrlPathToExplicitFetch` MSBuild property as a semicolon-separated string**.
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  ...
+  <PropertyGroup>
+    <!--
+    👇 If you set this, each URL path will be fetched
+       and saved as a static HTML file
+       even if those URLs are not linked from anywhere.
+    -->
+    <BlazorWasmPrerenderingUrlPathToExplicitFetch>/unkinked/page1;/unlinked/page2</BlazorWasmPrerenderingUrlPathToExplicitFetch>
+    ...
+```
 
 ## Appendix
 

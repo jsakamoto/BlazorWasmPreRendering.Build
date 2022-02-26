@@ -1,3 +1,6 @@
+v.1.0.0-preview.19.0
+- Improve: allows specifying an URL path list that are not linked from anywhere for explicit fetching.
+
 v.1.0.0-preview.18.0
 - Added the "BlazorWasmPrerenderingKeepServer" MSBuild property for troubleshooting.
 - Improve: show the server response when the HTTP status code does not represent success.
