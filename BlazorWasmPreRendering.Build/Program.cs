@@ -55,7 +55,13 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 prerenderingOptions.WebRootPath,
                 commandLineOptions.ServiceWorkerAssetsManifest);
 
-            if (!commandLineOptions.KeepRunning) await webHost.StopAsync();
+            if (commandLineOptions.KeepRunning)
+            {
+                Console.WriteLine();
+                Console.WriteLine("The pre-rendering server will keep running because the \"-k\" option switch is specified.");
+                Console.WriteLine("To stop the pre - rendering server and stop build, press Ctrl + C.");
+            }
+            else await webHost.StopAsync();
 
             await webHost.WaitForShutdownAsync();
         }
