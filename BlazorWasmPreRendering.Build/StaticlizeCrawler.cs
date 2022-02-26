@@ -52,20 +52,27 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             var requestUrl = this.BaseUrl + path;
             Console.WriteLine($"Getting {requestUrl}...");
+
+            if (!Uri.TryCreate(requestUrl, UriKind.Absolute, out var _))
+            {
+                IndentedWriteLines($"[ERROR] The request URL ({requestUrl}) was not valid format.", indentSize: 2);
+                return;
+            }
+
             var response = await this.HttpClient.GetAsync(requestUrl);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                Console.WriteLine($"  The HTTP status code was not OK. (it was {response.StatusCode}.)");
+                IndentedWriteLines($"[ERROR] The HTTP status code was not OK. (it was {response.StatusCode}.)", indentSize: 2);
 
                 if (response.Content.Headers.ContentType?.MediaType?.StartsWith("text/") == true)
                 {
                     try
                     {
                         var content = await response.Content.ReadAsStringAsync();
-                        IndentedWriteLines(content);
+                        IndentedWriteLines(content, indentSize: 4);
                     }
-                    catch (Exception ex) { IndentedWriteLines(ex.ToString()); }
+                    catch (Exception ex) { IndentedWriteLines(ex.ToString(), indentSize: 4); }
                 }
 
                 return;
@@ -98,7 +105,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             }
         }
 
-        private static void IndentedWriteLines(string content, int indentSize = 4)
+        private static void IndentedWriteLines(string content, int indentSize)
         {
             var indentSpaces = new string(' ', indentSize);
             foreach (var contentLine in content.Split('\n').Select(s => s.TrimEnd('\r')))
