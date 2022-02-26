@@ -11,6 +11,12 @@
 {
     private int currentCount = 0;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(1000);
+        //throw new Exception("What a bad thing!");
+    }
+
     private void IncrementCount()
     {
         currentCount++;

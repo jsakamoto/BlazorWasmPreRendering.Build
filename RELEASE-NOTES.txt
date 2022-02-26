@@ -1,3 +1,8 @@
+v.1.0.0-preview.18.0
+- Added the "BlazorWasmPrerenderingKeepServer" MSBuild property for troubleshooting.
+- Improve: show the server response when the HTTP status code does not represent success.
+- Improve: just skip instead of a crash even if a URL to fetch next was not a valid format.
+
 v.1.0.0-preview.17.0
 - Fix: "PageTitle" and "HeadContnet" were not rendered on .NET 7.
 - Fix: Prerendering was failed if the target project references minor upgraded ASP.NET Core NuGet packages.
