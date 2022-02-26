@@ -43,7 +43,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             this.EnableBrotliCompression = enableBrotliCompression;
         }
 
-        public Task SaveToStaticFileAsync() => SaveToStaticFileAsync("/");
+        public Task SaveToStaticFileAsync() => this.SaveToStaticFileAsync("/");
 
         private async Task SaveToStaticFileAsync(string path)
         {
@@ -57,6 +57,17 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 Console.WriteLine($"  The HTTP status code was not OK. (it was {response.StatusCode}.)");
+
+                if (response.Content.Headers.ContentType?.MediaType?.StartsWith("text/") == true)
+                {
+                    try
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        IndentedWriteLines(content);
+                    }
+                    catch (Exception ex) { IndentedWriteLines(ex.ToString()); }
+                }
+
                 return;
             }
             var mediaType = response.Content.Headers.ContentType?.MediaType;
@@ -67,10 +78,10 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             }
 
             var htmlContent = await response.Content.ReadAsStringAsync();
-            var outputPath = GetOutputPath(path);
+            var outputPath = this.GetOutputPath(path);
 
             File.WriteAllText(outputPath, htmlContent);
-            RecompressStaticFile(outputPath);
+            this.RecompressStaticFile(outputPath);
 
             using var htmlDoc = this.HtmlParser.ParseDocument(htmlContent);
             var links = htmlDoc.Links
@@ -83,7 +94,16 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             foreach (var link in links)
             {
-                await SaveToStaticFileAsync(link);
+                await this.SaveToStaticFileAsync(link);
+            }
+        }
+
+        private static void IndentedWriteLines(string content, int indentSize = 4)
+        {
+            var indentSpaces = new string(' ', indentSize);
+            foreach (var contentLine in content.Split('\n').Select(s => s.TrimEnd('\r')))
+            {
+                Console.WriteLine(indentSpaces + contentLine);
             }
         }
 
