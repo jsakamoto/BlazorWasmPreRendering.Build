@@ -30,6 +30,7 @@ public class StaticlizeCrawlerTest
 
         var crawler = new StaticlizeCrawler(
             baseUrl,
+            urlPathToExplicitFetch: null,
             webRootPath: outDir,
             OutputStyle.IndexHtmlInSubFolders,
             enableBrotliCompression: false,
@@ -50,6 +51,7 @@ public class StaticlizeCrawlerTest
 
         var crawler = new StaticlizeCrawler(
             baseUrl,
+            urlPathToExplicitFetch: null,
             webRootPath: outDir,
             OutputStyle.AppendHtmlExtension,
             enableBrotliCompression: false,

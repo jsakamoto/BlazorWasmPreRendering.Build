@@ -43,6 +43,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             var crawler = new StaticlizeCrawler(
                 baseUrl,
+                commandLineOptions.UrlPathToExplicitFetch,
                 prerenderingOptions.WebRootPath,
                 commandLineOptions.OutputStyle,
                 prerenderingOptions.EnableGZipCompression,

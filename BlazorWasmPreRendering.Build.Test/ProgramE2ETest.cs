@@ -89,26 +89,83 @@ public class ProgramE2ETest
         // Validate prerendered contents.
 
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
-        var counterIndexHtmlPath = Path.Combine(wwwrootDir, "counter", "index.html");
-        var fetchdataIndexHtmlPath = Path.Combine(wwwrootDir, "fetchdata", "index.html");
-        File.Exists(rootIndexHtmlPath).IsTrue();
-        File.Exists(counterIndexHtmlPath).IsTrue();
-        File.Exists(fetchdataIndexHtmlPath).IsTrue();
+        var expectedHtmlFiles = GetFullPathList(wwwrootDir, "counter/index.html", "fetchdata/index.html", "index.html");
 
-        var htmlParser = new HtmlParser();
-        using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
-        using var counterIndexHtml = htmlParser.ParseDocument(File.ReadAllText(counterIndexHtmlPath));
-        using var fetchdataIndexHtml = htmlParser.ParseDocument(File.ReadAllText(fetchdataIndexHtmlPath));
+        var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
+        actualHtmlFiles.Is(expectedHtmlFiles);
 
         // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
-        rootIndexHtml.Title.Is("Home");
-        counterIndexHtml.Title.Is("Counter");
-        fetchdataIndexHtml.Title.Is("Weather forecast");
+        Validate(actualHtmlFiles[2], title_is: "Home", h1_is: "Hello, world!");
+        Validate(actualHtmlFiles[0], title_is: "Counter", h1_is: "Counter");
+        Validate(actualHtmlFiles[1], title_is: "Weather forecast", h1_is: "Weather forecast");
+    }
 
-        rootIndexHtml.QuerySelector("h1")!.TextContent.Is("Hello, world!");
-        counterIndexHtml.QuerySelector("h1")!.TextContent.Is("Counter");
-        fetchdataIndexHtml.QuerySelector("h1")!.TextContent.Is("Weather forecast");
+    [Test]
+    public async Task Including_EasterEggPage_TestAsync()
+    {
+        // Given
+
+        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
+        var sampleAppProjectDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp1");
+        using var publishDir = new WorkDirectory();
+
+        var publishProcess = XProcess.Start(
+            "dotnet",
+            $"publish -c:Debug -p:BlazorEnableCompression=false -p:BlazorWasmPrerendering=disable -o:\"{publishDir}\"",
+            workingDirectory: sampleAppProjectDir);
+        await publishProcess.WaitForExitAsync();
+        publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);
+
+        // When
+
+        // Execute prerenderer
+        var exitCode = await Program.Main(new[] {
+            "-a", "BlazorWasmApp1",
+            "-t", "BlazorWasmApp1.App",
+            "--selectorofrootcomponent", "#app,app",
+            "--selectorofheadoutletcomponent", "head::after",
+            "-p", publishDir,
+            "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
+            "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
+            "-f", "net5.0",
+            "-o", "AppendHtmlExtension",
+            "-u", "/easter-egg"
+        });
+        exitCode.Is(0);
+
+        // Then
+
+        // Validate prerendered contents.
+
+        var wwwrootDir = Path.Combine(publishDir, "wwwroot");
+        var expectedHtmlFiles = GetFullPathList(wwwrootDir, "counter.html", "easter-egg.html", "fetchdata.html", "index.html");
+
+        var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
+        actualHtmlFiles.Is(expectedHtmlFiles);
+
+        // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
+        Validate(actualHtmlFiles[3], title_is: "Home", h1_is: "Hello, world!");
+        Validate(actualHtmlFiles[0], title_is: "Counter", h1_is: "Counter");
+        Validate(actualHtmlFiles[2], title_is: "Weather forecast", h1_is: "Weather forecast");
+        Validate(actualHtmlFiles[1], title_is: "Easter Egg", h1_is: "Hello, Easter Egg!");
+    }
+
+    private static string[] GetFullPathList(string baseDir, params string[] pathList)
+    {
+        return pathList
+            .Select(path => Path.Combine(path.Split('/')))
+            .Select(path => Path.Combine(baseDir, path))
+            .ToArray();
+    }
+
+    private static void Validate(string htmlPath, string title_is, string h1_is)
+    {
+        var htmlParser = new HtmlParser();
+        using var html = htmlParser.ParseDocument(File.ReadAllText(htmlPath));
+
+        html.Title.Is(title_is);
+
+        html.QuerySelector("h1")!.TextContent.Trim().Is(h1_is);
     }
 
     [Test]
@@ -148,17 +205,13 @@ public class ProgramE2ETest
         // Validate prerendered contents.
 
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
-        var aboutIndexHtmlPath = Path.Combine(wwwrootDir, "about-this-site", "index.html");
-        File.Exists(rootIndexHtmlPath).IsTrue();
-        File.Exists(aboutIndexHtmlPath).IsTrue();
+        var expectedHtmlFiles = GetFullPathList(wwwrootDir, "about-this-site/index.html", "index.html");
 
-        var htmlParser = new HtmlParser();
-        using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
-        using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
+        var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
+        actualHtmlFiles.Is(expectedHtmlFiles);
 
-        rootIndexHtml.QuerySelector("h1")!.TextContent.Trim().Is("Welcome to Blazor Wasm App 2!");
-        aboutIndexHtml.QuerySelector("h1")!.TextContent.Trim().Is("About Page");
+        Validate(actualHtmlFiles[0], title_is: "BlazorWasmApp2.Client", h1_is: "About Page");
+        Validate(actualHtmlFiles[1], title_is: "BlazorWasmApp2.Client", h1_is: "Welcome to Blazor Wasm App 2!");
     }
 
     [Test]
@@ -198,17 +251,13 @@ public class ProgramE2ETest
         // Validate prerendered contents.
 
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
-        var aboutIndexHtmlPath = Path.Combine(wwwrootDir, "about-this-site", "index.html");
-        File.Exists(rootIndexHtmlPath).IsTrue();
-        File.Exists(aboutIndexHtmlPath).IsTrue();
+        var expectedHtmlFiles = GetFullPathList(wwwrootDir, "about-this-site/index.html", "index.html");
 
-        var htmlParser = new HtmlParser();
-        using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
-        using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
+        var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
+        actualHtmlFiles.Is(expectedHtmlFiles);
 
-        rootIndexHtml.QuerySelector("h1")!.TextContent.Trim().Is("Welcome to Blazor Wasm App 2!");
-        aboutIndexHtml.QuerySelector("h1")!.TextContent.Trim().Is("About Page");
+        Validate(actualHtmlFiles[0], title_is: "BlazorWasmApp2.Client", h1_is: "About Page");
+        Validate(actualHtmlFiles[1], title_is: "BlazorWasmApp2.Client", h1_is: "Welcome to Blazor Wasm App 2!");
     }
 
     [Test]

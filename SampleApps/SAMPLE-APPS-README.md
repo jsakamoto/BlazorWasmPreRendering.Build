@@ -13,8 +13,10 @@
 
 - .NET 5.0
 - The root component DOM element tag is `<div id="app">`.
-- It is deployed to the GitHub Pages by GitHub Actions script.
+- It is referenced from the End-to-End test.
 - Set page titles by `Toolbelt.Blazor.HeadElement`.
+- It is deployed to the GitHub Pages by GitHub Actions script.
+- Include the easter egg page.
 
 ## BlazorWasmApp2
 

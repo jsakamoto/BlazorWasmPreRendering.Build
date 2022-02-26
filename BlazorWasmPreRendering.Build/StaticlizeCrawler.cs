@@ -29,8 +29,11 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         private bool EnableBrotliCompression { get; }
 
+        private IEnumerable<string> UrlPathToExplicitFetch { get; }
+
         public StaticlizeCrawler(
             string baseUrl,
+            string? urlPathToExplicitFetch,
             string webRootPath,
             OutputStyle outputStyle,
             bool enableGZipCompression,
@@ -41,9 +44,23 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             this.OutputStyle = outputStyle;
             this.EnableGZipCompression = enableGZipCompression;
             this.EnableBrotliCompression = enableBrotliCompression;
+
+            this.UrlPathToExplicitFetch = (urlPathToExplicitFetch ?? "")
+                .Split(';')
+                .Select(s => s.Trim())
+                .Where(s => !string.IsNullOrEmpty(s))
+                .ToArray();
         }
 
-        public Task SaveToStaticFileAsync() => this.SaveToStaticFileAsync("/");
+        public async Task SaveToStaticFileAsync()
+        {
+            await this.SaveToStaticFileAsync("/");
+
+            foreach (var urlPathToExplicitFetch in this.UrlPathToExplicitFetch)
+            {
+                await this.SaveToStaticFileAsync(urlPathToExplicitFetch);
+            }
+        }
 
         private async Task SaveToStaticFileAsync(string path)
         {
