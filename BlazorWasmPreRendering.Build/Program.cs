@@ -50,6 +50,19 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 prerenderingOptions.EnableBrotliCompression);
             await crawler.SaveToStaticFileAsync();
 
+
+            if (crawler.EncounteredAnyErrors && !commandLineOptions.KeepRunning)
+            {
+                Console.WriteLine();
+                Console.WriteLine("INFORMATION");
+                Console.WriteLine("===========");
+                Console.WriteLine("The crawler encountered whatever errors.");
+                Console.WriteLine("If you want to keep running the pre-rendering server process for debugging it on live, you can do that by setting the \"BlazorWasmPrerenderingKeepServer\" MSBuild property to \"true\".");
+                Console.WriteLine();
+                Console.WriteLine("ex) dotnet publish -p:BlazorWasmPrerenderingKeepServer=true");
+                Console.WriteLine();
+            }
+
             Console.WriteLine("Fetching complete.");
 
             await ServiceWorkerAssetsManifest.UpdateAsync(

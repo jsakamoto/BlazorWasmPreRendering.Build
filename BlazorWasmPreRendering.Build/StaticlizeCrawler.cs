@@ -13,6 +13,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 {
     internal class StaticlizeCrawler
     {
+        public bool EncounteredAnyErrors { get; private set; } = false;
+
         private HtmlParser HtmlParser { get; } = new();
 
         private HashSet<string> SavedPathSet { get; } = new();
@@ -72,6 +74,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             if (!Uri.TryCreate(requestUrl, UriKind.Absolute, out var _))
             {
+                this.EncounteredAnyErrors = true;
                 IndentedWriteLines($"[ERROR] The request URL ({requestUrl}) was not valid format.", indentSize: 2);
                 return;
             }
@@ -80,6 +83,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
+                this.EncounteredAnyErrors = true;
                 IndentedWriteLines($"[ERROR] The HTTP status code was not OK. (it was {response.StatusCode}.)", indentSize: 2);
 
                 if (response.Content.Headers.ContentType?.MediaType?.StartsWith("text/") == true)

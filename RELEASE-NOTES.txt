@@ -1,3 +1,6 @@
+v.1.0.0-preview.19.2
+- Improve: show the message explaining how to keep running the pre-rendering server process for debugging when the crawler encountered whatever errors.
+
 v.1.0.0-preview.19.0
 - Improve: allows specifying an URL path list that are not linked from anywhere for explicit fetching.
 
