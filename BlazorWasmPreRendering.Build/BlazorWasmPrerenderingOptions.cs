@@ -19,6 +19,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         public IndexHtmlFragments IndexHtmlFragments { get; init; } = null!;
 
+        public bool DeleteLoadingContents { get; init; }
+
 
 
         public bool EnableGZipCompression { get; init; }

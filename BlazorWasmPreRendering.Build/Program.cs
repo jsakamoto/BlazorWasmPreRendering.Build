@@ -106,7 +106,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var enableGZipCompression = File.Exists(indexHtmlPath + ".gz");
             var enableBrotliCompression = File.Exists(indexHtmlPath + ".br");
 
-            var htmlFragment = IndexHtmlFragments.Load(indexHtmlPath, commandLineOptions.SelectorOfRootComponent, commandLineOptions.SelectorOfHeadOutletComponent);
+            var htmlFragment = IndexHtmlFragments.Load(indexHtmlPath, commandLineOptions.SelectorOfRootComponent, commandLineOptions.SelectorOfHeadOutletComponent, commandLineOptions.DeleteLoadingContents);
             var options = new BlazorWasmPrerenderingOptions
             {
                 WebRootPath = webRootPath,
@@ -117,6 +117,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 HeadOutletComponentType = typeof(Microsoft.AspNetCore.Components.Web.HeadOutlet),
 #endif
                 IndexHtmlFragments = htmlFragment,
+                DeleteLoadingContents = commandLineOptions.DeleteLoadingContents,
 
                 EnableGZipCompression = enableGZipCompression,
                 EnableBrotliCompression = enableBrotliCompression,

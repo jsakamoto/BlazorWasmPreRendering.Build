@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using BlazorWasmPreRendering.Build.Test.Constants;
 using NUnit.Framework;
 using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer;
@@ -52,8 +53,9 @@ public class ProgramE2ETest
         ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, outputStyle: OutputStyle.IndexHtmlInSubFolders);
     }
 
-    [Test]
-    public async Task Including_ServerSide_Middleware_TestAsync()
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Including_ServerSide_Middleware_TestAsync(bool deleteLoadingContents)
     {
         // Given
 
@@ -80,7 +82,8 @@ public class ProgramE2ETest
             "-p", publishDir,
             "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
-            "-f", "net5.0"
+            "-f", "net5.0",
+            deleteLoadingContents ? "-d" : ""
         });
         exitCode.Is(0);
 
@@ -95,13 +98,15 @@ public class ProgramE2ETest
         actualHtmlFiles.Is(expectedHtmlFiles);
 
         // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
-        Validate(actualHtmlFiles[2], title_is: "Home", h1_is: "Hello, world!");
-        Validate(actualHtmlFiles[0], title_is: "Counter", h1_is: "Counter");
-        Validate(actualHtmlFiles[1], title_is: "Weather forecast", h1_is: "Weather forecast");
+        const string loadingContents = "Loading...";
+        Validate(actualHtmlFiles[2], loadingContents, title_is: "Home", h1_is: "Hello, world!", deleteLoadingContents);
+        Validate(actualHtmlFiles[0], loadingContents, title_is: "Counter", h1_is: "Counter", deleteLoadingContents);
+        Validate(actualHtmlFiles[1], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", deleteLoadingContents);
     }
 
-    [Test]
-    public async Task Including_EasterEggPage_TestAsync()
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Including_EasterEggPage_TestAsync(bool deleteLoadingContents)
     {
         // Given
 
@@ -129,7 +134,8 @@ public class ProgramE2ETest
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
             "-f", "net5.0",
             "-o", "AppendHtmlExtension",
-            "-u", "/easter-egg"
+            "-u", "/easter-egg",
+            deleteLoadingContents? "-d" : ""
         });
         exitCode.Is(0);
 
@@ -144,10 +150,11 @@ public class ProgramE2ETest
         actualHtmlFiles.Is(expectedHtmlFiles);
 
         // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
-        Validate(actualHtmlFiles[3], title_is: "Home", h1_is: "Hello, world!");
-        Validate(actualHtmlFiles[0], title_is: "Counter", h1_is: "Counter");
-        Validate(actualHtmlFiles[2], title_is: "Weather forecast", h1_is: "Weather forecast");
-        Validate(actualHtmlFiles[1], title_is: "Easter Egg", h1_is: "Hello, Easter Egg!");
+        const string loadingContents = "Loading...";
+        Validate(actualHtmlFiles[3], loadingContents, title_is: "Home", h1_is: "Hello, world!", deleteLoadingContents);
+        Validate(actualHtmlFiles[0], loadingContents, title_is: "Counter", h1_is: "Counter", deleteLoadingContents);
+        Validate(actualHtmlFiles[2], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", deleteLoadingContents);
+        Validate(actualHtmlFiles[1], loadingContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!", deleteLoadingContents);
     }
 
     private static string[] GetFullPathList(string baseDir, params string[] pathList)
@@ -158,7 +165,7 @@ public class ProgramE2ETest
             .ToArray();
     }
 
-    private static void Validate(string htmlPath, string title_is, string h1_is)
+    private static void Validate(string htmlPath, string loadingContents, string title_is, string h1_is, bool loadingContentsAreDeleted = false)
     {
         var htmlParser = new HtmlParser();
         using var html = htmlParser.ParseDocument(File.ReadAllText(htmlPath));
@@ -166,10 +173,33 @@ public class ProgramE2ETest
         html.Title.Is(title_is);
 
         html.QuerySelector("h1")!.TextContent.Trim().Is(h1_is);
+
+        var appElement = html.QuerySelector("#app");
+        if (appElement == null) throw new Exception("the element #app was not found.");
+
+        if (loadingContentsAreDeleted)
+        {
+            appElement.InnerHtml.TrimStart().StartsWith(
+                "<!-- %%-PRERENDERING-BEGIN-%% -->\n"
+            ).IsTrue();
+            appElement.InnerHtml.TrimStart().StartsWith(
+                "<!-- %%-PRERENDERING-BEGIN-%% -->\n" +
+                "<div style=\"opacity: 0; position: fixed; z-index: -1; top: 0; left: 0; bottom: 0; right: 0;\">"
+            ).IsFalse();
+        }
+        else
+        {
+            appElement.InnerHtml.TrimStart().StartsWith(
+                loadingContents + "\n" +
+                "<!-- %%-PRERENDERING-BEGIN-%% -->\n" +
+                "<div style=\"opacity: 0; position: fixed; z-index: -1; top: 0; left: 0; bottom: 0; right: 0;\">"
+            ).IsTrue();
+        }
     }
 
-    [Test]
-    public async Task AppComponent_is_in_the_other_Assembly_TestAsync()
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task AppComponent_is_in_the_other_Assembly_TestAsync(bool deleteLoadingContents)
     {
         // Given
 
@@ -196,7 +226,8 @@ public class ProgramE2ETest
             "-p", publishDir,
             "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
             "-m", "",
-            "-f", "net5.0"
+            "-f", "net5.0",
+            deleteLoadingContents? "-d" : ""
         });
         exitCode.Is(0);
 
@@ -210,12 +241,13 @@ public class ProgramE2ETest
         var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
         actualHtmlFiles.Is(expectedHtmlFiles);
 
-        Validate(actualHtmlFiles[0], title_is: "BlazorWasmApp2.Client", h1_is: "About Page");
-        Validate(actualHtmlFiles[1], title_is: "BlazorWasmApp2.Client", h1_is: "Welcome to Blazor Wasm App 2!");
+        Validate(actualHtmlFiles[0], BlazorWasmApp2.LoadingContents, title_is: "BlazorWasmApp2.Client", h1_is: "About Page", deleteLoadingContents);
+        Validate(actualHtmlFiles[1], BlazorWasmApp2.LoadingContents, title_is: "BlazorWasmApp2.Client", h1_is: "Welcome to Blazor Wasm App 2!", deleteLoadingContents);
     }
 
-    [Test]
-    public async Task AppComponent_is_in_the_other_Assembly_and_FallBack_TestAsync()
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task AppComponent_is_in_the_other_Assembly_and_FallBack_TestAsync(bool deleteLoadingContents)
     {
         // Given
 
@@ -242,7 +274,8 @@ public class ProgramE2ETest
             "-p", publishDir,
             "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
             "-m", "",
-            "-f", "net5.0"
+            "-f", "net5.0",
+            deleteLoadingContents ? "-d" : ""
         });
         exitCode.Is(0);
 
@@ -256,8 +289,8 @@ public class ProgramE2ETest
         var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
         actualHtmlFiles.Is(expectedHtmlFiles);
 
-        Validate(actualHtmlFiles[0], title_is: "BlazorWasmApp2.Client", h1_is: "About Page");
-        Validate(actualHtmlFiles[1], title_is: "BlazorWasmApp2.Client", h1_is: "Welcome to Blazor Wasm App 2!");
+        Validate(actualHtmlFiles[0], BlazorWasmApp2.LoadingContents, title_is: "BlazorWasmApp2.Client", h1_is: "About Page", deleteLoadingContents);
+        Validate(actualHtmlFiles[1], BlazorWasmApp2.LoadingContents, title_is: "BlazorWasmApp2.Client", h1_is: "Welcome to Blazor Wasm App 2!", deleteLoadingContents);
     }
 
     [Test]

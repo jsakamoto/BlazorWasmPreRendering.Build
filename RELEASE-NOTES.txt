@@ -1,4 +1,5 @@
-v.1.0.0-preview.19.7
+v.1.0.0-preview.19.8
+- Improve: add the "BlazorWasmPrerenderingDeleteLoadingContents" option for deleting "Loading...." contents from pre-rendered HTML and making pre-rendered contents are visible immediately even Blazor Wasm runtime has not been started.
 - Improve: show the message explaining how to keep running the pre-rendering server process for debugging when the crawler encountered whatever errors.
 - Improve: just skip "javascript:" links instead of reporting them as errors.
 

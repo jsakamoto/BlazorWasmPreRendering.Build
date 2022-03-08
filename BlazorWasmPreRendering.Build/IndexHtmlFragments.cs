@@ -20,7 +20,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             this.LastPart = lastPart;
         }
 
-        public static IndexHtmlFragments Load(string indexHtmlPath, string selectorOfRootComponent, string? selectorOfHeadOutletComponent)
+        public static IndexHtmlFragments Load(string indexHtmlPath, string rootComponentSelector, string? headOutletComponentSelector, bool deleteLoadingContents)
         {
             var indexHtmlText = File.ReadAllText(indexHtmlPath);
             indexHtmlText = indexHtmlText.Replace("\r\n", "\n");
@@ -48,7 +48,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var parser = new HtmlParser();
             var indexHtmlDoc = parser.ParseDocument(indexHtmlText);
 
-            foreach (var eachSelector in new[] { selectorOfRootComponent, selectorOfHeadOutletComponent ?? "head::after" })
+            foreach (var eachSelector in new[] { rootComponentSelector, headOutletComponentSelector ?? "head::after" })
             {
                 var selector = eachSelector;
                 var insertPosition = AdjacentPosition.BeforeEnd;
@@ -64,6 +64,12 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
                 var componentElement = indexHtmlDoc.QuerySelector(selector);
                 if (componentElement == null) throw new Exception($"The element matches with selector \"{selector}\" was not found in the index.html.");
+
+                if (eachSelector == rootComponentSelector && deleteLoadingContents)
+                {
+                    componentElement.InnerHtml = ""; // delete the "Loading..." contents inside of the root component element.
+                }
+
                 componentElement.Insert(insertPosition, markerComment);
             }
 

@@ -24,6 +24,8 @@
 
         public OutputStyle OutputStyle { get; set; } = OutputStyle.IndexHtmlInSubFolders;
 
+        public bool DeleteLoadingContents { get; set; }
+
         public string? UrlPathToExplicitFetch { get; set; }
 
         public bool KeepRunning { get; init; }
