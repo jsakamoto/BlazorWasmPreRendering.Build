@@ -64,18 +64,29 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             }
         }
 
-        private async Task SaveToStaticFileAsync(string path)
+        private Task SaveToStaticFileAsync(string path)
         {
-            if (this.SavedPathSet.Contains(path)) return;
-            this.SavedPathSet.Add(path);
+            return this.SaveToStaticFileAsync((Href: $"about://{path}", Protocol: "about://", PathName: path));
+        }
 
-            var requestUrl = this.BaseUrl + path;
+        private async Task SaveToStaticFileAsync((string Href, string Protocol, string PathName) args)
+        {
+            if (this.SavedPathSet.Contains(args.Href)) return;
+            this.SavedPathSet.Add(args.Href);
+
+            if (args.Protocol == "javascript:")
+            {
+                IndentedWriteLines($"[WARNING] The requested URL ({args.Href}) was not navigatable.", indentSize: 0);
+                return;
+            }
+
+            var requestUrl = this.BaseUrl + args.PathName;
             Console.WriteLine($"Getting {requestUrl}...");
 
             if (!Uri.TryCreate(requestUrl, UriKind.Absolute, out var _))
             {
                 this.EncounteredAnyErrors = true;
-                IndentedWriteLines($"[ERROR] The request URL ({requestUrl}) was not valid format.", indentSize: 2);
+                IndentedWriteLines($"[ERROR] The requested URL ({requestUrl}) was not valid format.", indentSize: 2);
                 return;
             }
 
@@ -106,7 +117,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             }
 
             var htmlContent = await response.Content.ReadAsStringAsync();
-            var outputPath = this.GetOutputPath(path);
+            var outputPath = this.GetOutputPath(args.PathName);
 
             File.WriteAllText(outputPath, htmlContent);
             this.RecompressStaticFile(outputPath);
@@ -117,12 +128,11 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 .Where(link => string.IsNullOrEmpty(link.Origin))
                 .Where(link => string.IsNullOrEmpty(link.Target))
                 .Where(link => !string.IsNullOrEmpty(link.PathName))
-                .Select(link => link.PathName)
                 .ToArray();
 
             foreach (var link in links)
             {
-                await this.SaveToStaticFileAsync(link);
+                await this.SaveToStaticFileAsync((link.Href, link.Protocol, link.PathName));
             }
         }
 
