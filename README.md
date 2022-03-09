@@ -12,7 +12,7 @@ This will help make the contents of your Blazor WebAssembly static apps findable
 **And after installing this package:**  
 ![fig.2 - after](https://raw.githubusercontent.com/jsakamoto/BlazorWasmPreRendering.Build/master/.assets/fig02.after.png)
 
-## Usage
+## Quick Start
 
 Install this package to your Blazor WebAssembly project.
 
@@ -22,7 +22,7 @@ dotnet add package BlazorWasmPreRendering.Build --version 1.0.0-preview.14.0
 
 Basically, **that's all**.
 
-Once installing this package is done, the output of the `dotnet publish` command will include pre-rendered contents.
+**Once installing this package is done, the output of the `dotnet publish` command will include pre-rendered contents.**
 
 ## Configurations
 
@@ -129,13 +129,15 @@ If the root component doesn't live in the application assembly, you can specify 
     ...
 ```
 
+(* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
+
 #### Note: If the specified type was not found...
 
 If the specified type was not found, as a fallback behavior, this package tries to find the root component type (which has the type name "App" and inherits `ComponentBase` type) **from all assemblies that referenced from the application assembly**.
 
 ### Hosting Environment
 
-The host environment returns the environment name "Prerendering" during the pre-rendering process.
+The host environment returns the environment name **"Prerendering"** during the pre-rendering process.
 
 ```html
 @inject IWebAssemblyHostEnvironment HostEnv
@@ -146,6 +148,7 @@ The host environment returns the environment name "Prerendering" during the pre-
 If you want to customize the host environment name during the pre-rendering process, please specify the "BlazorWasmPrerenderingEnvironment" MSBuild property inside your .csproj file or inside of the "dotnet publish" command-line argument.
 
 ```xml
+<!-- This is the .csproj file of your Blazor WebAssembly app -->
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
   ...
   <PropertyGroup>
@@ -154,6 +157,7 @@ If you want to customize the host environment name during the pre-rendering proc
     <BlazorWasmPrerenderingEnvironment>Production</BlazorWasmPrerenderingEnvironment>
     ...
 ```
+(* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
 
 ### Output style
 
@@ -162,6 +166,7 @@ By default, all staticalized output HTML files are named "index.html" and are pl
 But if you **set the `BlazorWasmPrerenderingOutputStyle` MSBuild property to `AppendHtmlExtension`** when you publish the project, the staticalized files are named with **each request URL path appended ".html" file extension.**
 
 ```xml
+<!-- This is the .csproj file of your Blazor WebAssembly app -->
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
   ...
   <PropertyGroup>
@@ -172,6 +177,37 @@ But if you **set the `BlazorWasmPrerenderingOutputStyle` MSBuild property to `Ap
     <BlazorWasmPrerenderingOutputStyle>AppendHtmlExtension</BlazorWasmPrerenderingOutputStyle>
     ...
 ```
+(* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
+
+### Delete the "Loading..." contents
+
+By default, this package **keeps the "Loading..." contents** in the original fallback page (such as an `index.html`) into prerendered output static HTML files.
+
+And, **prerendered contents are invisible** on the browser screen.  
+(Only search engine crawlers can read them.)
+
+That is by design because even if users can see the prerendered contents immediately after initial page loading, **that page can not interact with users for a few seconds** until the Blazor WebAssembly runtime has been warmed up.
+
+However, in some cases, developers can control the user interactions completely until the Blazor WebAssembly runtime warmed up, and they would like to make the prerendered contents are visible immediately.
+
+For that case, set the `BlazorWasmPrerenderingDeleteLoadingContents` MSBuild property to `true`.
+
+```xml
+<!-- This is the .csproj file of your Blazor WebAssembly app -->
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  ...
+  <PropertyGroup>
+    <!--
+    👇 If you set this MSBuild property to true, 
+       then outut HTML files do not contain the "Loading..." contents,
+       and prerendered contents will be visible immediately. -->
+    <BlazorWasmPrerenderingDeleteLoadingContents>true</BlazorWasmPrerenderingDeleteLoadingContents>
+    ...
+```
+
+When that MSBuild property is set to `true`, this package deletes the "Loading..." contents from prerendered static HTML files and does not hide prerendered contents from users.
+
+(* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
 
 ### Url path to explicit fetch
 
@@ -193,6 +229,31 @@ To support that case, please **set the URL path list that you want to fetch expl
     <BlazorWasmPrerenderingUrlPathToExplicitFetch>/unkinked/page1;/unlinked/page2</BlazorWasmPrerenderingUrlPathToExplicitFetch>
     ...
 ```
+(* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
+
+## Troubleshooting
+
+If any exceptions happen in the prerendering process, the exception messages and stack traces will be shown in the console output of the `dotnet publish command.
+
+![fig.3 - an exception messaage and a stack trace](https://raw.githubusercontent.com/jsakamoto/BlazorWasmPreRendering.Build/master/.assets/fig04.http500.png)
+
+Those outputs should be helpful for you to investigate and resolve those exceptions.
+
+But in some cases, developers may want to investigate the living prerendering process.
+
+To do that, please set the `BlazorWasmPrerenderingKeepServer` MSBuild property to `true`.
+
+```shell
+dotnet publish -c:Release -p:BlazorWasmPrerenderingKeepServer=true
+```
+
+(* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
+
+When that MSBuild property is set to `true`, the `dotnet publish` command will not be exited, and the prerendering process is kept running until the Ctrl + C keyboard combination is pressed.
+
+During the prerendering process is running, developers can investigate it.
+
+![fig.4 - an exception messaage and a stack trace](https://raw.githubusercontent.com/jsakamoto/BlazorWasmPreRendering.Build/master/.assets/fig05.keeprunning.png)
 
 ## Appendix
 

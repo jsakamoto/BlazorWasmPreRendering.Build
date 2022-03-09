@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWasmPreRendering.Buil
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "README", "README", "{2765C3AD-EDA3-487A-B8DC-B4FA4E6FCD18}"
 	ProjectSection(SolutionItems) = preProject
+		MSBUILD-PROPERTIES.md = MSBUILD-PROPERTIES.md
 		README.md = README.md
 		RELEASE-NOTES.txt = RELEASE-NOTES.txt
 	EndProjectSection
