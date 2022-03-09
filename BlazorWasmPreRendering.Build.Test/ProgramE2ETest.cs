@@ -365,6 +365,21 @@ public class ProgramE2ETest
     }
 
     [Test]
+    public async Task Publish_with_HTTP500_Test()
+    {
+        // Given
+        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
+        var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp1");
+        using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
+
+        // When (Set the hoting environment name to "ExceptionTest")
+        var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Release -p:BlazorWasmPrerenderingEnvironment=ExceptionTest -p:BlazorEnableCompression=false --nologo", workDir).WaitForExitAsync();
+
+        // Then (Exit code is NOT 0)
+        dotnetCLI.ExitCode.IsNot(0, message: dotnetCLI.Output);
+    }
+
+    [Test]
     public async Task AppSettings_Test()
     {
         // Given

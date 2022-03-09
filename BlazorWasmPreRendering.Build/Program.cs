@@ -25,11 +25,11 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var assemblyLoader = new CustomAssemblyLoader();
             var prerenderingOptions = BuildPrerenderingOptions(assemblyLoader, commandLineOptions);
 
-            await PreRenderToStaticFilesAsync(commandLineOptions, assemblyLoader, prerenderingOptions);
-            return 0;
+            var success = await PreRenderToStaticFilesAsync(commandLineOptions, assemblyLoader, prerenderingOptions);
+            return success ? 0 : 1;
         }
 
-        private static async Task PreRenderToStaticFilesAsync(CommandLineOptions commandLineOptions, CustomAssemblyLoader assemblyLoader, BlazorWasmPrerenderingOptions prerenderingOptions)
+        private static async Task<bool> PreRenderToStaticFilesAsync(CommandLineOptions commandLineOptions, CustomAssemblyLoader assemblyLoader, BlazorWasmPrerenderingOptions prerenderingOptions)
         {
             using var webHost = await ServerSideRenderingWebHost.StartWebHostAsync(
                 assemblyLoader,
@@ -78,6 +78,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             else await webHost.StopAsync();
 
             await webHost.WaitForShutdownAsync();
+
+            return !crawler.EncounteredAnyErrors;
         }
 
         internal static BlazorWasmPrerenderingOptions BuildPrerenderingOptions(CustomAssemblyLoader assemblyLoader, CommandLineOptions commandLineOptions)
