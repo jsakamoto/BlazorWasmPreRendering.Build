@@ -1,3 +1,6 @@
+v.1.0.0-preview.21.0
+- Fix: the exit code of the "dotnet publish" command was 0 even when prerendering process encountered errors.
+
 v.1.0.0-preview.20.0
 - Improve: add the "BlazorWasmPrerenderingDeleteLoadingContents" option for deleting "Loading...." contents from pre-rendered HTML and making pre-rendered contents are visible immediately even Blazor Wasm runtime has not been started.
 - Improve: show the message explaining how to keep running the pre-rendering server process for debugging when the crawler encountered whatever errors.
