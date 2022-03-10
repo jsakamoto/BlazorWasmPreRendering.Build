@@ -1,3 +1,7 @@
+v.1.0.0-preview.22.0
+- Fix: crawl a "mailto:" protocol link and returns the result as a failure.
+- Improve: clarify classification of the crawling result (information/warnings/errors)
+
 v.1.0.0-preview.21.0
 - Fix: the exit code of the "dotnet publish" command was 0 even when prerendering process encountered errors.
 
