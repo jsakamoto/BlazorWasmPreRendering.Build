@@ -8,12 +8,13 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using static Toolbelt.Blazor.WebAssembly.PrerenderServer.StaticlizeCrawlingResult;
 
 namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 {
     internal class StaticlizeCrawler
     {
-        public bool EncounteredAnyErrors { get; private set; } = false;
+        private StaticlizeCrawlingResult CrawlingResult { get; set; } = Nothing;
 
         private HtmlParser HtmlParser { get; } = new();
 
@@ -54,7 +55,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 .ToArray();
         }
 
-        public async Task SaveToStaticFileAsync()
+        public async Task<StaticlizeCrawlingResult> SaveToStaticFileAsync()
         {
             await this.SaveToStaticFileAsync("/");
 
@@ -62,11 +63,13 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             {
                 await this.SaveToStaticFileAsync(urlPathToExplicitFetch);
             }
+
+            return this.CrawlingResult;
         }
 
         private Task SaveToStaticFileAsync(string path)
         {
-            return this.SaveToStaticFileAsync((Href: $"about://{path}", Protocol: "about://", PathName: path));
+            return this.SaveToStaticFileAsync((Href: $"about://{path}", Protocol: "about:", PathName: path));
         }
 
         private async Task SaveToStaticFileAsync((string Href, string Protocol, string PathName) args)
@@ -74,9 +77,11 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             if (this.SavedPathSet.Contains(args.Href)) return;
             this.SavedPathSet.Add(args.Href);
 
-            if (args.Protocol == "javascript:")
+            // DEBUG: Console.WriteLine($"Protocol:[{args.Protocol}], PathName:[{args.PathName}], Href:[{args.Href}]");
+
+            if (args.Protocol != "about:")
             {
-                IndentedWriteLines($"[WARNING] The requested URL ({args.Href}) was not navigatable.", indentSize: 0);
+                IndentedWriteLines($"[INFORMATION] The requested URL ({args.Href}) was not navigatable.", indentSize: 0);
                 return;
             }
 
@@ -85,8 +90,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             if (!Uri.TryCreate(requestUrl, UriKind.Absolute, out var _))
             {
-                this.EncounteredAnyErrors = true;
-                IndentedWriteLines($"[ERROR] The requested URL ({requestUrl}) was not valid format.", indentSize: 2);
+                this.CrawlingResult |= HasWarnings;
+                IndentedWriteLines($"[WARNING] The requested URL ({requestUrl}) was not valid format.", indentSize: 2);
                 return;
             }
 
@@ -94,8 +99,9 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                this.EncounteredAnyErrors = true;
-                IndentedWriteLines($"[ERROR] The HTTP status code was not OK. (it was {response.StatusCode}.)", indentSize: 2);
+                var (resultFlag, label) = ((int)response.StatusCode >= 500) ? (HasErrors, "ERROR") : (HasWarnings, "WARNING");
+                this.CrawlingResult |= resultFlag;
+                IndentedWriteLines($"[{label}] The HTTP status code was not OK. (it was ({(int)response.StatusCode}){response.StatusCode}.)", indentSize: 2);
 
                 if (response.Content.Headers.ContentType?.MediaType?.StartsWith("text/") == true)
                 {

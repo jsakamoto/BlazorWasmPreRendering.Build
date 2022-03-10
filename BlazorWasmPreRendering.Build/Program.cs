@@ -25,11 +25,11 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var assemblyLoader = new CustomAssemblyLoader();
             var prerenderingOptions = BuildPrerenderingOptions(assemblyLoader, commandLineOptions);
 
-            var success = await PreRenderToStaticFilesAsync(commandLineOptions, assemblyLoader, prerenderingOptions);
-            return success ? 0 : 1;
+            var crawlingResult = await PreRenderToStaticFilesAsync(commandLineOptions, assemblyLoader, prerenderingOptions);
+            return crawlingResult.HasFlag(StaticlizeCrawlingResult.HasErrors) ? 1 : 0;
         }
 
-        private static async Task<bool> PreRenderToStaticFilesAsync(CommandLineOptions commandLineOptions, CustomAssemblyLoader assemblyLoader, BlazorWasmPrerenderingOptions prerenderingOptions)
+        private static async Task<StaticlizeCrawlingResult> PreRenderToStaticFilesAsync(CommandLineOptions commandLineOptions, CustomAssemblyLoader assemblyLoader, BlazorWasmPrerenderingOptions prerenderingOptions)
         {
             using var webHost = await ServerSideRenderingWebHost.StartWebHostAsync(
                 assemblyLoader,
@@ -48,15 +48,15 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 commandLineOptions.OutputStyle,
                 prerenderingOptions.EnableGZipCompression,
                 prerenderingOptions.EnableBrotliCompression);
-            await crawler.SaveToStaticFileAsync();
+            var crawlingResult = await crawler.SaveToStaticFileAsync();
 
 
-            if (crawler.EncounteredAnyErrors && !commandLineOptions.KeepRunning)
+            if (crawlingResult != StaticlizeCrawlingResult.Nothing && !commandLineOptions.KeepRunning)
             {
                 Console.WriteLine();
                 Console.WriteLine("INFORMATION");
                 Console.WriteLine("===========");
-                Console.WriteLine("The crawler encountered whatever errors.");
+                Console.WriteLine("The crawler encountered errors and/or warnings.");
                 Console.WriteLine("If you want to keep running the pre-rendering server process for debugging it on live, you can do that by setting the \"BlazorWasmPrerenderingKeepServer\" MSBuild property to \"true\".");
                 Console.WriteLine();
                 Console.WriteLine("ex) dotnet publish -p:BlazorWasmPrerenderingKeepServer=true");
@@ -79,7 +79,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             await webHost.WaitForShutdownAsync();
 
-            return !crawler.EncounteredAnyErrors;
+            return crawlingResult;
         }
 
         internal static BlazorWasmPrerenderingOptions BuildPrerenderingOptions(CustomAssemblyLoader assemblyLoader, CommandLineOptions commandLineOptions)
