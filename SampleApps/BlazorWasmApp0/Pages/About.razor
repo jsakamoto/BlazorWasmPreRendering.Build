@@ -1,8 +1,61 @@
 ﻿@page "/about"
+@implements IDisposable
+@inject PersistentComponentState ApplicationState
+
 <PageTitle>About | Blazor Wasm App 0</PageTitle>
 
-<h1>About</h1>
+@if (_State != null)
+{
+	<h1>@_State.Title</h1>
 
-<div>
-	<a href="/">home</a>
-</div>
+	<div>
+		<a href="/">home</a>
+	</div>
+}
+else
+{
+	<div>Fetching page title...</div>
+}
+
+@code
+{
+	public class AboutPageState
+	{
+		public string Title{ get; set; }
+	}
+
+	private AboutPageState _State = null;
+
+	private IDisposable _PersistingSubscription;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		_PersistingSubscription = this.ApplicationState.RegisterOnPersisting(PersistAppsAsync);
+		Console.WriteLine("ApplicationState.TryTakeFromJson...");
+		if (this.ApplicationState.TryTakeFromJson<AboutPageState>("AboutPageState", out var state))
+		{
+			Console.WriteLine("ApplicationState.TryTakeFromJson is true");
+			_State = state;
+		}
+		else
+		{
+			Console.WriteLine("ApplicationState.TryTakeFromJson is false");
+			await Task.Delay(1000);
+			Console.WriteLine("_State = new AboutPageState {...}");
+			_State = new AboutPageState { Title = "About" };
+		}
+	}
+
+	private Task PersistAppsAsync()
+	{
+		Console.WriteLine("PersistAppsAsync");
+		this.ApplicationState.PersistAsJson("AboutPageState", _State);
+		return Task.CompletedTask;
+	}
+
+	 public void Dispose()
+    {
+        _PersistingSubscription?.Dispose();
+    }
+}

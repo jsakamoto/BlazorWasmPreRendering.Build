@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -13,7 +14,10 @@ namespace BlazorWasmApp1
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("#app");
+            if (!builder.RootComponents.Any())
+            {
+                builder.RootComponents.Add<App>("#app");
+            }
             ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
             await builder.Build().RunAsync();
         }
