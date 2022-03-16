@@ -17,7 +17,7 @@ This will help make the contents of your Blazor WebAssembly static apps findable
 Install this package to your Blazor WebAssembly project.
 
 ```
-dotnet add package BlazorWasmPreRendering.Build --version 1.0.0-preview.22.0
+dotnet add package BlazorWasmPreRendering.Build --version 1.0.0-preview.23.0
 ```
 
 Basically, **that's all**.
@@ -231,9 +231,65 @@ To support that case, please **set the URL path list that you want to fetch expl
 ```
 (* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
 
+### Render mode
+
+As you may know, this package is based on the standard ASP.NET Core Blazor server-side prerendering support.
+
+- See also: ["Prerender and integrate ASP.NET Core Razor components | Microsoft Docs"](https://docs.microsoft.com/en-us/aspnet/core/blazor/components/prerendering-and-integration?view=aspnetcore-6.0&pivots=webassembly)
+
+By default, the render mode of prerendering is `Static`.  
+And, **you can specify the render mode to `WebAssemblyRendered` via the `BlazorWasmPrerenderingMode` MSBuild property** if you want.
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  ...
+  <PropertyGroup>
+    <BlazorWasmPrerenderingMode>WebAssemblyRendered</BlazorWasmPrerenderingMode>
+    ...
+```
+(* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
+
+As the side effect of using the `WebAssemblyRendered` render mode, even you specify any values to the "BlazorWasmPrerenderingDeleteLoadingContents" MSBuild property, the "Loading..." contents are always removed, and prerendered contents never are invisible.
+
+When you use the `WebAssemblyRendered` render mode,  please pay attention to implementing a startup code of the Blazor WebAssembly app.
+
+Usually, a startup code of the Blazor WebAssembly app should be like this.
+
+```csharp
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+```
+However, if you use the `WebAssemblyRendered` render mode when prerendering, you should change the startup code below.
+
+```csharp
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+// 👇 Add the condition that determine root components are 
+//    already registered via prerednered HTML contents.
+if (!builder.RootComponents.Any())
+{
+    builder.RootComponents.Add<App>("app");
+    builder.RootComponents.Add<HeadOutlet>("head::after");
+}
+```
+
+That is because the root component types and their insertion positions are specified inside of the prerendered HTML contents, not inside of your C# code when the render mode is `WebAssemblyRendered`.
+
+Moreover, on .NET 6, you can also use the **"persisting prerendered state"** feature.
+
+When the render mode is `WebAssemblyRendered`, this package injects the `<persist-component-state />` tag helper into the fallback page.
+
+So what you should do is inject the `PersistentComponentState` service into your component and use it to store the component state at prerendering and retrieve the saved component state at the Blazor WebAssembly is started.
+
+Using the `WebAssemblyRendered` render mode and the persisting component state feature has **the significant potential to far improve the perceived launch speed of Blazor WebAssembly apps**.
+
+For more details, please see also the following link.
+
+- ["Persist prerendered state - Prerender and integrate ASP.NET Core Razor components | Microsoft Docs"](https://docs.microsoft.com/en-us/aspnet/core/blazor/components/prerendering-and-integration?view=aspnetcore-6.0&pivots=webassembly#persist-prerendered-state).
+
 ## Troubleshooting
 
-If any exceptions happen in the prerendering process, the exception messages and stack traces will be shown in the console output of the `dotnet publish command.
+If any exceptions happen in the prerendering process, the exception messages and stack traces will be shown in the console output of the `dotnet publish` command.
 
 ![fig.3 - an exception messaage and a stack trace](https://raw.githubusercontent.com/jsakamoto/BlazorWasmPreRendering.Build/master/.assets/fig04.http500.png)
 
@@ -241,7 +297,7 @@ Those outputs should be helpful for you to investigate and resolve those excepti
 
 But in some cases, developers may want to investigate the living prerendering process.
 
-To do that, please set the `BlazorWasmPrerenderingKeepServer` MSBuild property to `true`.
+To do that, please **set the `BlazorWasmPrerenderingKeepServer` MSBuild property to `true`**.
 
 ```shell
 dotnet publish -c:Release -p:BlazorWasmPrerenderingKeepServer=true
@@ -249,7 +305,7 @@ dotnet publish -c:Release -p:BlazorWasmPrerenderingKeepServer=true
 
 (* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
 
-When that MSBuild property is set to `true`, the `dotnet publish` command will not be exited, and the prerendering process is kept running until the Ctrl + C keyboard combination is pressed.
+When that MSBuild property is set to `true`, **the `dotnet publish` command will not be exited**, and the prerendering process is kept running until the Ctrl + C keyboard combination is pressed.
 
 During the prerendering process is running, developers can investigate it.
 

@@ -4,6 +4,7 @@
 
 Property name                               | Ddefault value | Description
 --------------------------------------------|----------------|------------
+BlazorWasmPrerendering                      |                | Set the `disable` to suppress prerendering.
 BlazorWasmPrerenderingRootComponentType     | `$(RootNamespace).App` | Set the full name (including namespace) of a root component class.
 BlazorWasmPrerenderingRootComponentSelector | `#app,app`     | Set the DOM element selector for attaching the root component.
 BlazorWasmPrerenderingHeadOutletComponentSelector| `head::after` | Set the DOM element selector for attaching the `<HeadOutlet>` component of the Blazor.
@@ -11,6 +12,7 @@ BlazorWasmPrerenderingOutputStyle           | `IndexHtmlInSubFolders` | When it 
 BlazorWasmPrerenderingDeleteLoadingContents | `false`        | When it is set to `true`, the "Loading..." contents will be deleted from prerendered output HTML files, and prerendered contents to be visible immediately even before the Blazor WebAssembly runtime has warmed up.
 BlazorWasmPrerenderingUrlPathToExplicitFetch|                | Set the semicolon-separated URL paths explicitly that are not linked from anywhere, such as easter-egg pages, to be prerendered.
 BlazorWasmPrerenderingEnvironment           | `Prerendering` | Set a name of a host environment that can retrieve via `IWebHostEnvironment.Environment`.
+BlazorWasmPrerenderingMode                  | `Static`       | Set the render mode in which `Static` or `WebAssemblyPrerendered`.
 BlazorWasmPrerenderingKeepServer            | `false`        | When it is set to `true`, the `dotnet publish` command will not be exited, and the prerendering server process will keep running until `Ctrl` + `C` is pressed.
 
 

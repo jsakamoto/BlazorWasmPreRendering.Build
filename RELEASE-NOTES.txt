@@ -1,3 +1,6 @@
+v.1.0.0-preview.23.0
+- Improve: add support for the "WebAssemblyPrerendered" render mode.
+
 v.1.0.0-preview.22.0
 - Fix: crawl a "mailto:" protocol link and returns the result as a failure.
 - Improve: clarify classification of the crawling result (information/warnings/errors)
