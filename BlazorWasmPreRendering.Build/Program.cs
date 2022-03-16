@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost;
@@ -93,6 +94,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             if (string.IsNullOrEmpty(commandLineOptions.SelectorOfHeadOutletComponent)) throw new ArgumentException("The --selectorofheadoutletcomponent parameter is required.");
 #endif
             if (string.IsNullOrEmpty(commandLineOptions.FrameworkName)) throw new ArgumentException("The -f|--frameworkname parameter is required.");
+            if (commandLineOptions.RenderMode != RenderMode.Static && commandLineOptions.RenderMode != RenderMode.WebAssemblyPrerendered)
+                throw new ArgumentException($"The -r|--rendermode parameter value \"{commandLineOptions.RenderMode}\" is not supported. (Only \"Static\" and \"WebAssemblyPrerendered\" are supported.)");
 
             var webRootPath = Path.Combine(commandLineOptions.PublishedDir, "wwwroot");
 
@@ -118,6 +121,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 #if ENABLE_HEADOUTLET
                 HeadOutletComponentType = typeof(Microsoft.AspNetCore.Components.Web.HeadOutlet),
 #endif
+                RenderMode = commandLineOptions.RenderMode,
                 IndexHtmlFragments = htmlFragment,
                 DeleteLoadingContents = commandLineOptions.DeleteLoadingContents,
 

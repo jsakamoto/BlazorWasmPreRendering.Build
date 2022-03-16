@@ -2,4 +2,4 @@
 @using Toolbelt.Blazor.WebAssembly.PrerenderServer
 @inject BlazorWasmPrerenderingOptions BlazorWasmPrerenderingOptions
 @{ Layout = "_Layout"; }
-@(await Html.RenderComponentAsync(BlazorWasmPrerenderingOptions.RootComponentType, RenderMode.Static, parameters: null))
+@(await Html.RenderComponentAsync(BlazorWasmPrerenderingOptions.RootComponentType, BlazorWasmPrerenderingOptions.RenderMode, parameters: null))

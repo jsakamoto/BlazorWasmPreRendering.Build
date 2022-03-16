@@ -1,4 +1,6 @@
-﻿namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 {
     public class CommandLineOptions
     {
@@ -22,9 +24,17 @@
 
         public string? Environment { get; set; }
 
+        public RenderMode RenderMode { get; set; } = RenderMode.Static;
+
         public OutputStyle OutputStyle { get; set; } = OutputStyle.IndexHtmlInSubFolders;
 
-        public bool DeleteLoadingContents { get; set; }
+        private bool _DeleteLoadingContents = false;
+
+        public bool DeleteLoadingContents
+        {
+            get => this._DeleteLoadingContents || RenderMode != RenderMode.Static;
+            set => this._DeleteLoadingContents = value;
+        }
 
         public string? UrlPathToExplicitFetch { get; set; }
 

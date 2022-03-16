@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 {
@@ -16,6 +17,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
         public Type RootComponentType { get; init; } = null!;
 
         public Type? HeadOutletComponentType { get; init; } = null;
+
+        public RenderMode RenderMode { get; init; }
 
         public IndexHtmlFragments IndexHtmlFragments { get; init; } = null!;
 
