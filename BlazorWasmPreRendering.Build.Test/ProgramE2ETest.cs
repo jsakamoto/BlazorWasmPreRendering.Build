@@ -18,21 +18,10 @@ public class ProgramE2ETest
     public async Task dotNET6_HeadOutlet_TestAsync()
     {
         // Given
-
         // Publish the sample app which sets its titles by .NET 6 <PageTitle>.
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var sampleAppProjectDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
-        using var publishDir = new WorkDirectory();
-
-        var publishProcess = XProcess.Start(
-            "dotnet",
-            $"publish -c:Debug -p:BlazorEnableCompression=false -p:BlazorWasmPrerendering=disable -o:\"{publishDir}\"",
-            workingDirectory: sampleAppProjectDir);
-        await publishProcess.WaitForExitAsync();
-        publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);
+        using var publishDir = await SampleSite.BlazorWasmApp0.PublishAsync();
 
         // When
-
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
             "-a", "BlazorWasmApp0",
@@ -40,14 +29,13 @@ public class ProgramE2ETest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net6.0"),
+            "-i", SampleSite.BlazorWasmApp0.IntermediateDir,
             "-m", "",
             "-f", "net6.0"
         });
         exitCode.Is(0);
 
         // Then
-
         // Validate prerendered contents.
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
         ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, outputStyle: OutputStyle.IndexHtmlInSubFolders);
@@ -58,21 +46,10 @@ public class ProgramE2ETest
     public async Task Including_ServerSide_Middleware_TestAsync(bool deleteLoadingContents)
     {
         // Given
-
         // Publish the sample app which sets its titles by Toolbelt.Blazor.HeadElement
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var sampleAppProjectDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp1");
-        using var publishDir = new WorkDirectory();
-
-        var publishProcess = XProcess.Start(
-            "dotnet",
-            $"publish -c:Debug -p:BlazorEnableCompression=false -p:BlazorWasmPrerendering=disable -o:\"{publishDir}\"",
-            workingDirectory: sampleAppProjectDir);
-        await publishProcess.WaitForExitAsync();
-        publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);
+        using var publishDir = await SampleSite.BlazorWasmApp1.PublishAsync();
 
         // When
-
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
             "-a", "BlazorWasmApp1",
@@ -80,7 +57,7 @@ public class ProgramE2ETest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
+            "-i", SampleSite.BlazorWasmApp1.IntermediateDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
             "-f", "net5.0",
             deleteLoadingContents ? "-d" : ""
@@ -109,20 +86,9 @@ public class ProgramE2ETest
     public async Task Including_EasterEggPage_TestAsync(bool deleteLoadingContents)
     {
         // Given
-
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var sampleAppProjectDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp1");
-        using var publishDir = new WorkDirectory();
-
-        var publishProcess = XProcess.Start(
-            "dotnet",
-            $"publish -c:Debug -p:BlazorEnableCompression=false -p:BlazorWasmPrerendering=disable -o:\"{publishDir}\"",
-            workingDirectory: sampleAppProjectDir);
-        await publishProcess.WaitForExitAsync();
-        publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);
+        using var publishDir = await SampleSite.BlazorWasmApp1.PublishAsync();
 
         // When
-
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
             "-a", "BlazorWasmApp1",
@@ -130,7 +96,7 @@ public class ProgramE2ETest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
+            "-i", SampleSite.BlazorWasmApp1.IntermediateDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
             "-f", "net5.0",
             "-o", "AppendHtmlExtension",
@@ -202,21 +168,10 @@ public class ProgramE2ETest
     public async Task AppComponent_is_in_the_other_Assembly_TestAsync(bool deleteLoadingContents)
     {
         // Given
-
         // Publish the sample app
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var sampleAppProjectDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp2", "Client");
-        using var publishDir = new WorkDirectory();
-
-        var publishProcess = XProcess.Start(
-            "dotnet",
-            $"publish -c:Debug -p:BlazorEnableCompression=false -o:\"{publishDir}\"",
-            workingDirectory: sampleAppProjectDir);
-        await publishProcess.WaitForExitAsync();
-        publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);
+        using var publishDir = await SampleSite.BlazorWasmApp2.PublishAsync();
 
         // When
-
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
             "-a", "BlazorWasmApp2.Client",
@@ -224,7 +179,7 @@ public class ProgramE2ETest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
+            "-i", SampleSite.BlazorWasmApp2.IntermediateDir,
             "-m", "",
             "-f", "net5.0",
             deleteLoadingContents? "-d" : ""
@@ -250,21 +205,10 @@ public class ProgramE2ETest
     public async Task AppComponent_is_in_the_other_Assembly_and_FallBack_TestAsync(bool deleteLoadingContents)
     {
         // Given
-
         // Publish the sample app
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var sampleAppProjectDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp2", "Client");
-        using var publishDir = new WorkDirectory();
-
-        var publishProcess = XProcess.Start(
-            "dotnet",
-            $"publish -c:Debug -p:BlazorEnableCompression=false -o:\"{publishDir}\"",
-            workingDirectory: sampleAppProjectDir);
-        await publishProcess.WaitForExitAsync();
-        publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);
+        using var publishDir = await SampleSite.BlazorWasmApp2.PublishAsync();
 
         // When
-
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
             "-a", "BlazorWasmApp2.Client",
@@ -272,7 +216,7 @@ public class ProgramE2ETest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", Path.Combine(sampleAppProjectDir, "obj", "Debug", "net5.0"),
+            "-i", SampleSite.BlazorWasmApp2.IntermediateDir,
             "-m", "",
             "-f", "net5.0",
             deleteLoadingContents ? "-d" : ""
