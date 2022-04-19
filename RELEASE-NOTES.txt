@@ -1,3 +1,6 @@
+v.1.0.0-preview.24.0
+- Improve: specify middleware packages to be installed by "AssemblyMetadata" attributes.
+
 v.1.0.0-preview.23.0
 - Improve: add support for the "WebAssemblyPrerendered" render mode.
 
