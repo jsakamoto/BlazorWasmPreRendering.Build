@@ -9,6 +9,7 @@ using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer.Models;
 using Toolbelt.Diagnostics;
+using static Toolbelt.Diagnostics.XProcess;
 
 namespace BlazorWasmPreRendering.Build.Test;
 
@@ -43,7 +44,7 @@ public class ProgramE2ETest
 
     [TestCase(true)]
     [TestCase(false)]
-    public async Task Including_ServerSide_Middleware_TestAsync(bool deleteLoadingContents)
+    public async Task Including_ServerSide_Middleware_Legacy_TestAsync(bool deleteLoadingContents)
     {
         // Given
         // Publish the sample app which sets its titles by Toolbelt.Blazor.HeadElement
@@ -79,6 +80,30 @@ public class ProgramE2ETest
         Validate(actualHtmlFiles[2], loadingContents, title_is: "Home", h1_is: "Hello, world!", deleteLoadingContents);
         Validate(actualHtmlFiles[0], loadingContents, title_is: "Counter", h1_is: "Counter", deleteLoadingContents);
         Validate(actualHtmlFiles[1], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", deleteLoadingContents);
+    }
+
+    [Test]
+    public async Task Including_ServerSide_Middleware_from_AssemblyMetaData_TestAsync()
+    {
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp0");
+
+        using var dotnetCLI = Start(
+            "dotnet", "publish -c:Release -p:BlazorWasmPrerenderingKeepServer=true -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false",
+            projectDir,
+            options => options.WhenDisposing = XProcessTerminate.EntireProcessTree);
+        var success = await dotnetCLI.WaitForOutputAsync(output => output.Trim().StartsWith("Start fetching..."), millsecondsTimeout: 15000);
+        if (!success) { throw new Exception(dotnetCLI.Output); }
+
+        using var httpClient = new HttpClient();
+        var httpResponse = await httpClient.GetAsync("http://127.0.0.1:5050/");
+        httpResponse.EnsureSuccessStatusCode();
+
+        httpResponse.Headers.TryGetValues("X-Middleware1-Version", out var values1).IsTrue();
+        values1.Is("1.0.0.0");
+
+        httpResponse.Headers.TryGetValues("X-Middleware2-Version", out var values2).IsTrue();
+        values2.Is("2.0.0.0");
     }
 
     [TestCase(true)]

@@ -98,8 +98,9 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 throw new ArgumentException($"The -r|--rendermode parameter value \"{commandLineOptions.RenderMode}\" is not supported. (Only \"Static\" and \"WebAssemblyPrerendered\" are supported.)");
 
             var webRootPath = Path.Combine(commandLineOptions.PublishedDir, "wwwroot");
+            var frameworkDir = Path.Combine(webRootPath, "_framework");
 
-            var middlewarePackages = MiddlewarePackageReference.Parse(commandLineOptions.MiddlewarePackages);
+            var middlewarePackages = MiddlewarePackageReference.Build(folderToScan: frameworkDir, commandLineOptions.MiddlewarePackages);
             var middlewareDllsDir = PrepareMiddlewareDlls(middlewarePackages, commandLineOptions.IntermediateDir, commandLineOptions.FrameworkName);
             SetupCustomAssemblyLoader(assemblyLoader, webRootPath, middlewareDllsDir);
 

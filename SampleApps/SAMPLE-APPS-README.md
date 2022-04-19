@@ -1,27 +1,24 @@
 ﻿# Sample Apps
 
-## BlazorWasmApp0
+|                |BlazorWasmApp0|BlazorWasmApp1    |BlazorWasmApp2
+|----------------|--------------|------------------|--------------
+|Framework       | .NET 6.0     | .NET 5.0         | .NET 5.0
+|Projects        |Client + RCLIb| Client           | Component + Client   
+|Root element    | `<app>`      | `<div id='app'>` | `<app>`
+|Used in E2E test| ✅ Yes       | ✅ Yes          | ✅ Yes
+|Page title      | `<PageTitle>`| `<Title>`        | -
+|PWA             | ✅ Yes       | -                | -
+|Has easter-egg  | -            | ✅ Yes           | -
+|Deploy to GitHub Pages | -     | ✅ Yes           | -
 
-- .NET 6.0
-- The root component DOM element tag is `<app>`.
-- It is referenced from the End-to-End test.
-- Set page titles by .NET6 `<PageTitle>`.
-- PWA
+## Appendix
 
+### BlazorWasmApp0
 
-## BlazorWasmApp1
+- The razor class library which is referenced from the `BlazorWasmApp0` project has `AssemblyMetadata` attributes to install middleware packages `Middleware1` ver.1.0 and `Middleware2` ver.2.0.
 
-- .NET 5.0
-- The root component DOM element tag is `<div id="app">`.
-- It is referenced from the End-to-End test.
-- Set page titles by `Toolbelt.Blazor.HeadElement`.
-- It is deployed to the GitHub Pages by GitHub Actions script.
-- Include the easter egg page.
+### BlazorWasmApp2
 
-## BlazorWasmApp2
-
-- .NET 5.0
 - Consists from the component library project and the Blazor WebAssembly project.
   - The component libray project defines the interface.
   - The Blazor Wasm project implements that interface and register it to a DI container.
-- It is referenced from the End-to-End test.

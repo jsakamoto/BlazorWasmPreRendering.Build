@@ -48,7 +48,7 @@ public class ProgramTests
 
         // Then
         outputDir.IsNotNull();
-        var generatedProjectFilePath = Path.Combine(outputDir!, "Project.csproj");
+        var generatedProjectFilePath = Path.Combine(outputDir, "Project.csproj");
         File.Exists(generatedProjectFilePath).IsTrue();
 
         // Then

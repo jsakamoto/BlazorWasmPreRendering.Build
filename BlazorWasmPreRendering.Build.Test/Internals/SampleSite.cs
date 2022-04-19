@@ -57,10 +57,8 @@ public class SampleSite : IDisposable
         this.TargetFramework = targetFramework;
         this.Configuration = configuration;
 
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var srcSampleAppsDir = Path.Combine(solutionDir, "SampleApps");
+        this.SampleAppsWorkDir = CreateSampleAppsWorkDir();
 
-        this.SampleAppsWorkDir = WorkDirectory.CreateCopyFrom(srcSampleAppsDir, arg => arg.Name is (not "obj" and not "bin"));
         this.ProjectDir = Path.Combine($"{this.SampleAppsWorkDir}/{projectName}".Split('/'));
         this.IntermediateDir = Path.Combine(this.ProjectDir, "obj", this.Configuration, this.TargetFramework);
         this.PublishSrcDir = Path.Combine(this.ProjectDir, "bin", this.Configuration, this.TargetFramework, "publish");
@@ -72,7 +70,7 @@ public class SampleSite : IDisposable
         {
             var publishProcess = XProcess.Start(
                 "dotnet",
-                $"publish -c:{this.Configuration} -p:BlazorEnableCompression=false -p:BlazorWasmPrerendering=disable",
+                $"publish -c:{this.Configuration} -p:BlazorWasmPrerendering=disable -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false",
                 workingDirectory: this.ProjectDir);
             await publishProcess.WaitForExitAsync();
             publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);
@@ -80,6 +78,14 @@ public class SampleSite : IDisposable
         }
 
         return WorkDirectory.CreateCopyFrom(this.PublishSrcDir, _ => true);
+    }
+
+    public static WorkDirectory CreateSampleAppsWorkDir()
+    {
+        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
+        var srcSampleAppsDir = Path.Combine(solutionDir, "SampleApps");
+
+        return WorkDirectory.CreateCopyFrom(srcSampleAppsDir, arg => arg.Name is (not "obj" and not "bin"));
     }
 
     public void Dispose()
