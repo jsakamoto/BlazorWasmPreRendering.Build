@@ -238,20 +238,20 @@ As you may know, this package is based on the standard ASP.NET Core Blazor serve
 - See also: ["Prerender and integrate ASP.NET Core Razor components | Microsoft Docs"](https://docs.microsoft.com/en-us/aspnet/core/blazor/components/prerendering-and-integration?view=aspnetcore-6.0&pivots=webassembly)
 
 By default, the render mode of prerendering is `Static`.  
-And, **you can specify the render mode to `WebAssemblyRendered` via the `BlazorWasmPrerenderingMode` MSBuild property** if you want.
+And, **you can specify the render mode to `WebAssemblyPrerendered` via the `BlazorWasmPrerenderingMode` MSBuild property** if you want.
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
   ...
   <PropertyGroup>
-    <BlazorWasmPrerenderingMode>WebAssemblyRendered</BlazorWasmPrerenderingMode>
+    <BlazorWasmPrerenderingMode>WebAssemblyPrerendered</BlazorWasmPrerenderingMode>
     ...
 ```
 (* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
 
-As the side effect of using the `WebAssemblyRendered` render mode, even you specify any values to the "BlazorWasmPrerenderingDeleteLoadingContents" MSBuild property, the "Loading..." contents are always removed, and prerendered contents never are invisible.
+As the side effect of using the `WebAssemblyPrerendered` render mode, even you specify any values to the "BlazorWasmPrerenderingDeleteLoadingContents" MSBuild property, the "Loading..." contents are always removed, and prerendered contents never are invisible.
 
-When you use the `WebAssemblyRendered` render mode,  please pay attention to implementing a startup code of the Blazor WebAssembly app.
+When you use the `WebAssemblyPrerendered` render mode,  please pay attention to implementing a startup code of the Blazor WebAssembly app.
 
 Usually, a startup code of the Blazor WebAssembly app should be like this.
 
@@ -260,7 +260,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 ```
-However, if you use the `WebAssemblyRendered` render mode when prerendering, you should change the startup code below.
+However, if you use the `WebAssemblyPrerendered` render mode when prerendering, you should change the startup code below.
 
 ```csharp
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -273,15 +273,15 @@ if (!builder.RootComponents.Any())
 }
 ```
 
-That is because the root component types and their insertion positions are specified inside of the prerendered HTML contents, not inside of your C# code when the render mode is `WebAssemblyRendered`.
+That is because the root component types and their insertion positions are specified inside of the prerendered HTML contents, not inside of your C# code when the render mode is `WebAssemblyPrerendered`.
 
 Moreover, on .NET 6, you can also use the **"persisting prerendered state"** feature.
 
-When the render mode is `WebAssemblyRendered`, this package injects the `<persist-component-state />` tag helper into the fallback page.
+When the render mode is `WebAssemblyPrerendered`, this package injects the `<persist-component-state />` tag helper into the fallback page.
 
 So what you should do is inject the `PersistentComponentState` service into your component and use it to store the component state at prerendering and retrieve the saved component state at the Blazor WebAssembly is started.
 
-Using the `WebAssemblyRendered` render mode and the persisting component state feature has **the significant potential to far improve the perceived launch speed of Blazor WebAssembly apps**.
+Using the `WebAssemblyPrerendered` render mode and the persisting component state feature has **the significant potential to far improve the perceived launch speed of Blazor WebAssembly apps**.
 
 For more details, please see also the following link.
 
