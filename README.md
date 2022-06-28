@@ -1,4 +1,4 @@
-﻿# BlazorWasmPreRendering.Build [![NuGet Package](https://img.shields.io/nuget/v/BlazorWasmPreRendering.Build.svg)](https://j.mp/3meP0zP)
+﻿# BlazorWasmPreRendering.Build [![NuGet Package](https://img.shields.io/nuget/v/BlazorWasmPreRendering.Build.svg)](https://www.nuget.org/packages/BlazorWasmPreRendering.Build/)
 
 ## Summary
 
@@ -17,7 +17,7 @@ This will help make the contents of your Blazor WebAssembly static apps findable
 Install this package to your Blazor WebAssembly project.
 
 ```
-dotnet add package BlazorWasmPreRendering.Build --version 1.0.0-preview.24.0
+dotnet add package BlazorWasmPreRendering.Build --prerelease
 ```
 
 Basically, **that's all**.
@@ -313,10 +313,10 @@ During the prerendering process is running, developers can investigate it.
 
 ## Appendix
 
-- If you would like to **change a title or any meta elements** for each page in your Blazor WebAssembly app, I recommend using the [**"Blazor Head Element Helper"** ![NuGet Package](https://img.shields.io/nuget/v/Toolbelt.Blazor.HeadElement.svg)](http://j.mp/2WnL7ug) NuGet package.
+- If you would like to **change a title or any meta elements** for each page in your Blazor WebAssembly app, I recommend using the [**"Blazor Head Element Helper"** ![NuGet Package](https://img.shields.io/nuget/v/Toolbelt.Blazor.HeadElement.svg)](https://www.nuget.org/packages/Toolbelt.Blazor.HeadElement/) NuGet package.
   - Since the ver.1.0.0 preview 8 of this package, **the .NET 6 `<PageTitle>` and `<HeadContent>` components** are also statically pre-rendered properly.
-- If you would like to deploy your Blazor WebAssembly app to **GitHub Pages**, I recommend using the [**"Publish SPA for GitHub Pages"** ![NuGet Package](https://img.shields.io/nuget/v/PublishSPAforGitHubPages.Build.svg)](https://j.mp/3mdrLpC) NuGet package.
-- The **["Awesome Blazor Browser"](https://bit.ly/3hPGfdW)** site is one of a good showcase of this package. That site is republishing every day by GitHub Actions with pre-rendering powered by this package.
+- If you would like to deploy your Blazor WebAssembly app to **GitHub Pages**, I recommend using the [**"Publish SPA for GitHub Pages"** ![NuGet Package](https://img.shields.io/nuget/v/PublishSPAforGitHubPages.Build.svg)](https://www.nuget.org/packages/PublishSPAforGitHubPages.Build/) NuGet package.
+- The **["Awesome Blazor Browser"](https://jsakamoto.github.io/awesome-blazor-browser/)** site is one of a good showcase of this package. That site is republishing every day by GitHub Actions with pre-rendering powered by this package.
 
 ## Notice
 
@@ -329,8 +329,8 @@ I welcome to fork and improve this project on your hand.
 
 ## Release notes
 
-[Release notes](https://j.mp/3KlvH2k)
+[Release notes](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/RELEASE-NOTES.txt)
 
 ## License
 
-[Mozilla Public License Version 2.0](https://j.mp/33z1OdH)
+[Mozilla Public License Version 2.0](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/LICENSE)
