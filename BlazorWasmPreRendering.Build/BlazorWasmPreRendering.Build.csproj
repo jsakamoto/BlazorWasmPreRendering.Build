@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.0-preview.24.0</Version>
+    <Version>1.0.0-preview.24.1</Version>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Authors>J.Sakamoto</Authors>
     <PackageId>BlazorWasmPreRendering.Build</PackageId>
@@ -77,6 +77,7 @@
       <PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
       <PackageReleaseNotes>$(PackageReleaseNotes)v.0.0.0</PackageReleaseNotes>
       <PackageReleaseNotes>$([System.Text.RegularExpressions.Regex]::Match($(PackageReleaseNotes), "^(v\.[\d\.]+.+?)v\.[\d\.]+", System.Text.RegularExpressions.RegexOptions.Singleline).Groups[1].Value)</PackageReleaseNotes>
+      <PackageReleaseNotes>$(PackageReleaseNotes)%0a%0aTo see all the change logs, please visit the following URL.%0a- https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/RELEASE-NOTES.txt</PackageReleaseNotes>
     </PropertyGroup>
     <PropertyGroup>
       <NuspecProperties>version=$(Version);$(NuspecProperties)</NuspecProperties>
