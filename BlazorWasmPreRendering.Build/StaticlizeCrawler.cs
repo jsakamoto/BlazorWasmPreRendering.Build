@@ -34,6 +34,10 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         private IEnumerable<string> UrlPathToExplicitFetch { get; }
 
+        private readonly List<string> _StaticalizedFiles = new List<string>();
+
+        public IEnumerable<string> StaticalizedFiles => this._StaticalizedFiles;
+
         public StaticlizeCrawler(
             string baseUrl,
             string? urlPathToExplicitFetch,
@@ -126,6 +130,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var outputPath = this.GetOutputPath(args.PathName);
 
             File.WriteAllText(outputPath, htmlContent);
+            this._StaticalizedFiles.Add(outputPath);
             this.RecompressStaticFile(outputPath);
 
             using var htmlDoc = this.HtmlParser.ParseDocument(htmlContent);

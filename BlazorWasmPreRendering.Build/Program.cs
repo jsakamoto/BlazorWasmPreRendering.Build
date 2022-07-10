@@ -68,7 +68,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             await ServiceWorkerAssetsManifest.UpdateAsync(
                 prerenderingOptions.WebRootPath,
-                commandLineOptions.ServiceWorkerAssetsManifest);
+                commandLineOptions.ServiceWorkerAssetsManifest,
+                crawler.StaticalizedFiles);
 
             if (commandLineOptions.KeepRunning)
             {

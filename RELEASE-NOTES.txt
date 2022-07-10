@@ -1,3 +1,7 @@
+v.1.0.0-preview.25.0
+- Fix: PWA support - staticalized files are not reflected in a `service-worker-assets.js`.
+- BREAKING CHANGE: drop supporting .NET 7 temporarily because the .NET 7 SDK preview can not package multi-targeting frameworks Razor class library.
+
 v.1.0.0-preview.24.1
 - Fix: fix typo in the README document.
 

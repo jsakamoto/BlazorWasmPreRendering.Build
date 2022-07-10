@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
@@ -13,7 +14,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 {
     internal class ServiceWorkerAssetsManifest
     {
-        public static async ValueTask UpdateAsync(string wwwrootDir, string? serviceWorkerAssetsManifest)
+        public static async ValueTask UpdateAsync(string wwwrootDir, string? serviceWorkerAssetsManifest, IEnumerable<string> staticalizedFiles)
         {
             if (serviceWorkerAssetsManifest == null) return;
             var serviceWorkerAssetsJsPath = Path.Combine(wwwrootDir, serviceWorkerAssetsManifest);
@@ -24,14 +25,23 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, ";\\s*$", "");
             var assetsManifestFile = JsonSerializer.Deserialize<AssetsManifestFile>(serviceWorkerAssetsJs);
             if (assetsManifestFile == null) return;
+            if (assetsManifestFile.assets == null) assetsManifestFile.assets = new List<AssetsManifestFileEntry>();
 
-            var assetManifestEntry = assetsManifestFile.assets?.First(a => a.url == "index.html");
-            if (assetManifestEntry == null) return;
-
-            await using (var indexHtmlStream = File.OpenRead(Path.Combine(wwwrootDir, "index.html")))
+            foreach (var staticalizedFile in staticalizedFiles)
             {
-                using var sha256 = SHA256.Create();
-                assetManifestEntry.hash = "sha256-" + Convert.ToBase64String(await sha256.ComputeHashAsync(indexHtmlStream));
+                var relativeUrl = string.Join('/', Path.GetRelativePath(wwwrootDir, staticalizedFile).Split('\\'));
+                var assetManifestEntry = assetsManifestFile.assets.FirstOrDefault(a => a.url == relativeUrl);
+                if (assetManifestEntry == null)
+                {
+                    assetManifestEntry = new AssetsManifestFileEntry { url = relativeUrl };
+                    assetsManifestFile.assets.Add(assetManifestEntry);
+                }
+
+                await using (var indexHtmlStream = File.OpenRead(staticalizedFile))
+                {
+                    using var sha256 = SHA256.Create();
+                    assetManifestEntry.hash = "sha256-" + Convert.ToBase64String(await sha256.ComputeHashAsync(indexHtmlStream));
+                }
             }
 
             await using (var serviceWorkerAssetsStream = File.OpenWrite(serviceWorkerAssetsJsPath))
