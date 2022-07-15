@@ -9,7 +9,8 @@ public class SampleSite : IDisposable
 {
     /// <summary>
     /// - .NET 6<br/>
-    /// - its titles by .NET 6 &lt;PageTitle&gt;.
+    /// - its titles by .NET 6 &lt;PageTitle&gt;.<br/>
+    /// - PWA
     /// </summary>
     public static SampleSite BlazorWasmApp0 { get; } = new SampleSite("BlazorWasmApp0", "net6.0");
 

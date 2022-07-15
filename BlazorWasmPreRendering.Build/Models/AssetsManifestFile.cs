@@ -1,4 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Json;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.Models
 {
@@ -7,5 +13,26 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.Models
         public string? version { get; set; }
 
         public List<AssetsManifestFileEntry>? assets { get; set; }
+
+        public static async ValueTask<AssetsManifestFile?> LoadAsync(string assetsManifestFilePath)
+        {
+            var serviceWorkerAssetsJs = await File.ReadAllTextAsync(assetsManifestFilePath);
+            serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, @"^self\.assetsManifest\s*=\s*", "");
+            serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, ";\\s*$", "");
+            var assetsManifestFile = JsonSerializer.Deserialize<AssetsManifestFile>(serviceWorkerAssetsJs);
+            return assetsManifestFile;
+        }
+
+        public async Task SaveAsync(string serviceWorkerAssetsJsPath)
+        {
+            await using var serviceWorkerAssetsStream = File.OpenWrite(serviceWorkerAssetsJsPath);
+            await using var streamWriter = new StreamWriter(serviceWorkerAssetsStream, Encoding.UTF8, 50, leaveOpen: true);
+            streamWriter.Write("self.assetsManifest = ");
+            streamWriter.Flush();
+            using var jsonWriter = JsonReaderWriterFactory.CreateJsonWriter(serviceWorkerAssetsStream, Encoding.UTF8, ownsStream: false, indent: true);
+            new DataContractJsonSerializer(typeof(AssetsManifestFile)).WriteObject(jsonWriter, this);
+            jsonWriter.Flush();
+            streamWriter.WriteLine(";");
+        }
     }
 }

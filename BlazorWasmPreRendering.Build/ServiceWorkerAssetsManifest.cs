@@ -2,11 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Json;
 using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer.Models;
 
@@ -20,10 +16,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var serviceWorkerAssetsJsPath = Path.Combine(wwwrootDir, serviceWorkerAssetsManifest);
             if (!File.Exists(serviceWorkerAssetsJsPath)) return;
 
-            var serviceWorkerAssetsJs = await File.ReadAllTextAsync(serviceWorkerAssetsJsPath);
-            serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, @"^self\.assetsManifest\s*=\s*", "");
-            serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, ";\\s*$", "");
-            var assetsManifestFile = JsonSerializer.Deserialize<AssetsManifestFile>(serviceWorkerAssetsJs);
+            var assetsManifestFile = await AssetsManifestFile.LoadAsync(serviceWorkerAssetsJsPath);
             if (assetsManifestFile == null) return;
             if (assetsManifestFile.assets == null) assetsManifestFile.assets = new List<AssetsManifestFileEntry>();
 
@@ -44,16 +37,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 }
             }
 
-            await using (var serviceWorkerAssetsStream = File.OpenWrite(serviceWorkerAssetsJsPath))
-            {
-                await using var streamWriter = new StreamWriter(serviceWorkerAssetsStream, Encoding.UTF8, 50, leaveOpen: true);
-                streamWriter.Write("self.assetsManifest = ");
-                streamWriter.Flush();
-                using var jsonWriter = JsonReaderWriterFactory.CreateJsonWriter(serviceWorkerAssetsStream, Encoding.UTF8, ownsStream: false, indent: true);
-                new DataContractJsonSerializer(typeof(AssetsManifestFile)).WriteObject(jsonWriter, assetsManifestFile);
-                jsonWriter.Flush();
-                streamWriter.WriteLine(";");
-            }
+            await assetsManifestFile.SaveAsync(serviceWorkerAssetsJsPath);
         }
     }
 }
