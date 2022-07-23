@@ -16,7 +16,9 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: 5.0.x
+          dotnet-version: | 
+            5.0.x
+            7.0.100-preview.6.22352.1
 
       # Publish the site
       - name: Publish
