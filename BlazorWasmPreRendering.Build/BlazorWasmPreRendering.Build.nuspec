@@ -21,7 +21,7 @@
     <file src="build\**" target="build" />
     <file src="$projectDir$bin\$configuration$\net5.0\publish\*" target="tools\net5.0" />
     <file src="$projectDir$bin\$configuration$\net6.0\publish\*" target="tools\net6.0" />
-    <!-- <file src="$projectDir$bin\$configuration$\net7.0\publish\*" target="tools\net7.0" /> -->
+    <file src="$projectDir$bin\$configuration$\net7.0\publish\*" target="tools\net7.0" />
     <!--<file src="$componentsrootdir$THIRD-PARTY-NOTICES.txt" target=".\THIRD-PARTY-NOTICES.txt" />-->
   </files>
 </package>
