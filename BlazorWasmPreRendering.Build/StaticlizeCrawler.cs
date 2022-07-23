@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using Microsoft.Extensions.Logging;
 using static Toolbelt.Blazor.WebAssembly.PrerenderServer.StaticlizeCrawlingResult;
 
 namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
@@ -32,6 +33,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         private bool EnableBrotliCompression { get; }
 
+        private ILogger Logger { get; }
+
         private IEnumerable<string> UrlPathToExplicitFetch { get; }
 
         private readonly List<string> _StaticalizedFiles = new List<string>();
@@ -44,13 +47,15 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             string webRootPath,
             OutputStyle outputStyle,
             bool enableGZipCompression,
-            bool enableBrotliCompression)
+            bool enableBrotliCompression,
+            ILogger logger)
         {
             this.BaseUrl = baseUrl.TrimEnd('/');
             this.WebRootPath = webRootPath;
             this.OutputStyle = outputStyle;
             this.EnableGZipCompression = enableGZipCompression;
             this.EnableBrotliCompression = enableBrotliCompression;
+            this.Logger = logger;
 
             this.UrlPathToExplicitFetch = (urlPathToExplicitFetch ?? "")
                 .Split(';')
@@ -78,24 +83,25 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         private async Task SaveToStaticFileAsync((string Href, string Protocol, string PathName) args)
         {
-            if (this.SavedPathSet.Contains(args.Href)) return;
-            this.SavedPathSet.Add(args.Href);
+            var href = args.Href.Split('#').FirstOrDefault() ?? "";
+            if (this.SavedPathSet.Contains(href)) return;
+            this.SavedPathSet.Add(href);
 
             // DEBUG: Console.WriteLine($"Protocol:[{args.Protocol}], PathName:[{args.PathName}], Href:[{args.Href}]");
 
             if (args.Protocol != "about:")
             {
-                IndentedWriteLines($"[INFORMATION] The requested URL ({args.Href}) was not navigatable.", indentSize: 0);
+                this.IndentedWriteLines($"[INFORMATION] The requested URL ({args.Href}) was not navigatable.", indentSize: 0);
                 return;
             }
 
             var requestUrl = this.BaseUrl + args.PathName;
-            Console.WriteLine($"Getting {requestUrl}...");
+            this.Logger.LogInformation($"Getting {requestUrl}...");
 
             if (!Uri.TryCreate(requestUrl, UriKind.Absolute, out var _))
             {
                 this.CrawlingResult |= HasWarnings;
-                IndentedWriteLines($"[WARNING] The requested URL ({requestUrl}) was not valid format.", indentSize: 2);
+                this.IndentedWriteLines($"[WARNING] The requested URL ({requestUrl}) was not valid format.", indentSize: 2);
                 return;
             }
 
@@ -105,16 +111,16 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             {
                 var (resultFlag, label) = ((int)response.StatusCode >= 500) ? (HasErrors, "ERROR") : (HasWarnings, "WARNING");
                 this.CrawlingResult |= resultFlag;
-                IndentedWriteLines($"[{label}] The HTTP status code was not OK. (it was ({(int)response.StatusCode}){response.StatusCode}.)", indentSize: 2);
+                this.IndentedWriteLines($"[{label}] The HTTP status code was not OK. (it was ({(int)response.StatusCode}){response.StatusCode}.)", indentSize: 2);
 
                 if (response.Content.Headers.ContentType?.MediaType?.StartsWith("text/") == true)
                 {
                     try
                     {
                         var content = await response.Content.ReadAsStringAsync();
-                        IndentedWriteLines(content, indentSize: 4);
+                        this.IndentedWriteLines(content, indentSize: 4);
                     }
-                    catch (Exception ex) { IndentedWriteLines(ex.ToString(), indentSize: 4); }
+                    catch (Exception ex) { this.IndentedWriteLines(ex.ToString(), indentSize: 4); }
                 }
 
                 return;
@@ -122,7 +128,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var mediaType = response.Content.Headers.ContentType?.MediaType;
             if (mediaType != "text/html")
             {
-                Console.WriteLine($"  The content type was not text/html. (it was {mediaType}.)");
+                this.Logger.LogInformation($"  The content type was not text/html. (it was {mediaType}.)");
                 return;
             }
 
@@ -147,12 +153,12 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             }
         }
 
-        private static void IndentedWriteLines(string content, int indentSize)
+        private void IndentedWriteLines(string content, int indentSize)
         {
             var indentSpaces = new string(' ', indentSize);
             foreach (var contentLine in content.Split('\n').Select(s => s.TrimEnd('\r')))
             {
-                Console.WriteLine(indentSpaces + contentLine);
+                this.Logger.LogInformation(indentSpaces + contentLine);
             }
         }
 

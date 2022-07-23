@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Toolbelt.Blazor.WebAssembly.PrerenderServer.Internal.Services.Logger;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost;
 
 namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
@@ -48,7 +49,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 prerenderingOptions.WebRootPath,
                 commandLineOptions.OutputStyle,
                 prerenderingOptions.EnableGZipCompression,
-                prerenderingOptions.EnableBrotliCompression);
+                prerenderingOptions.EnableBrotliCompression,
+                new TinyConsoleLogger());
             var crawlingResult = await crawler.SaveToStaticFileAsync();
 
 
