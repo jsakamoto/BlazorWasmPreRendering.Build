@@ -1,3 +1,6 @@
+v.1.0.0-preview.26.0
+- Fix: the same path, only the fragment was different, was repeatedly staticized.
+
 v.1.0.0-preview.25.1
 - Fix: revert that the dropping support for .NET 7.
 
