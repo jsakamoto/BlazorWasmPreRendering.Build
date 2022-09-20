@@ -8,5 +8,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
         Nothing,
         HasWarnings,
         HasErrors,
+        HasErrorsOfServiceNotRegistered,
+        HasErrorsOfJSInvokeOnServer,
     }
 }

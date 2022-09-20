@@ -1,0 +1,21 @@
+﻿@inject GreetingService Greeting
+@inject Site2Options Options
+@inject IJSRuntime JSRuntime
+
+<div style="text-align:center">
+    <h1>
+        @Greeting.Welcome(Title)
+    </h1>
+</div>
+
+@code {
+    string Title = "Blazor";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (this.Options.JSInvokeOnServer)
+        {
+            await this.JSRuntime.InvokeVoidAsync("alert", "Invoked.");
+        }
+    }
+}

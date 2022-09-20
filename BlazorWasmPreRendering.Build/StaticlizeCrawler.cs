@@ -119,6 +119,15 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                     {
                         var content = await response.Content.ReadAsStringAsync();
                         this.IndentedWriteLines(content, indentSize: 4);
+
+                        if (content.Contains("There is no registered service of type"))
+                        {
+                            this.CrawlingResult |= HasErrorsOfServiceNotRegistered;
+                        }
+                        if (content.Contains("JavaScript interop calls can only be performed during the OnAfterRenderAsync lifecycle method"))
+                        {
+                            this.CrawlingResult |= HasErrorsOfJSInvokeOnServer;
+                        }
                     }
                     catch (Exception ex) { this.IndentedWriteLines(ex.ToString(), indentSize: 4); }
                 }
