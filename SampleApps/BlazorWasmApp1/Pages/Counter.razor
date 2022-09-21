@@ -1,5 +1,6 @@
 @page "/counter"
 @inject IWebAssemblyHostEnvironment HostEnv
+@inject IJSRuntime JSRuntime
 <Title>Counter</Title>
 
 <h1>Counter</h1>
@@ -15,10 +16,14 @@
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(1000);
-    
+
         if (this.HostEnv.Environment == "ExceptionTest")
         {
             throw new Exception("What a bad thing!");
+        }
+        if (this.HostEnv.Environment == "JSInvokeOnServerTest")
+        {
+            await this.JSRuntime.InvokeVoidAsync("alert", "Hello");
         }
     }
 

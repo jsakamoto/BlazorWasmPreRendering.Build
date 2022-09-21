@@ -72,12 +72,13 @@ public class StaticlizeCrawlerTest
                 $"Getting {baseUrl}/fetchdata/weather-forecast...");
     }
 
-    [Test]
-    public async Task SaveToStaticFileAsync_ServiceNotRegisteredError_Test()
+    [TestCase(5055, true, false)]
+    [TestCase(5056, false, true)]
+    public async Task SaveToStaticFileAsync_ServiceNotRegisteredError_Test(int port, bool serviceNotRegistered1, bool serviceNotRegistered2)
     {
         // Given
-        const string baseUrl = "http://127.0.0.1:5053";
-        using var site = await TestSites.StartTestSite2(baseUrl, serviceNotRegistered: true);
+        var baseUrl = $"http://127.0.0.1:{port}";
+        using var site = await TestSites.StartTestSite2(baseUrl, serviceNotRegistered1, serviceNotRegistered2);
         using var outDir = new WorkDirectory();
 
         // When

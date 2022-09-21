@@ -24,7 +24,7 @@ namespace BlazorWasmApp1
 
         private static void ConfigureServices(IServiceCollection services, string baseAddress, IWebAssemblyHostEnvironment? hostEnvironment = null)
         {
-            if (hostEnvironment?.Environment != "NoWay")
+            if (hostEnvironment?.Environment != "ServiceNotRegisteredTest")
             {
                 services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
                 services.AddHeadElementHelper();

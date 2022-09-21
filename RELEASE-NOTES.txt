@@ -1,3 +1,6 @@
+v.1.0.0-preview.27.0
+- Improve: Show the guide messages about how to fix the code when server errors happen.
+
 v.1.0.0-preview.26.0
 - Fix: the same path, only the fragment was different, was repeatedly staticized.
 

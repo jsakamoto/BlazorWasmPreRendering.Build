@@ -1,5 +1,3 @@
-using Site2;
-
 var builder = WebApplication.CreateBuilder(args);
 var options = new Site2Options();
 builder.Configuration.AddCommandLine(args);
@@ -9,7 +7,11 @@ builder.Configuration.Bind(options);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton(options);
-if (!options.ServiceNotRegistered)
+if (!options.ServiceNotRegistered1)
+{
+    builder.Services.AddScoped<FormatStringService>();
+}
+if (!options.ServiceNotRegistered2)
 {
     builder.Services.AddScoped<GreetingService>();
 }

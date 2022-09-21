@@ -32,7 +32,8 @@ public static class TestSites
 
     public static async ValueTask<IDisposable> StartTestSite2(
         string baseUrl,
-        bool serviceNotRegistered = false,
+        bool serviceNotRegistered1 = false,
+        bool serviceNotRegistered2 = false,
         bool jsInvokeOnServer = false)
     {
         var site2Dir = Path.Combine(GetTestSitesDir(), "Site2-ServerErrors");
@@ -40,7 +41,8 @@ public static class TestSites
         var dotnetCLI = XProcess.Start(
             "dotnet", "run " +
             $"--urls {baseUrl} " +
-            $"--ServiceNotRegistered={serviceNotRegistered} " +
+            $"--ServiceNotRegistered1={serviceNotRegistered1} " +
+            $"--ServiceNotRegistered2={serviceNotRegistered2} " +
             $"--JSInvokeOnServer={jsInvokeOnServer} ",
             workDir);
         var success = await dotnetCLI.WaitForOutputAsync(output => output.Contains(baseUrl), millsecondsTimeout: 15000);
