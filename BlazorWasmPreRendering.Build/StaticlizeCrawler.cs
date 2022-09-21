@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -119,6 +120,17 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                     {
                         var content = await response.Content.ReadAsStringAsync();
                         this.IndentedWriteLines(content, indentSize: 4);
+
+                        if (content.Contains("There is no registered service of type") ||// failed for property injection
+                            content.Contains("Unable to resolve service for type") || // failed for middle ware injection
+                            Regex.IsMatch(content, "No service for type .+ has been registered")) // failed for services.GetRequiredService<T>()
+                        {
+                            this.CrawlingResult |= HasErrorsOfServiceNotRegistered;
+                        }
+                        if (content.Contains("JavaScript interop calls can only be performed during the OnAfterRenderAsync lifecycle method"))
+                        {
+                            this.CrawlingResult |= HasErrorsOfJSInvokeOnServer;
+                        }
                     }
                     catch (Exception ex) { this.IndentedWriteLines(ex.ToString(), indentSize: 4); }
                 }

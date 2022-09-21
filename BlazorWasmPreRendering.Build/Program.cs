@@ -53,17 +53,9 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 new TinyConsoleLogger());
             var crawlingResult = await crawler.SaveToStaticFileAsync();
 
-
-            if (crawlingResult != StaticlizeCrawlingResult.Nothing && !commandLineOptions.KeepRunning)
+            if (crawlingResult != StaticlizeCrawlingResult.Nothing)
             {
-                Console.WriteLine();
-                Console.WriteLine("INFORMATION");
-                Console.WriteLine("===========");
-                Console.WriteLine("The crawler encountered errors and/or warnings.");
-                Console.WriteLine("If you want to keep running the pre-rendering server process for debugging it on live, you can do that by setting the \"BlazorWasmPrerenderingKeepServer\" MSBuild property to \"true\".");
-                Console.WriteLine();
-                Console.WriteLine("ex) dotnet publish -p:BlazorWasmPrerenderingKeepServer=true");
-                Console.WriteLine();
+                ReportErrorsOfCrawling(crawlingResult, commandLineOptions.KeepRunning);
             }
 
             Console.WriteLine("Fetching complete.");
@@ -244,6 +236,78 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             }
 
             return Path.Combine(projectDir, "bin", "Release", frameworkName);
+        }
+
+        private static void ReportErrorsOfCrawling(StaticlizeCrawlingResult crawlingResult, bool keepRunning)
+        {
+            Console.WriteLine();
+            Console.WriteLine("INFORMATION");
+            Console.WriteLine("=============================");
+            Console.WriteLine("The crawler encountered errors and/or warnings.");
+
+            if (crawlingResult.HasFlag(StaticlizeCrawlingResult.HasErrorsOfServiceNotRegistered))
+            {
+                Console.WriteLine();
+                Console.WriteLine("\x1b[91mX\x1b[0m [ERROR] There is no registered service");
+                Console.WriteLine("-----------------------------");
+                Console.WriteLine("If the \"Program.cs\" of your Blazor WebAssembly app is like this:");
+                Console.WriteLine("");
+                Console.WriteLine("  var builder = WebAssemblyHostBuilder.CreateDefault(args);");
+                Console.WriteLine("  ...");
+                Console.WriteLine("  builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });");
+                Console.WriteLine("  builder.Services.AddScoped<IFooService, FooService>();");
+                Console.WriteLine("  ...");
+                Console.WriteLine("");
+                Console.WriteLine("Change the above code to extract service registration into the static method named \"ConfigureServices()\" like below:");
+                Console.WriteLine("");
+                Console.WriteLine("  var builder = WebAssemblyHostBuilder.CreateDefault(args);");
+                Console.WriteLine("  ...");
+                Console.WriteLine("  ConfigureServices(builder.Services, builder.HostEnvironment)");
+                Console.WriteLine("  ...");
+                Console.WriteLine("  static void ConfigureServices(IServiceCollection services, IWebAssemblyHostEnvironment hostEnv) {");
+                Console.WriteLine("    services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(hostEnv.BaseAddress) });");
+                Console.WriteLine("    services.AddScoped<IFooService, FooService>();");
+                Console.WriteLine("    ...");
+                Console.WriteLine("  }");
+                Console.WriteLine("");
+                Console.WriteLine("For more detail, see also: https://github.com/jsakamoto/BlazorWasmPreRendering.Build#services-registration");
+            }
+
+            if (crawlingResult.HasFlag(StaticlizeCrawlingResult.HasErrorsOfJSInvokeOnServer))
+            {
+                Console.WriteLine();
+                Console.WriteLine("\x1b[91mX\x1b[0m [ERROR] JavaScript interop calls cannot be issued at this time");
+                Console.WriteLine("-----------------------------");
+                Console.WriteLine("if you are calling JavaScript code in \"OnInitializedAsync()\" like this:");
+                Console.WriteLine("");
+                Console.WriteLine("  @inject IJSRuntime JS");
+                Console.WriteLine("  ...");
+                Console.WriteLine("  protected async Task OnInitializedAsync() {");
+                Console.WriteLine("    await this.JS.InvokeVoidAsync(\"...\", ...);");
+                Console.WriteLine("    ...");
+                Console.WriteLine("");
+                Console.WriteLine("Please consider changing the above code to like below.");
+                Console.WriteLine("");
+                Console.WriteLine("  @inject IJSRuntime JS");
+                Console.WriteLine("  ...");
+                Console.WriteLine("  protected async Task OnAfterRenderAsync(bool firstRender) {");
+                Console.WriteLine("    if (firstRender) {");
+                Console.WriteLine("      await this.JS.InvokeVoidAsync(\"...\", ...);");
+                Console.WriteLine("      ...");
+                Console.WriteLine("");
+                Console.WriteLine("For more detail, see also: https://docs.microsoft.com/aspnet/core/blazor/javascript-interoperability/call-javascript-from-dotnet#prerendering");
+            }
+
+            if (!keepRunning)
+            {
+                Console.WriteLine();
+                Console.WriteLine("TIPS");
+                Console.WriteLine("-----------------------------");
+                Console.WriteLine("If you want to keep running the pre-rendering server process for debugging it on live, you can do that by setting the \"BlazorWasmPrerenderingKeepServer\" MSBuild property to \"true\".");
+                Console.WriteLine();
+                Console.WriteLine("ex) dotnet publish -p:BlazorWasmPrerenderingKeepServer=true");
+            }
+            Console.WriteLine();
         }
     }
 }

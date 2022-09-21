@@ -333,8 +333,10 @@ public class ProgramE2ETest
         }
     }
 
-    [Test]
-    public async Task Publish_with_HTTP500_Test()
+    [TestCase("ExceptionTest", false, false)]
+    [TestCase("ServiceNotRegisteredTest", true, false)]
+    [TestCase("JSInvokeOnServerTest", false, true)]
+    public async Task Publish_with_HTTP500_Test(string env, bool msg1, bool msg2)
     {
         // Given
         var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
@@ -342,10 +344,21 @@ public class ProgramE2ETest
         using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
 
         // When (Set the hoting environment name to "ExceptionTest")
-        var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Release -p:BlazorWasmPrerenderingEnvironment=ExceptionTest -p:BlazorEnableCompression=false --nologo", workDir).WaitForExitAsync();
+        var dotnetCLI = await XProcess.Start("dotnet", $"publish -c:Release -p:BlazorWasmPrerenderingEnvironment={env} -p:BlazorEnableCompression=false --nologo", workDir).WaitForExitAsync();
 
         // Then (Exit code is NOT 0)
-        dotnetCLI.ExitCode.IsNot(0, message: dotnetCLI.Output);
+        var output = dotnetCLI.Output;
+        dotnetCLI.ExitCode.IsNot(0, message: output);
+
+        // Then (guide messages was shown accroing to its situation)
+        var title1 = "[ERROR] There is no registered service";
+        var message1 = "If the \"Program.cs\" of your Blazor WebAssembly app is like this";
+        var title2 = "[ERROR] JavaScript interop calls cannot be issued at this time";
+        var message2 = "if you are calling JavaScript code in \"OnInitializedAsync()\" like this:";
+        output.Contains(title1).Is(msg1);
+        output.Contains(message1).Is(msg1);
+        output.Contains(title2).Is(msg2);
+        output.Contains(message2).Is(msg2);
     }
 
     [Test]
