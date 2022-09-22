@@ -36,6 +36,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             using var webHost = await ServerSideRenderingWebHost.StartWebHostAsync(
                 assemblyLoader,
                 commandLineOptions.Environment,
+                commandLineOptions.ServerPort,
                 prerenderingOptions);
             var server = webHost.Services.GetRequiredService<IServer>();
             var baseAddresses = server.Features.Get<IServerAddressesFeature>()!.Addresses;

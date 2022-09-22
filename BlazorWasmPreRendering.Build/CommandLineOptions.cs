@@ -32,12 +32,18 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         public bool DeleteLoadingContents
         {
-            get => this._DeleteLoadingContents || RenderMode != RenderMode.Static;
+            get => this._DeleteLoadingContents || this.RenderMode != RenderMode.Static;
             set => this._DeleteLoadingContents = value;
         }
 
         public string? UrlPathToExplicitFetch { get; set; }
 
         public bool KeepRunning { get; init; }
+
+        public static readonly string DefaultServerPort = "5050-5999";
+
+        private string _ServerPort = DefaultServerPort;
+
+        public string ServerPort { get => this._ServerPort; set { this._ServerPort = string.IsNullOrEmpty(value) ? DefaultServerPort : value; } }
     }
 }
