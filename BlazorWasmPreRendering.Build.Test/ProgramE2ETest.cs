@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer.Models;
+using Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost;
 using Toolbelt.Diagnostics;
 using static Toolbelt.Diagnostics.XProcess;
 
@@ -87,23 +88,34 @@ public class ProgramE2ETest
     {
         using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
         var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp0");
+        var serverPort = ServerSideRenderingWebHost.GetAvailableTcpPort("5050-5999");
 
         using var dotnetCLI = Start(
-            "dotnet", "publish -c:Release -p:BlazorWasmPrerenderingKeepServer=true -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false",
+            "dotnet", $"publish -c:Release -p:BlazorWasmPrerenderingKeepServer=true -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingServerPort={serverPort}",
             projectDir,
             options => options.WhenDisposing = XProcessTerminate.EntireProcessTree);
         var success = await dotnetCLI.WaitForOutputAsync(output => output.Trim().StartsWith("Start fetching..."), millsecondsTimeout: 15000);
         if (!success) { throw new Exception(dotnetCLI.Output); }
 
+        var serverUrl = $"http://127.0.0.1:{serverPort}/";
         using var httpClient = new HttpClient();
-        var httpResponse = await httpClient.GetAsync("http://127.0.0.1:5050/");
-        httpResponse.EnsureSuccessStatusCode();
+        try
+        {
+            var httpResponse = await httpClient.GetAsync(serverUrl);
+            httpResponse.EnsureSuccessStatusCode();
 
-        httpResponse.Headers.TryGetValues("X-Middleware1-Version", out var values1).IsTrue();
-        values1.Is("1.0.0.0");
+            httpResponse.Headers.TryGetValues("X-Middleware1-Version", out var values1).IsTrue();
+            values1.Is("1.0.0.0");
 
-        httpResponse.Headers.TryGetValues("X-Middleware2-Version", out var values2).IsTrue();
-        values2.Is("2.0.0.0");
+            httpResponse.Headers.TryGetValues("X-Middleware2-Version", out var values2).IsTrue();
+            values2.Is("2.0.0.0");
+        }
+        finally
+        {
+            // NOTICE: Killing the "dotnet publish" process doesn't kill the pre-rendering server process, even though it is a child process of the "dotnet publish" process.
+            // Therefore, this test code kicks the back door of the pre-rendering server (sending "HTTP DELETE /" request) to terminate it.
+            try { await httpClient.DeleteAsync(serverUrl); } catch { }
+        }
     }
 
     [TestCase(true)]

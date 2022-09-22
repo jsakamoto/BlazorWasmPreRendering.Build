@@ -1,3 +1,6 @@
+v.1.0.0-preview.28.0
+- Improve: Determine the pre-rendering server's listening TCP port dynamically.
+
 v.1.0.0-preview.27.0
 - Improve: Show the guide messages about how to fix the code when server errors happen.
 

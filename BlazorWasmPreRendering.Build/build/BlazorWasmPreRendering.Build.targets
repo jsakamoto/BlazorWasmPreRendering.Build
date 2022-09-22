@@ -23,6 +23,7 @@
       <BlazorWasmPrerenderingOutputStyle Condition=" '$(BlazorWasmPrerenderingOutputStyle)' == '' ">IndexHtmlInSubFolders</BlazorWasmPrerenderingOutputStyle>
       <BlazorWasmPrerenderingKeepServer Condition=" '$(BlazorWasmPrerenderingKeepServer)' == '' ">false</BlazorWasmPrerenderingKeepServer>
       <BlazorWasmPrerenderingDeleteLoadingContents Condition=" '$(BlazorWasmPrerenderingKeepServer)' == '' ">false</BlazorWasmPrerenderingDeleteLoadingContents>
+      <BlazorWasmPrerenderingServerPort Condition=" '$(BlazorWasmPrerenderingServerPort)' == '' ">5050-5999</BlazorWasmPrerenderingServerPort>
     </PropertyGroup>
   </Target>
 
@@ -53,6 +54,6 @@
       <BlazorWasmPrerenderingDeleteLoadingContentsSwitch Condition=" '$(BlazorWasmPrerenderingDeleteLoadingContents)' == 'true' "> -d</BlazorWasmPrerenderingDeleteLoadingContentsSwitch>
     </PropertyGroup>
 
-    <Exec Command="dotnet &quot;$(BlazorWasmPrerenderingServerDll)&quot; -a &quot;$(BlazorWasmPrerenderingAssembly)&quot; -t &quot;$(BlazorWasmPrerenderingRootComponentType)&quot; --selectorofrootcomponent &quot;$(BlazorWasmPrerenderingRootComponentSelector)&quot; --selectorofheadoutletcomponent &quot;$(BlazorWasmPrerenderingHeadOutletComponentSelector)&quot; -p &quot;$(BlazorWasmPrerenderingPublishDir)&quot; -i &quot;$(BlazorWasmPrerenderingIntermediateDir)&quot; -m &quot;$(BlazorWasmPrerenderingMiddlewareArg)&quot; -f &quot;$(BlazorWasmPrerenderingTFM)&quot; --serviceworkerassetsmanifest &quot;$(ServiceWorkerAssetsManifest)&quot; -e &quot;$(BlazorWasmPrerenderingEnvironment)&quot; -o &quot;$(BlazorWasmPrerenderingOutputStyle)&quot; $(BlazorWasmPrerenderingKeepServerSwitch)$(BlazorWasmPrerenderingDeleteLoadingContentsSwitch) -u &quot;$(BlazorWasmPrerenderingUrlPathToExplicitFetch)&quot; -r &quot;$(BlazorWasmPrerenderingMode)&quot;" />
+    <Exec Command="dotnet &quot;$(BlazorWasmPrerenderingServerDll)&quot; -a &quot;$(BlazorWasmPrerenderingAssembly)&quot; -t &quot;$(BlazorWasmPrerenderingRootComponentType)&quot; --selectorofrootcomponent &quot;$(BlazorWasmPrerenderingRootComponentSelector)&quot; --selectorofheadoutletcomponent &quot;$(BlazorWasmPrerenderingHeadOutletComponentSelector)&quot; -p &quot;$(BlazorWasmPrerenderingPublishDir)&quot; -i &quot;$(BlazorWasmPrerenderingIntermediateDir)&quot; -m &quot;$(BlazorWasmPrerenderingMiddlewareArg)&quot; -f &quot;$(BlazorWasmPrerenderingTFM)&quot; --serviceworkerassetsmanifest &quot;$(ServiceWorkerAssetsManifest)&quot; -e &quot;$(BlazorWasmPrerenderingEnvironment)&quot; -o &quot;$(BlazorWasmPrerenderingOutputStyle)&quot; $(BlazorWasmPrerenderingKeepServerSwitch)$(BlazorWasmPrerenderingDeleteLoadingContentsSwitch) -u &quot;$(BlazorWasmPrerenderingUrlPathToExplicitFetch)&quot; -r &quot;$(BlazorWasmPrerenderingMode)&quot; --serverport &quot;$(BlazorWasmPrerenderingServerPort)&quot;" />
   </Target>
 </Project>
