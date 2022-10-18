@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 {
     public class ResetHeadOutletScript
     {

@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BlazorWasmPreRendering.Build.WebHost\BlazorWasmPreRendering.Build.WebHost.csproj" />
     <ProjectReference Include="..\BlazorWasmPreRendering.Build\BlazorWasmPreRendering.Build.csproj" />
   </ItemGroup>
 

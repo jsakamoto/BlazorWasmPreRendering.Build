@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost;
 
 namespace BlazorWasmPreRendering.Build.Test.WebHost;
 

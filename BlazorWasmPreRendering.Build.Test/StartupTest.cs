@@ -6,8 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost;
 
 namespace BlazorWasmPreRendering.Build.Test;
 

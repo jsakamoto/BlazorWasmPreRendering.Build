@@ -12,9 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 {
-    public class Startup
+    internal class Startup
     {
         private IConfiguration Configuration { get; }
 
@@ -22,9 +22,9 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost
 
         private IWebAssemblyHostEnvironment HostEnvironment { get; }
 
-        private BlazorWasmPrerenderingOptions PrerenderingOptions { get; }
+        private ServerSideRenderingContext PrerenderingOptions { get; }
 
-        public Startup(IConfiguration configuration, Uri baseAddress, IWebAssemblyHostEnvironment hostEnvironment, BlazorWasmPrerenderingOptions prerenderingOptions)
+        public Startup(IConfiguration configuration, Uri baseAddress, IWebAssemblyHostEnvironment hostEnvironment, ServerSideRenderingContext prerenderingOptions)
         {
             this.Configuration = configuration;
             this.BaseAddress = baseAddress;

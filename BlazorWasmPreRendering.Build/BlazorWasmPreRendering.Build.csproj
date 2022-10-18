@@ -26,16 +26,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="bundleconfig.json" />
-    <None Include="bundleconfig.json" />
-    <EmbeddedResource Include="Scripts\*" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.16.1" />
-    <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
     <PackageReference Include="CommandLineSwitchParser" Version="1.1.0" />
-    <PackageReference Include="NuGet.Versioning" Version="6.1.0" />
+    <PackageReference Include="XProcess" Version="1.3.0" />
+    <PackageReference Include="NuGet.Versioning" Version="6.3.1" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
@@ -48,6 +42,10 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0-preview.5.22303.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BlazorWasmPreRendering.Build.Shared\BlazorWasmPreRendering.Build.Shared.csproj" />
   </ItemGroup>
 
   <!-- Pack settings -->
