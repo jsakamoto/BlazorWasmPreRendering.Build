@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.0-preview.28.0</Version>
+    <Version>2.0.0-alpha.1.0</Version>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Authors>J.Sakamoto</Authors>
     <PackageId>BlazorWasmPreRendering.Build</PackageId>
@@ -57,9 +57,17 @@
 
   <Target Name="PublishForPackage">
     <Message Importance="high" Text="[PublishForPackage]" />
+
+    <!-- Publish Build Program -->
     <Exec Command="dotnet publish -c:$(Configuration) -f:net5.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net6.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net7.0 --nologo" />
+
+    <!-- Publish WebHost Program -->
+    <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net5.0 --nologo" />
+    <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net6.0 --nologo" />
+    <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net7.0 --nologo" />
+
     <ItemGroup>
       <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\Microsoft.*.dll" />
       <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\web.config" />
