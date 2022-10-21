@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
-namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared
 {
-    internal class CommandLineOptions
+    public class ServerSideRenderingOptions
     {
         public string? WebRootPath { get; init; }
 
         public string? MiddlewareDllsDir { get; init; }
 
-        public IEnumerable<MiddlewarePackageReference>? MiddlewarePackages { get; init; }
+        public List<MiddlewarePackageReference> MiddlewarePackages { get; set; } = new();
 
         public string? AssemblyName { get; init; }
 
@@ -18,7 +17,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 
         public RenderMode RenderMode { get; init; }
 
-        public IndexHtmlFragments? IndexHtmlFragments { get; init; }
+        public IndexHtmlFragments IndexHtmlFragments { get; set; } = new("", "", "");
 
         public bool DeleteLoadingContents { get; init; }
 

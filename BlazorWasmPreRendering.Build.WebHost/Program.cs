@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
 namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 {
@@ -13,51 +14,54 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
     {
         public static async Task Main(string[] args)
         {
-            var commandLineOptions = new CommandLineOptions();
-            var configuration = new ConfigurationBuilder().AddCommandLine(args).Build();
-            configuration.Bind(commandLineOptions);
+            var options = new ServerSideRenderingOptions();
+            new ConfigurationBuilder()
+                .AddEnvironmentVariables(prefix: Constants.ConfigurationPrefix)
+                .AddCommandLine(args)
+                .Build()
+                .Bind(options);
 
-            var context = BuildPrerenderingContext(commandLineOptions);
+            var context = BuildPrerenderingContext(options);
 
             await ServerSideRenderingWebHost.StartWebHostAsync(context);
         }
 
-        private static ServerSideRenderingContext BuildPrerenderingContext(CommandLineOptions commandLineOptions)
+        internal static ServerSideRenderingContext BuildPrerenderingContext(ServerSideRenderingOptions options)
         {
-            if (string.IsNullOrEmpty(commandLineOptions.WebRootPath)) throw new ArgumentException("The WebRootPath parameter is required.");
-            if (string.IsNullOrEmpty(commandLineOptions.MiddlewareDllsDir)) throw new ArgumentException("The MiddlewareDllsDir parameter is required.");
-            if (string.IsNullOrEmpty(commandLineOptions.AssemblyName)) throw new ArgumentException("The --assembly-name parameter is required.");
-            if (string.IsNullOrEmpty(commandLineOptions.RootComponentTypeName)) throw new ArgumentException("The --root-component-type-name parameter is required.");
-            if (commandLineOptions.IndexHtmlFragments == null) throw new ArgumentException("The IndexHtmlFragments parameter is required.");
-            if (commandLineOptions.MiddlewarePackages == null) throw new ArgumentException("The MiddlewarePackages parameter is required.");
+            if (string.IsNullOrEmpty(options.WebRootPath)) throw new ArgumentException("The WebRootPath parameter is required.");
+            if (string.IsNullOrEmpty(options.MiddlewareDllsDir)) throw new ArgumentException("The MiddlewareDllsDir parameter is required.");
+            if (string.IsNullOrEmpty(options.AssemblyName)) throw new ArgumentException("The AssemblyName parameter is required.");
+            if (string.IsNullOrEmpty(options.RootComponentTypeName)) throw new ArgumentException("The RootComponentTypeName parameter is required.");
+            if (options.IndexHtmlFragments == null) throw new ArgumentException("The IndexHtmlFragments parameter is required.");
+            if (options.MiddlewarePackages == null) throw new ArgumentException("The MiddlewarePackages parameter is required.");
 
-            var assemblyLoader = SetupCustomAssemblyLoader(commandLineOptions.WebRootPath, commandLineOptions.MiddlewareDllsDir);
+            var assemblyLoader = SetupCustomAssemblyLoader(options.WebRootPath, options.MiddlewareDllsDir);
 
-            var appAssembly = assemblyLoader.LoadAssembly(commandLineOptions.AssemblyName);
-            if (appAssembly == null) throw new ArgumentException($"The application assembly \"{commandLineOptions.AssemblyName}\" colud not load.");
+            var appAssembly = assemblyLoader.LoadAssembly(options.AssemblyName);
+            if (appAssembly == null) throw new ArgumentException($"The application assembly \"{options.AssemblyName}\" colud not load.");
 
-            var rootComponentType = GetRootComponentType(assemblyLoader, commandLineOptions.RootComponentTypeName, appAssembly);
+            var rootComponentType = GetRootComponentType(assemblyLoader, options.RootComponentTypeName, appAssembly);
 
-            var options = new ServerSideRenderingContext
+            var context = new ServerSideRenderingContext
             {
                 AssemblyLoader = assemblyLoader,
-                WebRootPath = commandLineOptions.WebRootPath,
+                WebRootPath = options.WebRootPath,
                 ApplicationAssembly = appAssembly,
                 RootComponentType = rootComponentType,
 
 #if ENABLE_HEADOUTLET
                 HeadOutletComponentType = typeof(Microsoft.AspNetCore.Components.Web.HeadOutlet),
 #endif
-                RenderMode = commandLineOptions.RenderMode,
-                IndexHtmlFragments = commandLineOptions.IndexHtmlFragments,
+                RenderMode = options.RenderMode,
+                IndexHtmlFragments = options.IndexHtmlFragments,
 
-                DeleteLoadingContents = commandLineOptions.DeleteLoadingContents,
-                MiddlewarePackages = commandLineOptions.MiddlewarePackages,
+                DeleteLoadingContents = options.DeleteLoadingContents,
+                MiddlewarePackages = options.MiddlewarePackages,
 
-                Environment = commandLineOptions.Environment,
-                ServerPort = commandLineOptions.ServerPort
+                Environment = options.Environment,
+                ServerPort = options.ServerPort
             };
-            return options;
+            return context;
         }
 
         private static Type GetRootComponentType(CustomAssemblyLoader assemblyLoader, string typeNameOfRootComponent, Assembly appAssembly)

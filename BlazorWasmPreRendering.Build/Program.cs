@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using CommandLineSwitchParser;
@@ -20,36 +22,20 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
         public static async Task<int> Main(string[] args)
         {
             var commandLineOptions = CommandLineSwitch.Parse<CommandLineOptions>(ref args, options => options.EnumParserStyle = EnumParserStyle.OriginalCase);
-            //var assemblyLoader = new CustomAssemblyLoader();
-            var prerenderingOptions = BuildPrerenderingOptions(/*assemblyLoader, */commandLineOptions);
+            var prerenderingOptions = BuildPrerenderingOptions(commandLineOptions);
 
-            var crawlingResult = await PreRenderToStaticFilesAsync(commandLineOptions, /*assemblyLoader,*/ prerenderingOptions);
+            var crawlingResult = await PreRenderToStaticFilesAsync(commandLineOptions, prerenderingOptions);
             return crawlingResult.HasFlag(StaticlizeCrawlingResult.HasErrors) ? 1 : 0;
         }
 
         private static async Task<StaticlizeCrawlingResult> PreRenderToStaticFilesAsync(
             CommandLineOptions commandLineOptions,
-            /*CustomAssemblyLoader assemblyLoader,*/
             BlazorWasmPrerenderingOptions prerenderingOptions)
         {
-            //using var webHost = await ServerSideRenderingWebHost.StartWebHostAsync(
-            //    assemblyLoader,
-            //    commandLineOptions.Environment,
-            //    commandLineOptions.ServerPort,
-            //    prerenderingOptions);
-            //var server = webHost.Services.GetRequiredService<IServer>();
-            //var baseAddresses = server.Features.Get<IServerAddressesFeature>()!.Addresses;
-            //var baseUrl = baseAddresses.First();
-
             var serverPort = GetAvailableTcpPort(commandLineOptions.ServerPort);
-            var webHostProcess = XProcess.Start(
-                "dotnet",
-                "exec \"foo/bar.dll\" " +
-                $"--middleware-dlls-dir \"{prerenderingOptions.MiddlewareDllsDir}\" " +
-                $"--assembly-name \"{commandLineOptions.AssemblyName}\" " +
-                $"--server-port \"{serverPort}\" "
-                );
             var baseUrl = $"http://127.0.0.1:{serverPort}"; // throw new NotImplementedException();
+
+            var webHostProcess = await StartWebHostAsync(commandLineOptions, prerenderingOptions, serverPort, baseUrl);
 
             Console.WriteLine($"Start fetching...[{baseUrl}]");
 
@@ -92,7 +78,37 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             return crawlingResult;
         }
 
-        internal static BlazorWasmPrerenderingOptions BuildPrerenderingOptions(/*CustomAssemblyLoader assemblyLoader,*/ CommandLineOptions commandLineOptions)
+        private static async Task<XProcess> StartWebHostAsync(CommandLineOptions commandLineOptions, BlazorWasmPrerenderingOptions prerenderingOptions, int serverPort, string baseUrl)
+        {
+            var webHostDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".webhost", "BlazorWasmPreRendering.Build.WebHost.dll");
+            var webHostStartInfo = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                ArgumentList = { "exec", webHostDllPath },
+                WorkingDirectory = prerenderingOptions.WebRootPath
+            };
+
+            var webHostOptions = new ServerSideRenderingOptions
+            {
+                WebRootPath = prerenderingOptions.WebRootPath,
+                MiddlewareDllsDir = prerenderingOptions.MiddlewareDllsDir,
+                MiddlewarePackages = prerenderingOptions.MiddlewarePackages,
+                AssemblyName = commandLineOptions.AssemblyName,
+                RootComponentTypeName = commandLineOptions.TypeNameOfRootComponent,
+                RenderMode = commandLineOptions.RenderMode,
+                IndexHtmlFragments = prerenderingOptions.IndexHtmlFragments,
+                DeleteLoadingContents = prerenderingOptions.DeleteLoadingContents,
+                Environment = commandLineOptions.Environment,
+                ServerPort = serverPort
+            };
+            StoreOptionsToEnvironment(webHostOptions, Constants.ConfigurationPrefix, webHostStartInfo.Environment);
+
+            var webHostProcess = XProcess.Start(webHostStartInfo);
+            await webHostProcess.WaitForOutputAsync(predicate: output => output.Contains(baseUrl), millsecondsTimeout: 20000);
+            return webHostProcess;
+        }
+
+        internal static BlazorWasmPrerenderingOptions BuildPrerenderingOptions(CommandLineOptions commandLineOptions)
         {
             if (string.IsNullOrEmpty(commandLineOptions.IntermediateDir)) throw new ArgumentException("The -i|--intermediatedir parameter is required.");
             if (string.IsNullOrEmpty(commandLineOptions.PublishedDir)) throw new ArgumentException("The -p|--publisheddir parameter is required.");
@@ -112,12 +128,6 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var middlewarePackages = MiddlewarePackageReferenceBuilder.Build(folderToScan: frameworkDir, commandLineOptions.MiddlewarePackages);
             var middlewareDllsDir = PrepareMiddlewareDlls(middlewarePackages, commandLineOptions.IntermediateDir, commandLineOptions.FrameworkName);
 
-            //SetupCustomAssemblyLoader(assemblyLoader, webRootPath, middlewareDllsDir);
-
-            //var appAssembly = assemblyLoader.LoadAssembly(commandLineOptions.AssemblyName);
-            //if (appAssembly == null) throw new ArgumentException($"The application assembly \"{commandLineOptions.AssemblyName}\" colud not load.");
-            //var appComponentType = GetAppComponentType(assemblyLoader, commandLineOptions.TypeNameOfRootComponent, appAssembly);
-
             var indexHtmlPath = Path.Combine(webRootPath, "index.html");
             var enableGZipCompression = File.Exists(indexHtmlPath + ".gz");
             var enableBrotliCompression = File.Exists(indexHtmlPath + ".br");
@@ -127,70 +137,17 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var options = new BlazorWasmPrerenderingOptions
             {
                 WebRootPath = webRootPath,
-                //ApplicationAssembly = appAssembly,
-
-                //RootComponentType = appComponentType,
-#if ENABLE_HEADOUTLET
-                //HeadOutletComponentType = typeof(Microsoft.AspNetCore.Components.Web.HeadOutlet),
-#endif
                 RenderMode = commandLineOptions.RenderMode,
                 IndexHtmlFragments = htmlFragment,
                 DeleteLoadingContents = commandLineOptions.DeleteLoadingContents,
 
                 EnableGZipCompression = enableGZipCompression,
                 EnableBrotliCompression = enableBrotliCompression,
-                MiddlewarePackages = middlewarePackages,
-
-
+                MiddlewarePackages = middlewarePackages.ToList(),
                 MiddlewareDllsDir = middlewareDllsDir,
             };
             return options;
         }
-
-        //private static Type GetAppComponentType(CustomAssemblyLoader assemblyLoader, string typeNameOfRootComponent, Assembly appAssembly)
-        //{
-        //    var rootComponentAssembly = appAssembly;
-
-        //    var rootComponentTypeNameParts = typeNameOfRootComponent.Split(',');
-        //    var rootComponentTypeName = rootComponentTypeNameParts[0].Trim();
-        //    var rootComponentAssemblyName = rootComponentTypeNameParts.Length > 1 ? rootComponentTypeNameParts[1].Trim() : "";
-        //    if (rootComponentAssemblyName != "")
-        //    {
-        //        rootComponentAssembly = assemblyLoader.LoadAssembly(rootComponentAssemblyName);
-        //        if (rootComponentAssembly == null) throw new ArgumentException($"The assembly that has component type \"{typeNameOfRootComponent}\" colud not load.");
-        //    }
-
-        //    var appComponentType = rootComponentAssembly.GetType(rootComponentTypeName);
-
-        //    if (appComponentType == null)
-        //    {
-        //        var assemblies = appAssembly.GetReferencedAssemblies()
-        //            .Where(asmname => !string.IsNullOrEmpty(asmname.Name))
-        //            .Where(asmname => !asmname.Name!.StartsWith("Microsoft."))
-        //            .Where(asmname => !asmname.Name!.StartsWith("System."))
-        //            .Select(asmname => assemblyLoader.LoadAssembly(asmname.Name!))
-        //            .Where(asm => asm != null)
-        //            .Prepend(appAssembly) as IEnumerable<Assembly>;
-
-        //        appComponentType = assemblies
-        //            .SelectMany(asm => asm.GetTypes())
-        //            .Where(t => t.Name == "App")
-        //            .Where(t => t.IsSubclassOf(typeof(ComponentBase)))
-        //            .FirstOrDefault();
-        //    }
-
-        //    if (appComponentType == null) throw new ArgumentException($"The component type \"{typeNameOfRootComponent}\" was not found.");
-        //    return appComponentType;
-        //}
-
-        //private static void SetupCustomAssemblyLoader(CustomAssemblyLoader assemblyLoader, string webRootPath, string middlewareDllsDir)
-        //{
-        //    var appAssemblyDir = Path.Combine(webRootPath, "_framework");
-        //    assemblyLoader.AddSerachDir(appAssemblyDir);
-
-        //    if (!string.IsNullOrEmpty(middlewareDllsDir))
-        //        assemblyLoader.AddSerachDir(middlewareDllsDir);
-        //}
 
         private static string PrepareMiddlewareDlls(IEnumerable<MiddlewarePackageReference> middlewarePackages, string intermediateDir, string frameworkName)
         {
@@ -263,6 +220,38 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             var availabeTcpPort = IntEnumerator.ParseRangeText(tcpPortRangeText).FirstOrDefault(port => !usedTcpPorts.Contains(port));
             if (availabeTcpPort == 0) throw new Exception($"There is no avaliable TCP port in range \"{tcpPortRangeText}\".");
             return availabeTcpPort;
+        }
+
+        internal static void StoreOptionsToEnvironment(object obj, string prefix, IDictionary<string, string?> dictionary)
+        {
+            var props = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var prop in props)
+            {
+                var value = prop.GetValue(obj, null);
+                if (value == null) continue;
+
+                switch (Type.GetTypeCode(prop.PropertyType))
+                {
+                    case TypeCode.Object:
+                        if (value is IEnumerable enumerable)
+                        {
+                            var index = 0;
+                            foreach (var item in enumerable)
+                            {
+                                StoreOptionsToEnvironment(item, prefix + prop.Name + ":" + index + ":", dictionary);
+                                index++;
+                            }
+                        }
+                        else
+                        {
+                            StoreOptionsToEnvironment(value, prefix + prop.Name + ":", dictionary);
+                        }
+                        break;
+                    default:
+                        dictionary.Add(prefix + prop.Name, value.ToString());
+                        break;
+                }
+            }
         }
 
         private static void ReportErrorsOfCrawling(StaticlizeCrawlingResult crawlingResult, bool keepRunning)

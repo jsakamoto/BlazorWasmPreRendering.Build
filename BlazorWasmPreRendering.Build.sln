@@ -40,11 +40,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiddlewarePackage1", "Sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiddlewarePackage2", "SampleApps\MiddlewarePackage2\MiddlewarePackage2.csproj", "{504C6A4E-7BC3-4732-875E-68660A6CA02C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWasmPreRendering.Build.WebHost", "BlazorWasmPreRendering.Build.WebHost\BlazorWasmPreRendering.Build.WebHost.csproj", "{53D86514-8E9C-4C85-9BCA-85381C61BA98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWasmPreRendering.Build.WebHost", "BlazorWasmPreRendering.Build.WebHost\BlazorWasmPreRendering.Build.WebHost.csproj", "{53D86514-8E9C-4C85-9BCA-85381C61BA98}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4D2914BF-0FCC-41B8-84EB-1DD50E319FE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWasmPreRendering.Build.Shared", "BlazorWasmPreRendering.Build.Shared\BlazorWasmPreRendering.Build.Shared.csproj", "{E6464CB2-397F-4C69-9422-EDEE002FD5D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWasmPreRendering.Build.Shared", "BlazorWasmPreRendering.Build.Shared\BlazorWasmPreRendering.Build.Shared.csproj", "{E6464CB2-397F-4C69-9422-EDEE002FD5D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

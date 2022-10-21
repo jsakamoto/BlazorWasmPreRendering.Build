@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
@@ -9,14 +8,6 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
     {
         public string WebRootPath { get; init; } = "";
 
-        //public Assembly ApplicationAssembly { get; init; } = null!;
-
-
-
-        //public Type RootComponentType { get; init; } = null!;
-
-        //public Type? HeadOutletComponentType { get; init; } = null;
-
         public RenderMode RenderMode { get; init; }
 
         public IndexHtmlFragments IndexHtmlFragments { get; init; } = null!;
@@ -24,13 +15,11 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
         public bool DeleteLoadingContents { get; init; }
 
 
-
         public bool EnableGZipCompression { get; init; }
 
         public bool EnableBrotliCompression { get; init; }
 
-        public IEnumerable<MiddlewarePackageReference> MiddlewarePackages { get; init; } = Enumerable.Empty<MiddlewarePackageReference>();
-
+        public List<MiddlewarePackageReference> MiddlewarePackages { get; init; } = new();
 
 
         public string MiddlewareDllsDir { get; init; } = "";
