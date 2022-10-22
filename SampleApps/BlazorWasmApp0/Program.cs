@@ -1,4 +1,5 @@
 ﻿using BlazorWasmApp0;
+using Ganss.XSS;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -9,4 +10,16 @@ if (!builder.RootComponents.Any())
     builder.RootComponents.Add<HeadOutlet>("head::after");
 }
 
+ConfigureServices(builder.Services);
+
 await builder.Build().RunAsync();
+
+static void ConfigureServices(IServiceCollection services)
+{
+    services.AddScoped<IHtmlSanitizer, HtmlSanitizer>(_ =>
+    {
+        var sanitizer = new HtmlSanitizer();
+        sanitizer.AllowedAttributes.Add("class");
+        return sanitizer;
+    });
+}

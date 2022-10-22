@@ -10,6 +10,7 @@
 |PWA             | ✅ Yes       | -                | -
 |Has easter-egg  | -            | ✅ Yes           | -
 |Deploy to GitHub Pages | -     | ✅ Yes           | -
+|Has AngleSharp dependency| ✅Yes | -              | -
 
 ## Appendix
 
