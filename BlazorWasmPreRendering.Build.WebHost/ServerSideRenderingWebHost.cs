@@ -37,6 +37,8 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
                 .UseStartup(builderContext => new Startup(builderContext.Configuration, new Uri(baseAddress), hostEnvironment, context));
             webHost = hostBuilder.Build();
             await webHost.StartAsync();
+
+            Console.WriteLine($"Listen to {baseAddress}/");
             return webHost;
         }
     }

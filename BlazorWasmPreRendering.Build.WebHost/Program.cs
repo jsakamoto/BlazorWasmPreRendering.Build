@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
@@ -23,13 +24,14 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 
             var context = BuildPrerenderingContext(options);
 
-            await ServerSideRenderingWebHost.StartWebHostAsync(context);
+            var webHost = await ServerSideRenderingWebHost.StartWebHostAsync(context);
+            await webHost.WaitForShutdownAsync();
         }
 
         internal static ServerSideRenderingContext BuildPrerenderingContext(ServerSideRenderingOptions options)
         {
             if (string.IsNullOrEmpty(options.WebRootPath)) throw new ArgumentException("The WebRootPath parameter is required.");
-            if (string.IsNullOrEmpty(options.MiddlewareDllsDir)) throw new ArgumentException("The MiddlewareDllsDir parameter is required.");
+            if (options.MiddlewareDllsDir == null) throw new ArgumentException("The MiddlewareDllsDir parameter is required.");
             if (string.IsNullOrEmpty(options.AssemblyName)) throw new ArgumentException("The AssemblyName parameter is required.");
             if (string.IsNullOrEmpty(options.RootComponentTypeName)) throw new ArgumentException("The RootComponentTypeName parameter is required.");
             if (options.IndexHtmlFragments == null) throw new ArgumentException("The IndexHtmlFragments parameter is required.");

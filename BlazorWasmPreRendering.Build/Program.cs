@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -28,14 +29,18 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             return crawlingResult.HasFlag(StaticlizeCrawlingResult.HasErrors) ? 1 : 0;
         }
 
-        private static async Task<StaticlizeCrawlingResult> PreRenderToStaticFilesAsync(
-            CommandLineOptions commandLineOptions,
-            BlazorWasmPrerenderingOptions prerenderingOptions)
+        private static async Task<StaticlizeCrawlingResult> PreRenderToStaticFilesAsync(CommandLineOptions commandLineOptions, BlazorWasmPrerenderingOptions prerenderingOptions)
         {
             var serverPort = GetAvailableTcpPort(commandLineOptions.ServerPort);
-            var baseUrl = $"http://127.0.0.1:{serverPort}"; // throw new NotImplementedException();
+            var baseUrl = $"http://127.0.0.1:{serverPort}";
 
-            var webHostProcess = await StartWebHostAsync(commandLineOptions, prerenderingOptions, serverPort, baseUrl);
+            using var webHostProcess = await StartWebHostAsync(commandLineOptions, prerenderingOptions, serverPort, baseUrl);
+            if (webHostProcess.Process.HasExited)
+            {
+                Console.WriteLine(webHostProcess.Output);
+                ReportErrorsOfCrawling(StaticlizeCrawlingResult.HasErrors, commandLineOptions.KeepRunning);
+                return StaticlizeCrawlingResult.HasErrors;
+            }
 
             Console.WriteLine($"Start fetching...[{baseUrl}]");
 
@@ -66,46 +71,16 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 Console.WriteLine();
                 Console.WriteLine("The pre-rendering server will keep running because the \"-k\" option switch is specified.");
                 Console.WriteLine("To stop the pre - rendering server and stop build, press Ctrl + C.");
-            }
-            else
-            {
+
+                ConsoleCancelEventHandler cancelKeyHandler = (object? sender, ConsoleCancelEventArgs args) => CancelKeyHandler(webHostProcess, baseUrl);
+                Console.CancelKeyPress += cancelKeyHandler;
                 await webHostProcess.WaitForExitAsync();
+                Console.CancelKeyPress -= cancelKeyHandler;
             }
 
-            webHostProcess.Process.Kill();
-            await webHostProcess.WaitForExitAsync();
+            await StopWebHostAsync(webHostProcess, baseUrl);
 
             return crawlingResult;
-        }
-
-        private static async Task<XProcess> StartWebHostAsync(CommandLineOptions commandLineOptions, BlazorWasmPrerenderingOptions prerenderingOptions, int serverPort, string baseUrl)
-        {
-            var webHostDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".webhost", "BlazorWasmPreRendering.Build.WebHost.dll");
-            var webHostStartInfo = new ProcessStartInfo
-            {
-                FileName = "dotnet",
-                ArgumentList = { "exec", webHostDllPath },
-                WorkingDirectory = prerenderingOptions.WebRootPath
-            };
-
-            var webHostOptions = new ServerSideRenderingOptions
-            {
-                WebRootPath = prerenderingOptions.WebRootPath,
-                MiddlewareDllsDir = prerenderingOptions.MiddlewareDllsDir,
-                MiddlewarePackages = prerenderingOptions.MiddlewarePackages,
-                AssemblyName = commandLineOptions.AssemblyName,
-                RootComponentTypeName = commandLineOptions.TypeNameOfRootComponent,
-                RenderMode = commandLineOptions.RenderMode,
-                IndexHtmlFragments = prerenderingOptions.IndexHtmlFragments,
-                DeleteLoadingContents = prerenderingOptions.DeleteLoadingContents,
-                Environment = commandLineOptions.Environment,
-                ServerPort = serverPort
-            };
-            StoreOptionsToEnvironment(webHostOptions, Constants.ConfigurationPrefix, webHostStartInfo.Environment);
-
-            var webHostProcess = XProcess.Start(webHostStartInfo);
-            await webHostProcess.WaitForOutputAsync(predicate: output => output.Contains(baseUrl), millsecondsTimeout: 20000);
-            return webHostProcess;
         }
 
         internal static BlazorWasmPrerenderingOptions BuildPrerenderingOptions(CommandLineOptions commandLineOptions)
@@ -252,6 +227,65 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                         break;
                 }
             }
+        }
+
+        private static async ValueTask<XProcess> StartWebHostAsync(CommandLineOptions commandLineOptions, BlazorWasmPrerenderingOptions prerenderingOptions, int serverPort, string baseUrl)
+        {
+            var webHostDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".webhost", "BlazorWasmPreRendering.Build.WebHost.dll");
+            var webHostStartInfo = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                ArgumentList = { "exec", webHostDllPath },
+                WorkingDirectory = prerenderingOptions.WebRootPath
+            };
+
+            var webHostOptions = new ServerSideRenderingOptions
+            {
+                WebRootPath = prerenderingOptions.WebRootPath,
+                MiddlewareDllsDir = prerenderingOptions.MiddlewareDllsDir,
+                MiddlewarePackages = prerenderingOptions.MiddlewarePackages,
+                AssemblyName = commandLineOptions.AssemblyName,
+                RootComponentTypeName = commandLineOptions.TypeNameOfRootComponent,
+                RenderMode = commandLineOptions.RenderMode,
+                IndexHtmlFragments = prerenderingOptions.IndexHtmlFragments,
+                DeleteLoadingContents = prerenderingOptions.DeleteLoadingContents,
+                Environment = commandLineOptions.Environment,
+                ServerPort = serverPort
+            };
+            StoreOptionsToEnvironment(webHostOptions, Constants.ConfigurationPrefix, webHostStartInfo.Environment);
+
+            var webHostProcess = XProcess.Start(webHostStartInfo);
+            await webHostProcess.WaitForOutputAsync(predicate: output => output.Contains(baseUrl), millsecondsTimeout: 20000);
+            return webHostProcess;
+        }
+
+        private static async ValueTask StopWebHostAsync(XProcess webHostProcess, string baseUrl)
+        {
+            if (webHostProcess.Process.HasExited) return;
+
+            using var httpClient = new HttpClient();
+            try
+            {
+                await httpClient.DeleteAsync(baseUrl);
+            }
+            catch (Exception e) { Console.WriteLine(e.ToString()); }
+
+            for (var i = 0; i < 50; i++)
+            {
+                if (webHostProcess.Process.HasExited) break;
+                await Task.Delay(100);
+            }
+            if (!webHostProcess.Process.HasExited) webHostProcess.Process.Kill();
+            await webHostProcess.WaitForExitAsync();
+        }
+
+        private static void CancelKeyHandler(XProcess webHostProcess, string baseUrl)
+        {
+            var awaiter = StopWebHostAsync(webHostProcess, baseUrl).ConfigureAwait(false).GetAwaiter();
+            awaiter.OnCompleted(() =>
+            {
+                try { awaiter.GetResult(); } catch (Exception e) { Console.WriteLine(e.ToString()); }
+            });
         }
 
         private static void ReportErrorsOfCrawling(StaticlizeCrawlingResult crawlingResult, bool keepRunning)

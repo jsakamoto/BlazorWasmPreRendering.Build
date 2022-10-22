@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Hosting;
@@ -107,12 +108,15 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
                 // NOTICE: This is the back door of this pre-rendering server for the unit test purpose. 
                 // When this server receives an "HTTP DELETE /" request, the server will be shut down even if the "KeepRunning" option was enabled.
                 // This is important to certainly terminate this server during the clean-up process of the unit test.
-                endpoints.MapDelete("/", async context =>
+                endpoints.MapDelete("/", context =>
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.OK;
-                    await context.Response.CompleteAsync();
                     var webHost = app.ApplicationServices.GetRequiredService<IWebHost>();
-                    var _ = webHost.StopAsync().ConfigureAwait(false);
+                    Task.Delay(100).ConfigureAwait(false).GetAwaiter().OnCompleted(() =>
+                    {
+                        webHost.StopAsync().ConfigureAwait(false);
+                    });
+                    return Task.CompletedTask;
                 });
 
                 endpoints.MapRazorPages();
