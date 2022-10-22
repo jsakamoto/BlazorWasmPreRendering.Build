@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 {
-    internal class CustomAssemblyLoader
+    public class CustomAssemblyLoader
     {
-        private readonly List<string> _AssemblySearchDirs = new List<string>();
+        private readonly List<string> _AssemblySearchDirs = new();
 
         public CustomAssemblyLoader()
         {

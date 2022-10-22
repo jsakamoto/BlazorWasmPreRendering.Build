@@ -12,7 +12,7 @@ public class IndexHtmlFragmentsTest
         var indexHtmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "index (2).html");
 
         // When
-        var indexHtmlFragments = IndexHtmlFragments.Load(
+        var indexHtmlFragments = IndexHtmlParser.Parse(
             indexHtmlPath,
             rootComponentSelector: "#app",
             headOutletComponentSelector: "head::after",
@@ -40,7 +40,7 @@ public class IndexHtmlFragmentsTest
         var indexHtmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "index (3).html");
 
         // When
-        var indexHtmlFragments = IndexHtmlFragments.Load(
+        var indexHtmlFragments = IndexHtmlParser.Parse(
             indexHtmlPath,
             rootComponentSelector: "app,#app",
             headOutletComponentSelector: "head::after",
@@ -68,7 +68,7 @@ public class IndexHtmlFragmentsTest
         var indexHtmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "index (2).html");
 
         // When
-        var indexHtmlFragments = IndexHtmlFragments.Load(
+        var indexHtmlFragments = IndexHtmlParser.Parse(
             indexHtmlPath,
             rootComponentSelector: "#app",
             headOutletComponentSelector: "head::after",

@@ -1,26 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
 namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 {
-    public class IndexHtmlFragments
+    public class IndexHtmlParser
     {
-        public string FirstPart { get; } = "";
-        public string MiddlePart { get; } = "";
-        public string LastPart { get; } = "";
-
-        public IndexHtmlFragments(string firstPart, string middlePart, string lastPart)
-        {
-            this.FirstPart = firstPart;
-            this.MiddlePart = middlePart;
-            this.LastPart = lastPart;
-        }
-
-        public static IndexHtmlFragments Load(string indexHtmlPath, string rootComponentSelector, string? headOutletComponentSelector, bool deleteLoadingContents)
+        public static IndexHtmlFragments Parse(string indexHtmlPath, string rootComponentSelector, string? headOutletComponentSelector, bool deleteLoadingContents)
         {
             var indexHtmlText = File.ReadAllText(indexHtmlPath);
             indexHtmlText = indexHtmlText.Replace("\r\n", "\n");

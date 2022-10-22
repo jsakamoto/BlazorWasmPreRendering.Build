@@ -8,10 +8,13 @@
     <RootNamespace>Toolbelt.Blazor.WebAssembly.PrerenderServer</RootNamespace>
     <DefineConstants Condition=" '$(TargetFramework)' != 'net5.0' ">$(DefineConstants);ENABLE_HEADOUTLET;</DefineConstants>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+
+    <!-- https://andrewlock.net/fixing-build-warning-netsdk1138-when-building-end-of-life-projects-with-dotnet-5/#setting-checkeoltargetframework-to-remove-the-warning -->
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.0-preview.28.0</Version>
+    <Version>2.0.0-alpha.1.0</Version>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Authors>J.Sakamoto</Authors>
     <PackageId>BlazorWasmPreRendering.Build</PackageId>
@@ -26,16 +29,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="bundleconfig.json" />
-    <None Include="bundleconfig.json" />
-    <EmbeddedResource Include="Scripts\*" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.16.1" />
-    <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
     <PackageReference Include="CommandLineSwitchParser" Version="1.1.0" />
-    <PackageReference Include="NuGet.Versioning" Version="6.1.0" />
+    <PackageReference Include="XProcess" Version="1.3.0" />
+    <PackageReference Include="NuGet.Versioning" Version="6.3.1" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
@@ -50,6 +47,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0-preview.5.22303.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BlazorWasmPreRendering.Build.Shared\BlazorWasmPreRendering.Build.Shared.csproj" />
+  </ItemGroup>
+
   <!-- Pack settings -->
   <PropertyGroup>
     <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);PublishForPackage</GenerateNuspecDependsOn>
@@ -59,13 +60,24 @@
 
   <Target Name="PublishForPackage">
     <Message Importance="high" Text="[PublishForPackage]" />
+
+    <!-- Publish Build Program -->
     <Exec Command="dotnet publish -c:$(Configuration) -f:net5.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net6.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net7.0 --nologo" />
+
+    <!-- Publish WebHost Program -->
+    <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net5.0 --nologo" />
+    <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net6.0 --nologo" />
+    <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net7.0 --nologo" />
+
     <ItemGroup>
       <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\Microsoft.*.dll" />
       <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\web.config" />
       <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\*.deps.json" />
+      <_ExcludeForNupkg Include="$(ProjectDir)..\BlazorWasmPreRendering.Build.WebHost\bin\$(Configuration)\net*\publish\Microsoft.*.dll" />
+      <_ExcludeForNupkg Include="$(ProjectDir)..\BlazorWasmPreRendering.Build.WebHost\bin\$(Configuration)\net*\publish\web.config" />
+      <_ExcludeForNupkg Include="$(ProjectDir)..\BlazorWasmPreRendering.Build.WebHost\bin\$(Configuration)\net*\publish\*.deps.json" />
     </ItemGroup>
     <Delete Files="@(_ExcludeForNupkg)" />
   </Target>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,17 +6,12 @@ using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.Extensions.Logging;
 using NuGet.Versioning;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
 namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 {
-    public class MiddlewarePackageReference
+    public class MiddlewarePackageReferenceBuilder
     {
-        public string PackageIdentity { get; init; } = "";
-
-        public string Assembly { get; init; } = "";
-
-        public string Version { get; init; } = "";
-
         public static IEnumerable<MiddlewarePackageReference> Build(string folderToScan, string? middlewarePackages, ILogger? logger = null)
         {
             return BuildFromAssemblyMetadata(folderToScan)
@@ -68,7 +63,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                         .GetCustomAttributes(typeof(AssemblyMetadataAttribute), inherit: true)
                         .OfType<AssemblyMetadataAttribute>()
                         .Where(attrib => attrib.Key == "BlazorWasmPreRendering.Build.MiddlewarePackageReference")
-                        .SelectMany(attib => MiddlewarePackageReference.Parse(attib.Value))
+                        .SelectMany(attib => MiddlewarePackageReferenceBuilder.Parse(attib.Value))
                         .ToArray();
                     if (assemblyMetadataAttributes.Any())
                     {
@@ -82,7 +77,6 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             return packageReferences;
         }
-
-        public override string ToString() => $"{this.PackageIdentity},{this.Assembly},{this.Version}";
     }
+
 }

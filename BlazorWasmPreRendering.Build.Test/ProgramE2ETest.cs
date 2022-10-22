@@ -8,7 +8,6 @@ using NUnit.Framework;
 using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer;
 using Toolbelt.Blazor.WebAssembly.PrerenderServer.Models;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost;
 using Toolbelt.Diagnostics;
 using static Toolbelt.Diagnostics.XProcess;
 
@@ -88,7 +87,7 @@ public class ProgramE2ETest
     {
         using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
         var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp0");
-        var serverPort = ServerSideRenderingWebHost.GetAvailableTcpPort("5050-5999");
+        var serverPort = Program.GetAvailableTcpPort("5050-5999");
 
         using var dotnetCLI = Start(
             "dotnet", $"publish -c:Release -p:BlazorWasmPrerenderingKeepServer=true -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingServerPort={serverPort}",
