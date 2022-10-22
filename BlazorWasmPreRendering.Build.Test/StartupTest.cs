@@ -6,8 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost;
 
 namespace BlazorWasmPreRendering.Build.Test;
 
@@ -18,15 +18,15 @@ public class StartupTest
     {
         // Given
         var config = new ConfigurationBuilder().Build();
-        var option = new BlazorWasmPrerenderingOptions
+        var context = new ServerSideRenderingContext
         {
-            MiddlewarePackages = new[] {
-                new MiddlewarePackageReference { PackageIdentity = "Toolbelt.Blazor.HeadElement.ServerPrerendering", Assembly = "", Version = "1.5.1" }
+            MiddlewarePackages = new MiddlewarePackageReference[] {
+                new() { PackageIdentity = "Toolbelt.Blazor.HeadElement.ServerPrerendering", Assembly = "", Version = "1.5.1" }
             }
         };
         var services = new ServiceCollection()
             .AddSingleton(config as IConfiguration)
-            .AddSingleton(option)
+            .AddSingleton(context)
             .AddSingleton(new CustomAssemblyLoader())
             .AddSingleton(new Uri("http://127.0.0.1:5000"))
             .AddSingleton(new HostEnvironment("http://127.0.0.1:5000", "Prerendering") as IWebAssemblyHostEnvironment)

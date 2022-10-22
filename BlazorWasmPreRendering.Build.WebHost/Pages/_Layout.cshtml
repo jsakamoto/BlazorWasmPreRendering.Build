@@ -1,8 +1,7 @@
 @using Microsoft.AspNetCore.Components
-@using Toolbelt.Blazor.WebAssembly.PrerenderServer
-@using Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost
+@using Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@inject BlazorWasmPrerenderingOptions BlazorWasmPrerenderingOptions
+@inject ServerSideRenderingContext BlazorWasmPrerenderingOptions
 @inject ResetHeadOutletScript ResetHeadOutletScript
 @Html.Raw(BlazorWasmPrerenderingOptions.IndexHtmlFragments.FirstPart)
 @if (BlazorWasmPrerenderingOptions.HeadOutletComponentType != null) {<!-- %%-PRERENDERING-HEADOUTLET-BEGIN-%% -->

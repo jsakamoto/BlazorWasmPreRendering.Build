@@ -40,6 +40,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiddlewarePackage1", "Sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiddlewarePackage2", "SampleApps\MiddlewarePackage2\MiddlewarePackage2.csproj", "{504C6A4E-7BC3-4732-875E-68660A6CA02C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWasmPreRendering.Build.WebHost", "BlazorWasmPreRendering.Build.WebHost\BlazorWasmPreRendering.Build.WebHost.csproj", "{53D86514-8E9C-4C85-9BCA-85381C61BA98}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4D2914BF-0FCC-41B8-84EB-1DD50E319FE1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWasmPreRendering.Build.Shared", "BlazorWasmPreRendering.Build.Shared\BlazorWasmPreRendering.Build.Shared.csproj", "{E6464CB2-397F-4C69-9422-EDEE002FD5D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,11 +88,20 @@ Global
 		{504C6A4E-7BC3-4732-875E-68660A6CA02C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{504C6A4E-7BC3-4732-875E-68660A6CA02C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{504C6A4E-7BC3-4732-875E-68660A6CA02C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53D86514-8E9C-4C85-9BCA-85381C61BA98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53D86514-8E9C-4C85-9BCA-85381C61BA98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53D86514-8E9C-4C85-9BCA-85381C61BA98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53D86514-8E9C-4C85-9BCA-85381C61BA98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6464CB2-397F-4C69-9422-EDEE002FD5D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6464CB2-397F-4C69-9422-EDEE002FD5D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6464CB2-397F-4C69-9422-EDEE002FD5D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6464CB2-397F-4C69-9422-EDEE002FD5D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{9A8A4185-D6CE-4A28-98F4-96A092AB0787} = {4D2914BF-0FCC-41B8-84EB-1DD50E319FE1}
 		{BE510F51-7EC3-4216-B89D-58A031EB6AB0} = {9D3D3493-8160-467E-BC93-A22DB08E3014}
 		{6FE54B1F-9FB8-447E-9D1B-A332BE714C28} = {9D3D3493-8160-467E-BC93-A22DB08E3014}
 		{16CC4FDF-D1AD-4E0F-95A1-66308F8980B2} = {6FE54B1F-9FB8-447E-9D1B-A332BE714C28}

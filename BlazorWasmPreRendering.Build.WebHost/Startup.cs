@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Hosting;
@@ -12,9 +13,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 {
-    public class Startup
+    internal class Startup
     {
         private IConfiguration Configuration { get; }
 
@@ -22,9 +23,9 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost
 
         private IWebAssemblyHostEnvironment HostEnvironment { get; }
 
-        private BlazorWasmPrerenderingOptions PrerenderingOptions { get; }
+        private ServerSideRenderingContext PrerenderingOptions { get; }
 
-        public Startup(IConfiguration configuration, Uri baseAddress, IWebAssemblyHostEnvironment hostEnvironment, BlazorWasmPrerenderingOptions prerenderingOptions)
+        public Startup(IConfiguration configuration, Uri baseAddress, IWebAssemblyHostEnvironment hostEnvironment, ServerSideRenderingContext prerenderingOptions)
         {
             this.Configuration = configuration;
             this.BaseAddress = baseAddress;
@@ -107,12 +108,15 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.WebHost
                 // NOTICE: This is the back door of this pre-rendering server for the unit test purpose. 
                 // When this server receives an "HTTP DELETE /" request, the server will be shut down even if the "KeepRunning" option was enabled.
                 // This is important to certainly terminate this server during the clean-up process of the unit test.
-                endpoints.MapDelete("/", async context =>
+                endpoints.MapDelete("/", context =>
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.OK;
-                    await context.Response.CompleteAsync();
                     var webHost = app.ApplicationServices.GetRequiredService<IWebHost>();
-                    var _ = webHost.StopAsync().ConfigureAwait(false);
+                    Task.Delay(100).ConfigureAwait(false).GetAwaiter().OnCompleted(() =>
+                    {
+                        webHost.StopAsync().ConfigureAwait(false);
+                    });
+                    return Task.CompletedTask;
                 });
 
                 endpoints.MapRazorPages();

@@ -9,7 +9,7 @@ public class MiddlewarePackageReferenceTest
     public void Parse_Test()
     {
         // When
-        var middlewarePackages = MiddlewarePackageReference.Build("", "Foo.Bar,,1.2.0.3;Fizz.Buzz,FizzBuzz,");
+        var middlewarePackages = MiddlewarePackageReferenceBuilder.Build("", "Foo.Bar,,1.2.0.3;Fizz.Buzz,FizzBuzz,");
 
         // Then
         middlewarePackages
@@ -26,7 +26,7 @@ public class MiddlewarePackageReferenceTest
         var frameworkDir = Path.Combine(publishDir, "wwwroot", "_framework");
 
         // When
-        var middlewarePackages = MiddlewarePackageReference.Build(folderToScan: frameworkDir, "");
+        var middlewarePackages = MiddlewarePackageReferenceBuilder.Build(folderToScan: frameworkDir, "");
 
         // Then
         middlewarePackages
@@ -44,7 +44,7 @@ public class MiddlewarePackageReferenceTest
         var frameworkDir = Path.Combine(publishDir, "wwwroot", "_framework");
 
         // When
-        var middlewarePackages = MiddlewarePackageReference.Build(
+        var middlewarePackages = MiddlewarePackageReferenceBuilder.Build(
             folderToScan: frameworkDir,
             "MiddlewarePackage2,,2.0.0-beta.2;MiddlewarePackage1,Middleware1,1.2.0-preview.1");
 

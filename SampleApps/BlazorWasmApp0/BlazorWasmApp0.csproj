@@ -8,10 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorWasmPreRendering.Build" Version="1.0.0-preview.28.0" />
+    <PackageReference Include="BlazorWasmPreRendering.Build" Version="2.0.0-alpha.1.0" />
     <PackageReference Include="PublishSPAforGitHubPages.Build" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.2" PrivateAssets="all" />
+    <PackageReference Include="HtmlSanitizer" Version="5.0.274-beta" />
   </ItemGroup>
 
   <ItemGroup>

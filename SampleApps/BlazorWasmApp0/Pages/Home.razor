@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject IConfiguration Configuration
 @inject IWebAssemblyHostEnvironment HostEnv
+@inject IHtmlSanitizer HtmlSanitizer
 
 <PageTitle>@_Title | Blazor Wasm App 0</PageTitle>
 <HeadContent>
@@ -24,6 +25,6 @@
 
 	protected override void OnInitialized()
 	{
-		_Title = Configuration.GetValue("HomeTitle", "");
+		this._Title = this.HtmlSanitizer.Sanitize(Configuration.GetValue("HomeTitle", ""));
 	}
 }
