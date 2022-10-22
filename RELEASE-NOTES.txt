@@ -1,3 +1,6 @@
+v.2.0.0-preview.1
+- Improve: Detached the pre-render web host to a separate out process.
+
 v.1.0.0-preview.28.0
 - Improve: Determine the pre-rendering server's listening TCP port dynamically.
 
