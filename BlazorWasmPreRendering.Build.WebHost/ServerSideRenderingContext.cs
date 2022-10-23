@@ -31,6 +31,8 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 
         public string? Environment { get; init; }
 
+        public string[] Locales { get; init; } = new string[0];
+
         public int ServerPort { get; init; }
     }
 }

@@ -393,7 +393,36 @@ public class ProgramE2ETest
         ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, homeTitle: "127.0.0.1");
     }
 
-    private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir, string homeTitle = "Home", string environment = "Prerendering", OutputStyle outputStyle = OutputStyle.AppendHtmlExtension)
+
+    [Test]
+    public async Task Localization_TestAsync()
+    {
+        // Given
+        // Publish the sample app that is localized.
+        using var publishDir = await SampleSite.BlazorWasmApp0.PublishAsync();
+
+        // When
+        // Execute prerenderer
+        var exitCode = await Program.Main(new[] {
+            "-a", "BlazorWasmApp0",
+            "-t", "BlazorWasmApp0.App",
+            "--selectorofrootcomponent", "#app,app",
+            "--selectorofheadoutletcomponent", "head::after",
+            "-p", publishDir,
+            "-i", SampleSite.BlazorWasmApp0.IntermediateDir,
+            "-m", "",
+            "-f", "net6.0",
+            "--locale", "ja,en"
+        });
+        exitCode.Is(0);
+
+        // Then
+        // Validate prerendered contents: the title of the "/about" page is localized.
+        var wwwrootDir = Path.Combine(publishDir, "wwwroot");
+        ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, aboutTitle: "アバウト", outputStyle: OutputStyle.IndexHtmlInSubFolders);
+    }
+
+    private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir, string homeTitle = "Home", string aboutTitle = "About", string environment = "Prerendering", OutputStyle outputStyle = OutputStyle.AppendHtmlExtension)
     {
         var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
         var aboutIndexHtmlPath = outputStyle == OutputStyle.AppendHtmlExtension ?
@@ -408,10 +437,10 @@ public class ProgramE2ETest
 
         // NOTICE: The document title was rendered by the <HeadOutlet> component of .NET 6.
         rootIndexHtml.Title.Is($"{homeTitle} | Blazor Wasm App 0");
-        aboutIndexHtml.Title.Is("About | Blazor Wasm App 0");
+        aboutIndexHtml.Title.Is($"{aboutTitle} | Blazor Wasm App 0");
 
         rootIndexHtml.QuerySelector("h1")!.TextContent.Is(homeTitle);
-        aboutIndexHtml.QuerySelector("h1")!.TextContent.Is("About");
+        aboutIndexHtml.QuerySelector("h1")!.TextContent.Is(aboutTitle);
 
         rootIndexHtml.QuerySelector("a")!.TextContent.Is("about");
         (rootIndexHtml.QuerySelector("a") as IHtmlAnchorElement)!.Href.Is("about:///about");

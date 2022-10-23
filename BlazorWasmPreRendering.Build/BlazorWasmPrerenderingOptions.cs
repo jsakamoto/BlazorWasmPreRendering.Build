@@ -21,7 +21,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         public List<MiddlewarePackageReference> MiddlewarePackages { get; init; } = new();
 
-
         public string MiddlewareDllsDir { get; init; } = "";
+
+        public List<string> Locales { get; init; } = new();
     }
 }

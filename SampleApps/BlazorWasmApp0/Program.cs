@@ -16,6 +16,7 @@ await builder.Build().RunAsync();
 
 static void ConfigureServices(IServiceCollection services)
 {
+    services.AddLocalization();
     services.AddScoped<IHtmlSanitizer, HtmlSanitizer>(_ =>
     {
         var sanitizer = new HtmlSanitizer();

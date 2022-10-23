@@ -48,6 +48,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 baseUrl,
                 commandLineOptions.UrlPathToExplicitFetch,
                 prerenderingOptions.WebRootPath,
+                prerenderingOptions.Locales,
                 commandLineOptions.OutputStyle,
                 prerenderingOptions.EnableGZipCompression,
                 prerenderingOptions.EnableBrotliCompression,
@@ -109,6 +110,14 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
             var htmlFragment = IndexHtmlParser.Parse(indexHtmlPath, commandLineOptions.SelectorOfRootComponent, commandLineOptions.SelectorOfHeadOutletComponent, commandLineOptions.DeleteLoadingContents);
 
+            var locales = new List<string>();
+            if (!string.IsNullOrEmpty(commandLineOptions.Locale))
+            {
+                locales.AddRange(commandLineOptions.Locale.Split(',')
+                    .Select(locale => locale.Trim())
+                    .Where(locale => !string.IsNullOrEmpty(locale)));
+            }
+
             var options = new BlazorWasmPrerenderingOptions
             {
                 WebRootPath = webRootPath,
@@ -120,6 +129,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 EnableBrotliCompression = enableBrotliCompression,
                 MiddlewarePackages = middlewarePackages.ToList(),
                 MiddlewareDllsDir = middlewareDllsDir,
+
+                Locales = locales
             };
             return options;
         }
@@ -197,8 +208,9 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             return availabeTcpPort;
         }
 
-        internal static void StoreOptionsToEnvironment(object obj, string prefix, IDictionary<string, string?> dictionary)
+        internal static void StoreOptionsToEnvironment(object? obj, string prefix, IDictionary<string, string?> dictionary)
         {
+            if (obj == null) return;
             var props = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var prop in props)
             {
@@ -213,7 +225,12 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                             var index = 0;
                             foreach (var item in enumerable)
                             {
-                                StoreOptionsToEnvironment(item, prefix + prop.Name + ":" + index + ":", dictionary);
+                                var typeCode = item is not null ? Type.GetTypeCode(item.GetType()) : TypeCode.Empty;
+                                switch (typeCode)
+                                {
+                                    case TypeCode.Object: StoreOptionsToEnvironment(item, prefix + prop.Name + ":" + index + ":", dictionary); break;
+                                    default: dictionary.Add(prefix + prop.Name + ":" + index, item?.ToString()); break;
+                                }
                                 index++;
                             }
                         }
@@ -236,7 +253,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             {
                 FileName = "dotnet",
                 ArgumentList = { "exec", webHostDllPath },
-                WorkingDirectory = prerenderingOptions.WebRootPath
+                WorkingDirectory = Path.Combine(prerenderingOptions.WebRootPath, "_framework")
             };
 
             var webHostOptions = new ServerSideRenderingOptions
@@ -250,6 +267,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 IndexHtmlFragments = prerenderingOptions.IndexHtmlFragments,
                 DeleteLoadingContents = prerenderingOptions.DeleteLoadingContents,
                 Environment = commandLineOptions.Environment,
+                Locales = prerenderingOptions.Locales,
                 ServerPort = serverPort
             };
             StoreOptionsToEnvironment(webHostOptions, Constants.ConfigurationPrefix, webHostStartInfo.Environment);

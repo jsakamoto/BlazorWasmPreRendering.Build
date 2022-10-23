@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
@@ -46,6 +47,7 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
             string baseUrl,
             string? urlPathToExplicitFetch,
             string webRootPath,
+            IEnumerable<string> locales,
             OutputStyle outputStyle,
             bool enableGZipCompression,
             bool enableBrotliCompression,
@@ -63,6 +65,15 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 .Select(s => s.Trim())
                 .Where(s => !string.IsNullOrEmpty(s))
                 .ToArray();
+
+            if (locales.Any())
+            {
+                this.HttpClient.DefaultRequestHeaders.AcceptLanguage.Clear();
+                foreach (var locale in locales)
+                {
+                    this.HttpClient.DefaultRequestHeaders.AcceptLanguage.Add(StringWithQualityHeaderValue.Parse(locale));
+                }
+            }
         }
 
         public async Task<StaticlizeCrawlingResult> SaveToStaticFileAsync()
