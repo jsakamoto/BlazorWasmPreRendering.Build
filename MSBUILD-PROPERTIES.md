@@ -12,6 +12,7 @@ BlazorWasmPrerenderingOutputStyle           | `IndexHtmlInSubFolders` | When it 
 BlazorWasmPrerenderingDeleteLoadingContents | `false`        | When it is set to `true`, the "Loading..." contents will be deleted from prerendered output HTML files, and prerendered contents to be visible immediately even before the Blazor WebAssembly runtime has warmed up.
 BlazorWasmPrerenderingUrlPathToExplicitFetch|                | Set the semicolon-separated URL paths explicitly that are not linked from anywhere, such as easter-egg pages, to be prerendered.
 BlazorWasmPrerenderingEnvironment           | `Prerendering` | Set a name of a host environment that can retrieve via `IWebHostEnvironment.Environment`.
+BlazorWasmPrerenderingLocale                | `en`           | Set a comma-separated locale list such as "en", "ja-JP,en-US", etc., those used when crawling. **⚠️Attention:** when you specify this MSBuild property via "dotnet" command line, you have to replace `,` (comma) with `%2c`.
 BlazorWasmPrerenderingMode                  | `Static`       | Set the render mode in which `Static` or `WebAssemblyPrerendered`.
 BlazorWasmPrerenderingKeepServer            | `false`        | When it is set to `true`, the `dotnet publish` command will not be exited, and the prerendering server process will keep running until `Ctrl` + `C` is pressed.
 
@@ -41,6 +42,11 @@ When you execute the `dotnet publish` command, you can specify MSBuild propertie
 ```shell
 dotnet publish -c:Release -p:{Property name 1}={Property value 1} -p:{Property name 2}={Property value 2} ...
 ```
+
+> **Warning**  
+> If you want to specify a comma-separated value as a property value, you must replace `,` (comma) with `%2c`.  
+> ex.) `dotnet publish -c:Release -p:BlazorWasmPrerenderingLocale=ja%2cen`
+
 
 ### 3. Specify it in environment variables of the OS platforms
 

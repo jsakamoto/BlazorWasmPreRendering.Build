@@ -1,3 +1,6 @@
+v.2.0.0-preview.2
+- Improve: Add support for setting the custom locale for crawling.
+
 v.2.0.0-preview.1
 - Improve: Detached the pre-render web host to a separate out process.
 

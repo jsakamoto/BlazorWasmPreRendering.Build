@@ -1,6 +1,6 @@
 ﻿# BlazorWasmPreRendering.Build [![NuGet Package](https://img.shields.io/nuget/v/BlazorWasmPreRendering.Build.svg)](https://www.nuget.org/packages/BlazorWasmPreRendering.Build/)
 
-## Summary
+## 📝Summary
 
 When you publish your Blazor WebAssembly app, this package pre-renders and saves the app as static HTML files in your public folder.
 
@@ -12,7 +12,7 @@ This will help make the contents of your Blazor WebAssembly static apps findable
 **And after installing this package:**  
 ![fig.2 - after](https://raw.githubusercontent.com/jsakamoto/BlazorWasmPreRendering.Build/master/.assets/fig02.after.png)
 
-## Quick Start
+## 🚀Quick Start
 
 Install this package to your Blazor WebAssembly project.
 
@@ -24,7 +24,7 @@ Basically, **that's all**.
 
 **Once installing this package is done, the output of the `dotnet publish` command will include pre-rendered contents!** 🎉
 
-## Configurations
+## ⚙️Configurations
 
 ### Services registration
 
@@ -287,7 +287,19 @@ For more details, please see also the following link.
 
 - ["Persist prerendered state - Prerender and integrate ASP.NET Core Razor components | Microsoft Docs"](https://docs.microsoft.com/en-us/aspnet/core/blazor/components/prerendering-and-integration?view=aspnetcore-6.0&pivots=webassembly#persist-prerendered-state).
 
-## Troubleshooting
+### Locale
+
+The pre-rendering process will default be taken under the "en" culture. If you want to pre-render that with another culture, you can do that by specifying the `BlazorWasmPrerenderingLocale` MSBuild property.
+You can set a comma-separated locale list such as "en", "ja-JP,en-US", etc. those used when crawling, to the `BlazorWasmPrerenderingLocale` MSBuild property.
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  ...
+  <PropertyGroup>
+    <BlazorWasmPrerenderingLocale>ja-JP,en-US</BlazorWasmPrerenderingLocale>
+    ...
+```
+## 🛠️Troubleshooting
 
 If any exceptions happen in the prerendering process, the exception messages and stack traces will be shown in the console output of the `dotnet publish` command.
 
@@ -311,14 +323,14 @@ During the prerendering process is running, developers can investigate it.
 
 ![fig.4 - an exception messaage and a stack trace](https://raw.githubusercontent.com/jsakamoto/BlazorWasmPreRendering.Build/master/.assets/fig05.keeprunning.png)
 
-## Appendix
+## 🔗Appendix
 
 - If you would like to **change a title or any meta elements** for each page in your Blazor WebAssembly app, I recommend using the [**"Blazor Head Element Helper"** ![NuGet Package](https://img.shields.io/nuget/v/Toolbelt.Blazor.HeadElement.svg)](https://www.nuget.org/packages/Toolbelt.Blazor.HeadElement/) NuGet package.
   - Since the ver.1.0.0 preview 8 of this package, **the .NET 6 `<PageTitle>` and `<HeadContent>` components** are also statically pre-rendered properly.
 - If you would like to deploy your Blazor WebAssembly app to **GitHub Pages**, I recommend using the [**"Publish SPA for GitHub Pages"** ![NuGet Package](https://img.shields.io/nuget/v/PublishSPAforGitHubPages.Build.svg)](https://www.nuget.org/packages/PublishSPAforGitHubPages.Build/) NuGet package.
 - The **["Awesome Blazor Browser"](https://jsakamoto.github.io/awesome-blazor-browser/)** site is one of a good showcase of this package. That site is republishing every day by GitHub Actions with pre-rendering powered by this package.
 
-## Notice
+## ⚠️Notice
 
 This package is now experimental stage.
 
@@ -327,10 +339,10 @@ But I'm not sure this package works fine even with a complicated real-world Blaz
 
 I welcome to fork and improve this project on your hand.
 
-## Release notes
+## 🎉Release notes
 
 [Release notes](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/RELEASE-NOTES.txt)
 
-## License
+## 📢License
 
 [Mozilla Public License Version 2.0](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/LICENSE)
