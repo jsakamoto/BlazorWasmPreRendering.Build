@@ -24,6 +24,8 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
 
         public string? Environment { get; set; }
 
+        public string? Locale { get; set; }
+
         public RenderMode RenderMode { get; set; } = RenderMode.Static;
 
         public OutputStyle OutputStyle { get; set; } = OutputStyle.IndexHtmlInSubFolders;

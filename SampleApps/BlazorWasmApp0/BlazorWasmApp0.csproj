@@ -12,6 +12,7 @@
     <PackageReference Include="PublishSPAforGitHubPages.Build" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.2" />
     <PackageReference Include="HtmlSanitizer" Version="5.0.274-beta" />
   </ItemGroup>
 
@@ -22,6 +23,21 @@
 
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Localization.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Localization.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Localization.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Localization.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

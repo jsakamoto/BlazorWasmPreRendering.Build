@@ -11,7 +11,8 @@ public class SampleSite : IDisposable
     /// - .NET 6<br/>
     /// - its titles by .NET 6 &lt;PageTitle&gt;.<br/>
     /// - PWA<br/>
-    /// - Use HtmlSanitizer package
+    /// - Use HtmlSanitizer package<br/>
+    /// - Localization
     /// </summary>
     public static SampleSite BlazorWasmApp0 { get; } = new SampleSite("BlazorWasmApp0", "net6.0");
 

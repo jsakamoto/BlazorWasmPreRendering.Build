@@ -1,6 +1,7 @@
 ﻿@page "/about"
 @implements IDisposable
 @inject PersistentComponentState ApplicationState
+@inject IStringLocalizer<Localization> Text
 
 <PageTitle>About | Blazor Wasm App 0</PageTitle>
 
@@ -43,7 +44,7 @@ else
 			Console.WriteLine("ApplicationState.TryTakeFromJson is false");
 			await Task.Delay(1000);
 			Console.WriteLine("_State = new AboutPageState {...}");
-			_State = new AboutPageState { Title = "About" };
+			_State = new AboutPageState { Title = this.Text["About"] };
 		}
 	}
 
