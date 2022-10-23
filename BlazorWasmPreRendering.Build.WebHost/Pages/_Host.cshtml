@@ -1,5 +1,5 @@
 ﻿@page "/"
 @using Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
-@inject ServerSideRenderingContext BlazorWasmPrerenderingOptions
+@inject ServerSideRenderingContext PrerenderingContext
 @{ Layout = "_Layout"; }
-@(await Html.RenderComponentAsync(BlazorWasmPrerenderingOptions.RootComponentType, BlazorWasmPrerenderingOptions.RenderMode, parameters: null))
+@(await Html.RenderComponentAsync(PrerenderingContext.RootComponentType, PrerenderingContext.RenderMode, parameters: null))

@@ -20,6 +20,7 @@ public class StartupTest
         var config = new ConfigurationBuilder().Build();
         var context = new ServerSideRenderingContext
         {
+            AssemblyLoader = new CustomAssemblyLoader(),
             MiddlewarePackages = new MiddlewarePackageReference[] {
                 new() { PackageIdentity = "Toolbelt.Blazor.HeadElement.ServerPrerendering", Assembly = "", Version = "1.5.1" }
             }
@@ -27,7 +28,6 @@ public class StartupTest
         var services = new ServiceCollection()
             .AddSingleton(config as IConfiguration)
             .AddSingleton(context)
-            .AddSingleton(new CustomAssemblyLoader())
             .AddSingleton(new Uri("http://127.0.0.1:5000"))
             .AddSingleton(new HostEnvironment("http://127.0.0.1:5000", "Prerendering") as IWebAssemblyHostEnvironment)
             .AddSingleton<Startup>()

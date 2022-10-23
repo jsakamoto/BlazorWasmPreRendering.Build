@@ -77,6 +77,7 @@ public class BuildProgramTests
                 LastPart = "</body>\r\n</html>",
                 MiddlePart = "</head>\r\n<body>\r\n",
             },
+            Locales = { "en", "ja" },
             MiddlewareDllsDir = "C:\\project\\obj\\Release\\net6.0\\middleware",
             MiddlewarePackages = {
                 new() { PackageIdentity = "Foo", Assembly = "Bar", Version = "1.0.0" },
@@ -99,6 +100,8 @@ public class BuildProgramTests
                 "X_IndexHtmlFragments:FirstPart|<html>\r\n<head>\r\n",
                 "X_IndexHtmlFragments:LastPart|</body>\r\n</html>",
                 "X_IndexHtmlFragments:MiddlePart|</head>\r\n<body>\r\n",
+                "X_Locales:0|en",
+                "X_Locales:1|ja",
                 "X_MiddlewareDllsDir|C:\\project\\obj\\Release\\net6.0\\middleware",
                 "X_MiddlewarePackages:0:Assembly|Bar",
                 "X_MiddlewarePackages:0:PackageIdentity|Foo",

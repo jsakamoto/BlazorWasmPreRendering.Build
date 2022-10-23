@@ -61,6 +61,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
                 MiddlewarePackages = options.MiddlewarePackages,
 
                 Environment = options.Environment,
+                Locales = options.Locales.ToArray(),
                 ServerPort = options.ServerPort
             };
             return context;

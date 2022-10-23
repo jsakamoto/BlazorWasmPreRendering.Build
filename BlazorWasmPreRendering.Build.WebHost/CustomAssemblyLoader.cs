@@ -15,24 +15,30 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
         {
             AssemblyLoadContext.Default.Resolving += (context, name) =>
             {
-                if (name.Name == null) return null;
                 return this._AssemblySearchDirs
-                    .Select(dir => this.LoadAssemblyFrom(dir, name.Name))
+                    .Select(dir => this.LoadAssemblyFrom(dir, name))
                     .Where(asm => asm != null)
                     .FirstOrDefault();
             };
         }
 
-        private Assembly? LoadAssemblyFrom(string assemblyDir, string assemblyName)
+        private Assembly? LoadAssemblyFrom(string assemblyDir, AssemblyName assemblyName)
         {
-            var assemblyPath = Path.Combine(assemblyDir, assemblyName);
+            if (assemblyName.Name == null) return null;
+
+            var assemblyPath = string.IsNullOrEmpty(assemblyName.CultureName) ?
+                Path.Combine(assemblyDir, assemblyName.Name) :
+                Path.Combine(assemblyDir, assemblyName.CultureName, assemblyName.Name);
             if (!assemblyPath.ToLower().EndsWith(".dll")) assemblyPath += ".dll";
+
             if (!File.Exists(assemblyPath))
             {
                 // TODO: Console.WriteLine($"{assemblyName} in {assemblyDir} - not found.");
+                File.AppendAllText("c:\\temp\\log.txt", $"NOT FOUND: {assemblyName.Name}({assemblyName.CultureName}) in {assemblyDir}\r\n");
                 return null;
             }
             // TODO: Console.WriteLine($"{assemblyName} in {assemblyDir} - FOUND.");
+            File.AppendAllText("c:\\temp\\log.txt", $"FOUND    : {assemblyName.Name}({assemblyName.CultureName}) in {assemblyDir}\r\n");
             var assembly = AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(File.ReadAllBytes(assemblyPath)));
             return assembly;
         }

@@ -23,19 +23,20 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 
         private IWebAssemblyHostEnvironment HostEnvironment { get; }
 
-        private ServerSideRenderingContext PrerenderingOptions { get; }
+        private ServerSideRenderingContext PrerenderingContext { get; }
 
-        public Startup(IConfiguration configuration, Uri baseAddress, IWebAssemblyHostEnvironment hostEnvironment, ServerSideRenderingContext prerenderingOptions)
+        public Startup(IConfiguration configuration, Uri baseAddress, IWebAssemblyHostEnvironment hostEnvironment, ServerSideRenderingContext prerenderingContext)
         {
             this.Configuration = configuration;
             this.BaseAddress = baseAddress;
             this.HostEnvironment = hostEnvironment;
-            this.PrerenderingOptions = prerenderingOptions;
+            this.PrerenderingContext = prerenderingContext;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(this.PrerenderingOptions);
+            services.AddSingleton(this.HostEnvironment);
+            services.AddSingleton(this.PrerenderingContext); // Pre-rendering context is used from _Host.cshtml and _Layout.cshtml via DI container.
 
             this.ConfigureApplicationServices(services);
 
@@ -43,12 +44,13 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddLocalization();
             services.AddSingleton<ResetHeadOutletScript>();
         }
 
         private void ConfigureApplicationServices(IServiceCollection services)
         {
-            var programClass = this.PrerenderingOptions.ApplicationAssembly
+            var programClass = this.PrerenderingContext.ApplicationAssembly
                 .GetTypes()
                 .FirstOrDefault(t => t.Name == "Program" || t.Name == "<Program>$");
             if (programClass == null) return;
@@ -101,6 +103,13 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 
             this.ConfigureApplicationMiddleware(app);
 
+            if (this.PrerenderingContext.Locales.Any())
+            {
+                app.UseRequestLocalization(new RequestLocalizationOptions()
+                    .AddSupportedCultures(this.PrerenderingContext.Locales)
+                    .AddSupportedUICultures(this.PrerenderingContext.Locales));
+            }
+
             app.UseStaticFiles(new StaticFileOptions { ServeUnknownFileTypes = true });
             app.UseRouting();
             app.UseEndpoints(endpoints =>
@@ -126,8 +135,8 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 
         internal void ConfigureApplicationMiddleware(IApplicationBuilder app)
         {
-            var assemblyLoader = app.ApplicationServices.GetRequiredService<CustomAssemblyLoader>();
-            foreach (var pack in this.PrerenderingOptions.MiddlewarePackages)
+            var assemblyLoader = this.PrerenderingContext.AssemblyLoader;
+            foreach (var pack in this.PrerenderingContext.MiddlewarePackages)
             {
                 var assemblyName = string.IsNullOrEmpty(pack.Assembly) ? pack.PackageIdentity : pack.Assembly;
                 var appAssembly = assemblyLoader.LoadAssembly(assemblyName);//.LoadFromAssemblyPath(appAssemblyPath);

@@ -412,7 +412,7 @@ public class ProgramE2ETest
             "-i", SampleSite.BlazorWasmApp0.IntermediateDir,
             "-m", "",
             "-f", "net6.0",
-            "--locale", "ja"
+            "--locale", "ja,en"
         });
         exitCode.Is(0);
 

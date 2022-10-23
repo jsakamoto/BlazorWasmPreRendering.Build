@@ -2,6 +2,8 @@
 indent_style = space
 indent_size = 2
 [*.{cs,vb}]
+indent_style = space
+indent_size = 4
 #### Naming styles ####
 
 # Naming rules

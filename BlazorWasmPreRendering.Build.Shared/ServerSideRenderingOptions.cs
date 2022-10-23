@@ -23,6 +23,8 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared
 
         public string? Environment { get; init; }
 
+        public List<string> Locales { get; init; } = new();
+
         public int ServerPort { get; init; }
     }
 }
