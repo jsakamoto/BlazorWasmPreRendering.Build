@@ -70,16 +70,17 @@ public class ProgramE2ETest
         // Validate prerendered contents.
 
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        var expectedHtmlFiles = GetFullPathList(wwwrootDir, "counter/index.html", "fetchdata/index.html", "index.html");
+        var expectedHtmlFiles = GetFullPathList(wwwrootDir, "about/.net/index.html", "counter/index.html", "fetchdata/index.html", "index.html");
 
         var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
         actualHtmlFiles.Is(expectedHtmlFiles);
 
         // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
         const string loadingContents = "Loading...";
-        Validate(actualHtmlFiles[2], loadingContents, title_is: "Home", h1_is: "Hello, world!", deleteLoadingContents);
-        Validate(actualHtmlFiles[0], loadingContents, title_is: "Counter", h1_is: "Counter", deleteLoadingContents);
-        Validate(actualHtmlFiles[1], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", deleteLoadingContents);
+        Validate(actualHtmlFiles[3], loadingContents, title_is: "Home", h1_is: "Hello, world!", deleteLoadingContents);
+        Validate(actualHtmlFiles[1], loadingContents, title_is: "Counter", h1_is: "Counter", deleteLoadingContents);
+        Validate(actualHtmlFiles[2], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", deleteLoadingContents);
+        Validate(actualHtmlFiles[0], loadingContents, title_is: "About .NET", h1_is: "About .NET", deleteLoadingContents);
     }
 
     [Test]
@@ -146,17 +147,18 @@ public class ProgramE2ETest
         // Validate prerendered contents.
 
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        var expectedHtmlFiles = GetFullPathList(wwwrootDir, "counter.html", "easter-egg.html", "fetchdata.html", "index.html");
+        var expectedHtmlFiles = GetFullPathList(wwwrootDir, "about/.net.html", "counter.html", "easter-egg.html", "fetchdata.html", "index.html");
 
         var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
         actualHtmlFiles.Is(expectedHtmlFiles);
 
         // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
         const string loadingContents = "Loading...";
-        Validate(actualHtmlFiles[3], loadingContents, title_is: "Home", h1_is: "Hello, world!", deleteLoadingContents);
-        Validate(actualHtmlFiles[0], loadingContents, title_is: "Counter", h1_is: "Counter", deleteLoadingContents);
-        Validate(actualHtmlFiles[2], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", deleteLoadingContents);
-        Validate(actualHtmlFiles[1], loadingContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!", deleteLoadingContents);
+        Validate(actualHtmlFiles[4], loadingContents, title_is: "Home", h1_is: "Hello, world!", deleteLoadingContents);
+        Validate(actualHtmlFiles[1], loadingContents, title_is: "Counter", h1_is: "Counter", deleteLoadingContents);
+        Validate(actualHtmlFiles[3], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", deleteLoadingContents);
+        Validate(actualHtmlFiles[0], loadingContents, title_is: "About .NET", h1_is: "About .NET", deleteLoadingContents);
+        Validate(actualHtmlFiles[2], loadingContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!", deleteLoadingContents);
     }
 
     private static string[] GetFullPathList(string baseDir, params string[] pathList)
