@@ -129,7 +129,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
                 });
 
                 endpoints.MapRazorPages();
-                endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapFallbackToPage(pattern: "/{*catch-all}", "/_Host");
             });
         }
 
