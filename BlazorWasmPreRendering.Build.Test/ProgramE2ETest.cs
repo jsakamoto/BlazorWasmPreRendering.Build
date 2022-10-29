@@ -395,7 +395,6 @@ public class ProgramE2ETest
         ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, homeTitle: "127.0.0.1");
     }
 
-
     [Test]
     public async Task Localization_TestAsync()
     {
@@ -422,6 +421,45 @@ public class ProgramE2ETest
         // Validate prerendered contents: the title of the "/about" page is localized.
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
         ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, aboutTitle: "アバウト", outputStyle: OutputStyle.IndexHtmlInSubFolders);
+    }
+
+
+    [Test]
+    public async Task ServeDotFile_Test()
+    {
+        // Given
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp1");
+        var serverPort = Program.GetAvailableTcpPort("5050-5999");
+
+        using var dotnetCLI = Start(
+            "dotnet", $"publish -c:Release -p:BlazorWasmPrerenderingKeepServer=true -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingServerPort={serverPort}",
+            projectDir,
+            options => options.WhenDisposing = XProcessTerminate.EntireProcessTree);
+        var success = await dotnetCLI.WaitForOutputAsync(output => output.Trim().StartsWith("Start fetching..."), millsecondsTimeout: 15000);
+        if (!success) { throw new Exception(dotnetCLI.Output); }
+
+        var serverUrl = $"http://127.0.0.1:{serverPort}/";
+        using var httpClient = new HttpClient();
+        try
+        {
+            // When
+            var httpResponse = await httpClient.GetAsync(serverUrl + "sample-data/.dot.json");
+
+            // Then: the json file that the name of it starts with "." can be read.
+            httpResponse.EnsureSuccessStatusCode();
+            var jsonText = await httpResponse.Content.ReadAsStringAsync();
+            jsonText.Split('\n').Select(s => s.TrimEnd('\r')).Is(
+                "{",
+                "  \"name\": \".dot.json\"",
+                "}");
+        }
+        finally
+        {
+            // NOTICE: Killing the "dotnet publish" process doesn't kill the pre-rendering server process, even though it is a child process of the "dotnet publish" process.
+            // Therefore, this test code kicks the back door of the pre-rendering server (sending "HTTP DELETE /" request) to terminate it.
+            try { await httpClient.DeleteAsync(serverUrl); } catch { }
+        }
     }
 
     private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir, string homeTitle = "Home", string aboutTitle = "About", string environment = "Prerendering", OutputStyle outputStyle = OutputStyle.AppendHtmlExtension)

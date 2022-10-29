@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
 
 namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
@@ -110,7 +112,11 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
                     .AddSupportedUICultures(this.PrerenderingContext.Locales));
             }
 
-            app.UseStaticFiles(new StaticFileOptions { ServeUnknownFileTypes = true });
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(env.WebRootPath, ExclusionFilters.None),
+                ServeUnknownFileTypes = true
+            });
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
