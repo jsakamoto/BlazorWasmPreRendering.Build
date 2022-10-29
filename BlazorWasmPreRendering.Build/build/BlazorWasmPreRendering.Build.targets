@@ -16,7 +16,7 @@
       <BlazorWasmPrerenderingRootComponentType Condition=" '$(BlazorWasmPrerenderingRootComponentType)' == '' ">$(RootNamespace).App</BlazorWasmPrerenderingRootComponentType>
       <BlazorWasmPrerenderingRootComponentSelector Condition=" '$(BlazorWasmPrerenderingRootComponentSelector)' == '' ">#app,app</BlazorWasmPrerenderingRootComponentSelector>
       <BlazorWasmPrerenderingHeadOutletComponentSelector Condition=" '$(BlazorWasmPrerenderingHeadOutletComponentSelector)' == '' ">head::after</BlazorWasmPrerenderingHeadOutletComponentSelector>
-      <BlazorWasmPrerenderingServerDll Condition=" '$(BlazorWasmPrerenderingServerDll)' == '' ">$(MSBuildThisFileDirectory)../tools/$(BlazorWasmPrerenderingTFM)/blazorwasm-prerendering-server.dll</BlazorWasmPrerenderingServerDll>
+      <BlazorWasmPrerenderingServerDll Condition=" '$(BlazorWasmPrerenderingServerDll)' == '' ">$(MSBuildThisFileDirectory)../tools/$(BlazorWasmPrerenderingTFM)/BlazorWasmPreRendering.Build.dll</BlazorWasmPrerenderingServerDll>
       <BlazorWasmPrerenderingIntermediateDir Condition=" '$(BlazorWasmPrerenderingIntermediateDir)' == '' ">$(ProjectDir)$(IntermediateOutputPath).</BlazorWasmPrerenderingIntermediateDir>
       <BlazorWasmPrerenderingMiddlewareArg Condition=" '$(BlazorWasmPrerenderingMiddlewarePackages)' == '' ">@(BlazorWasmPrerenderMiddleware->'%(Identity),%(Assembly),%(Version)')</BlazorWasmPrerenderingMiddlewareArg>
       <BlazorWasmPrerenderingEnvironment Condition=" '$(BlazorWasmPrerenderingEnvironment)' == '' ">Prerendering</BlazorWasmPrerenderingEnvironment>
