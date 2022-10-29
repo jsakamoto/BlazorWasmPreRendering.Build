@@ -6,8 +6,8 @@ using AngleSharp.Html.Parser;
 using BlazorWasmPreRendering.Build.Test.Constants;
 using NUnit.Framework;
 using Toolbelt;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer.Models;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Models;
 using Toolbelt.Diagnostics;
 using static Toolbelt.Diagnostics.XProcess;
 

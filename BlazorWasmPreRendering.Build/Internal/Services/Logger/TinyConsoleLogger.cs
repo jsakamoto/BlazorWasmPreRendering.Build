@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.Internal.Services.Logger
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Internal.Services.Logger
 {
     internal class TinyConsoleLogger : ILogger
     {

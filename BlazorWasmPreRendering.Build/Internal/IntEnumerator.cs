@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.Internal
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Internal
 {
     internal class IntEnumerator
     {

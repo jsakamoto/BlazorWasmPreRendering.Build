@@ -4,7 +4,7 @@
     <TargetFrameworks>net5.0;net6.0;net7.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
-    <RootNamespace>Toolbelt.Blazor.WebAssembly.PrerenderServer</RootNamespace>
+    <RootNamespace>Toolbelt.Blazor.WebAssembly.PreRendering.Build</RootNamespace>
     <DefineConstants Condition=" '$(TargetFramework)' != 'net5.0' ">$(DefineConstants);ENABLE_HEADOUTLET;</DefineConstants>
     <IncludeBuildOutput>false</IncludeBuildOutput>
 

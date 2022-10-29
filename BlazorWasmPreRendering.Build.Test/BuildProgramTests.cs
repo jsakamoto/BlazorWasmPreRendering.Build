@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using NUnit.Framework;
 using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
-using BuildProgram = Toolbelt.Blazor.WebAssembly.PrerenderServer.Program;
+using BuildProgram = Toolbelt.Blazor.WebAssembly.PreRendering.Build.Program;
 
 namespace BlazorWasmPreRendering.Build.Test;
 

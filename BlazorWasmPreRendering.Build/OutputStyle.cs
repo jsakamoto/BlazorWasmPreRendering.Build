@@ -1,4 +1,4 @@
-﻿namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
+﻿namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
 {
     public enum OutputStyle
     {

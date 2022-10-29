@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using Microsoft.Extensions.Logging;
-using static Toolbelt.Blazor.WebAssembly.PrerenderServer.StaticlizeCrawlingResult;
+using static Toolbelt.Blazor.WebAssembly.PreRendering.Build.StaticlizeCrawlingResult;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
 {
     internal class StaticlizeCrawler
     {

@@ -1,4 +1,4 @@
-﻿namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.Models
+﻿namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Models
 {
     public class AssetsManifestFileEntry
     {

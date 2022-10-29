@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer.Models;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Models;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
 {
     internal class ServiceWorkerAssetsManifest
     {

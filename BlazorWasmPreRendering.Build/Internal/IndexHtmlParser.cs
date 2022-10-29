@@ -6,7 +6,7 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
 {
     public class IndexHtmlParser
     {

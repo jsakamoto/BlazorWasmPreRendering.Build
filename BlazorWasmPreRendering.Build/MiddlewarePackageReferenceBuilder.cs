@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using NuGet.Versioning;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
 {
     public class MiddlewarePackageReferenceBuilder
     {

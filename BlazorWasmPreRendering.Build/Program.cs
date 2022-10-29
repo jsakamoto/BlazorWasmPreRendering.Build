@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using CommandLineSwitchParser;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Internal;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Internal.Services.Logger;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer.Internal;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer.Internal.Services.Logger;
 using Toolbelt.Diagnostics;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
 {
     public class Program
     {

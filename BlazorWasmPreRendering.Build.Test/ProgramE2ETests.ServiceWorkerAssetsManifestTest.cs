@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer.Models;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Models;
 
 namespace BlazorWasmPreRendering.Build.Test.ProgramE2ETests;
 

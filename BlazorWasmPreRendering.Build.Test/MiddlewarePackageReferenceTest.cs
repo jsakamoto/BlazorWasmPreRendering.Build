@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Toolbelt.Blazor.WebAssembly.PrerenderServer;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build;
 
 namespace BlazorWasmPreRendering.Build.Test;
 

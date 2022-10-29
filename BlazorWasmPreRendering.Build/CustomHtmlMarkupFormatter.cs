@@ -2,7 +2,7 @@
 using AngleSharp.Html;
 using AngleSharp.Text;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
 {
     internal class CustomHtmlMarkupFormatter : HtmlMarkupFormatter
     {
@@ -15,9 +15,9 @@ namespace Toolbelt.Blazor.WebAssembly.PrerenderServer
                 stringBuilder.Append(element.Prefix).Append(':');
             }
             stringBuilder.Append(element.LocalName);
-            foreach (IAttr attribute in element.Attributes)
+            foreach (var attribute in element.Attributes)
             {
-                stringBuilder.Append(' ').Append(Attribute(attribute));
+                stringBuilder.Append(' ').Append(this.Attribute(attribute));
             }
 
             // DON'T FORGET TO APPEND A SLASH FOR SELF CLOSING TAG.

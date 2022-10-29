@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Toolbelt.Blazor.WebAssembly.PrerenderServer.Models
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Models
 {
     public class AssetsManifestFile
     {
