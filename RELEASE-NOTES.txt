@@ -1,3 +1,7 @@
+v.2.0.0-preview.3
+Fix: Add support for an URL parameter, included dot.
+Fix: Could not serve static files that its name starting with a dot.
+
 v.2.0.0-preview.2
 - Improve: Add support for setting the custom locale for crawling.
 
