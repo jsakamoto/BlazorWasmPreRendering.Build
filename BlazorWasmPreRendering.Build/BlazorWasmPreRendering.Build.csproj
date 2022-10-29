@@ -13,17 +13,16 @@
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
+  <!-- Version, Author, Copyright, Description are defined in the VersionInfo.props -->
+  <Import Project="../VersionInfo.props"/>
+
   <PropertyGroup>
-    <Version>2.0.0-preview.2.1</Version>
-    <Authors>J.Sakamoto</Authors>
     <PackageId>BlazorWasmPreRendering.Build</PackageId>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/jsakamoto/BlazorWasmPreRendering.Build</PackageProjectUrl>
     <PackageTags>blazor,prerender</PackageTags>
     <PackageReleaseNotes>(Please write the package release notes in "../RELEASE-NOTES.txt")</PackageReleaseNotes>
     <PackageOutputPath>../_dist</PackageOutputPath>
-    <Copyright>Copyright © 2021-2022 J.Sakamoto, Mozilla Public License 2.0</Copyright>
-    <Description>When you publish your Blazor Wasm app, this package pre-renders and saves the app as static HTML files in your public folder.</Description>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
   </PropertyGroup>
