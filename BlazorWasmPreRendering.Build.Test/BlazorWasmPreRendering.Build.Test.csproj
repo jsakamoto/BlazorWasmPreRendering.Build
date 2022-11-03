@@ -12,7 +12,7 @@
     <PackageReference Include="ChainingAssertion-NUnit.Bin" Version="1.8.1" />
     <PackageReference Include="Moq" Version="4.18.2" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
     <PackageReference Include="Toolbelt.Blazor.HeadElement.ServerPrerendering" Version="7.1.1" />
     <PackageReference Include="Toolbelt.WorkDirectory " Version="1.0.0" />
@@ -25,13 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <Content Remove="TestSites\**\*" />
-    <Compile Remove="TestSites\**\*" />
-    <None Remove="TestSites\**\*" />
-    <None Include="TestSites\**\*" Exclude="TestSites\Site2-ServerErrors\bin\**\*;TestSites\Site2-ServerErrors\obj\**\*;" />
+    <Content Remove="_Fixtures\Assets\**\*" />
+    <None Remove="_Fixtures\Assets\**\*" />
+    <None Include="_Fixtures\Assets\**\*" />
+    <Content Remove="_Fixtures\TestSites\**\*" />
+    <Compile Remove="_Fixtures\TestSites\**\*" />
+    <None Remove="_Fixtures\TestSites\**\*" />
+    <None Include="_Fixtures\TestSites\**\*" Exclude="_Fixtures\TestSites\Site2-ServerErrors\bin\**\*;_Fixtures\TestSites\Site2-ServerErrors\obj\**\*;" />
   </ItemGroup>
 
 </Project>

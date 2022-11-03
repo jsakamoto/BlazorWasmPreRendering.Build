@@ -6,9 +6,9 @@ namespace BlazorWasmPreRendering.Build.Test;
 
 public static class TestSites
 {
-    private static string GetSolutionDir() => FileIO.FindContainerDirToAncestor("*.sln");
+    private static string GetProjectDir() => FileIO.FindContainerDirToAncestor("*.csproj");
 
-    private static string GetTestSitesDir() => Path.Combine(GetSolutionDir(), "BlazorWasmPreRendering.Build.Test", "TestSites");
+    private static string GetTestSitesDir() => Path.Combine(GetProjectDir(), "_Fixtures", "TestSites");
 
     public static async ValueTask<IAsyncDisposable> StartTestSite1(string baseUrl)
     {

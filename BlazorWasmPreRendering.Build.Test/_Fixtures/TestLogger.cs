@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace BlazorWasmPreRendering.Build.Test.Internals;
+namespace BlazorWasmPreRendering.Build.Test;
 
 public class TestLogger : ILogger
 {

@@ -1,4 +1,4 @@
-﻿namespace BlazorWasmPreRendering.Build.Test.Constants;
+﻿namespace BlazorWasmPreRendering.Build.Test;
 
 public static class BlazorWasmApp2
 {
