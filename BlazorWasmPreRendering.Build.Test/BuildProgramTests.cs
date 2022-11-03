@@ -26,7 +26,7 @@ public class BuildProgramTests
         File.Exists(generatedProjectFilePath).IsTrue();
 
         // Then
-        var expectedProjectFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "ExpectedProjectFile.xml");
+        var expectedProjectFilePath = Assets.GetAssetPathOf("ExpectedProjectFile.xml");
         var expectedProjectFileLines = File.ReadAllLines(expectedProjectFilePath).Select(line => line.Trim()).ToArray();
         var actualProjectFileLines = File.ReadAllLines(generatedProjectFilePath).Select(line => line.Trim()).ToArray();
         actualProjectFileLines.Is(expectedProjectFileLines);
@@ -51,7 +51,7 @@ public class BuildProgramTests
     {
         // Given
         using var workFolder = new WorkDirectory();
-        var templateProjectFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "ExpectedProjectFile.xml");
+        var templateProjectFilePath = Assets.GetAssetPathOf("ExpectedProjectFile.xml");
         var targetProjectFilePath = Path.Combine(workFolder, "Project.csproj");
         File.Copy(templateProjectFilePath, targetProjectFilePath);
 

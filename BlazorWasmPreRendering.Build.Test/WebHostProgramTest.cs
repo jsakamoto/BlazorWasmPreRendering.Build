@@ -3,6 +3,7 @@ using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
 namespace BlazorWasmPreRendering.Build.Test;
+
 public class WebHostProgramTest
 {
     [Test]
@@ -12,10 +13,8 @@ public class WebHostProgramTest
         using var workFolder = new WorkDirectory();
         var webRoot = Path.Combine(workFolder, "wwwroot");
         Directory.CreateDirectory(Path.Combine(webRoot, "_framework"));
-        File.Copy(sourceFileName: Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "BlazorWasmApp1.dll"),
-                  destFileName: Path.Combine(webRoot, "_framework", "BlazorWasmApp1.dll"));
-        File.Copy(sourceFileName: Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "index.html"),
-                  destFileName: Path.Combine(webRoot, "index.html"));
+        File.Copy(Assets.GetAssetPathOf("BlazorWasmApp1.dll"), Path.Combine(webRoot, "_framework", "BlazorWasmApp1.dll"));
+        File.Copy(Assets.GetAssetPathOf("index.html"), Path.Combine(webRoot, "index.html"));
 
         var options = new ServerSideRenderingOptions
         {

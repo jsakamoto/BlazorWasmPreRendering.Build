@@ -10,8 +10,7 @@ public class AssetsManifestFileTest
     public async Task LoadAsync_Test()
     {
         // Given
-        var testProjctDir = FileIO.FindContainerDirToAncestor("*.csproj");
-        var assetsManifestFilePath = Path.Combine(testProjctDir, "Assets", "service-worker-assets.js");
+        var assetsManifestFilePath = Assets.GetAssetPathOf("service-worker-assets.js");
 
         // When
         var assetsManifestFile = await AssetsManifestFile.LoadAsync(assetsManifestFilePath);
@@ -49,8 +48,7 @@ public class AssetsManifestFileTest
         // Then
         var actualLines = File.ReadLines(savedAssetsManifestFilePath);
 
-        var testProjctDir = FileIO.FindContainerDirToAncestor("*.csproj");
-        var expectedAssetsManifestFilePath = Path.Combine(testProjctDir, "Assets", "service-worker-assets.js");
+        var expectedAssetsManifestFilePath = Assets.GetAssetPathOf("service-worker-assets.js");
         var expectedLines = File.ReadLines(expectedAssetsManifestFilePath);
 
         actualLines.Is(expectedLines);

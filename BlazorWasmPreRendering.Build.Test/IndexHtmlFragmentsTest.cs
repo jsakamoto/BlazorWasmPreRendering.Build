@@ -9,7 +9,7 @@ public class IndexHtmlFragmentsTest
     public void Load_Test()
     {
         // Given
-        var indexHtmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "index (2).html");
+        var indexHtmlPath = Assets.GetAssetPathOf("index (2).html");
 
         // When
         var indexHtmlFragments = IndexHtmlParser.Parse(
@@ -37,7 +37,7 @@ public class IndexHtmlFragmentsTest
     public void Load_OncePrerendered_Test()
     {
         // Given
-        var indexHtmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "index (3).html");
+        var indexHtmlPath = Assets.GetAssetPathOf("index (3).html");
 
         // When
         var indexHtmlFragments = IndexHtmlParser.Parse(
@@ -65,7 +65,7 @@ public class IndexHtmlFragmentsTest
     public void Load_with_DeleteLoadingContents_Test()
     {
         // Given
-        var indexHtmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "index (2).html");
+        var indexHtmlPath = Assets.GetAssetPathOf("index (2).html");
 
         // When
         var indexHtmlFragments = IndexHtmlParser.Parse(
