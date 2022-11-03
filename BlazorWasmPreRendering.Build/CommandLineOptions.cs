@@ -47,5 +47,8 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
         private string _ServerPort = DefaultServerPort;
 
         public string ServerPort { get => this._ServerPort; set { this._ServerPort = string.IsNullOrEmpty(value) ? DefaultServerPort : value; } }
+
+        /// <summary>Options for Blazor Wasm Antivirus Protection - XorKey</summary>
+        public string? BWAPOptionsXorKey { get; set; }
     }
 }

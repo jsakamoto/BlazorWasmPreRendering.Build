@@ -19,7 +19,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
         public CustomAssemblyLoader(AssemblyLoadContext? context = null, string? xorKey = null)
         {
             this._Context = context ?? AssemblyLoadContext.Default;
-            this._XorKey = xorKey ?? "bwap";
+            this._XorKey = string.IsNullOrEmpty(xorKey) ? "bwap" : xorKey;
             this._Context.Resolving += (context, name) =>
             {
                 return this._AssemblySearchDirs

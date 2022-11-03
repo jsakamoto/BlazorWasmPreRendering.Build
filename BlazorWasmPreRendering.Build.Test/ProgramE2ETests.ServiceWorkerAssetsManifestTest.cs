@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Models;
 
@@ -12,6 +13,7 @@ public class ServiceWorkerAssetsManifestTest
         // Given
         // Publish the sample app which sets its titles by .NET 6 <PageTitle>.
         using var publishDir = await SampleSite.BlazorWasmApp0.PublishAsync();
+        using var intermediateDir = new WorkDirectory();
 
         // When
         // Execute prerenderer
@@ -21,7 +23,7 @@ public class ServiceWorkerAssetsManifestTest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", SampleSite.BlazorWasmApp0.IntermediateDir,
+            "-i", intermediateDir,
             "-m", "",
             "-f", "net6.0",
             "-o", "IndexHtmlInSubFolders",
@@ -48,6 +50,7 @@ public class ServiceWorkerAssetsManifestTest
         // Given
         // Publish the sample app which sets its titles by .NET 6 <PageTitle>.
         using var publishDir = await SampleSite.BlazorWasmApp0.PublishAsync();
+        using var intermediateDir = new WorkDirectory();
 
         // When
         // Execute prerenderer
@@ -57,7 +60,7 @@ public class ServiceWorkerAssetsManifestTest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", SampleSite.BlazorWasmApp0.IntermediateDir,
+            "-i", intermediateDir,
             "-m", "",
             "-f", "net6.0",
             "-o", "AppendHtmlExtension",

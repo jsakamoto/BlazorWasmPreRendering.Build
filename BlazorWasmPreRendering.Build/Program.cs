@@ -268,7 +268,8 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
                 DeleteLoadingContents = prerenderingOptions.DeleteLoadingContents,
                 Environment = commandLineOptions.Environment,
                 Locales = prerenderingOptions.Locales,
-                ServerPort = serverPort
+                ServerPort = serverPort,
+                BWAPOptionsXorKey = commandLineOptions.BWAPOptionsXorKey
             };
             StoreOptionsToEnvironment(webHostOptions, Constants.ConfigurationPrefix, webHostStartInfo.Environment);
 
