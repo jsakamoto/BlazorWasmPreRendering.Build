@@ -1,0 +1,17 @@
+﻿@page "/"
+@inject IWebAssemblyHostEnvironment HostEnv
+
+<PageTitle>Home of BlazorWasmAVP | Blazor Wasm App AVP</PageTitle>
+<HeadContent>
+	<meta name="description" content="This is a meta description.">
+</HeadContent>
+
+<h1>Home of BlazorWasmAVP</h1>
+
+<div>
+	<a href="/about">about</a>
+</div>
+
+<div class="environment">
+	Environment: @HostEnv.Environment
+</div>

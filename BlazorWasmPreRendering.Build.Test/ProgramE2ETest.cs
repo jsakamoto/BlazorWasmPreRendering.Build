@@ -20,6 +20,7 @@ public class ProgramE2ETest
         // Given
         // Publish the sample app which sets its titles by .NET 6 <PageTitle>.
         using var publishDir = await SampleSite.BlazorWasmApp0.PublishAsync();
+        using var intermediateDir = new WorkDirectory();
 
         // When
         // Execute prerenderer
@@ -29,7 +30,7 @@ public class ProgramE2ETest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", SampleSite.BlazorWasmApp0.IntermediateDir,
+            "-i", intermediateDir,
             "-m", "",
             "-f", "net6.0"
         });
@@ -38,16 +39,19 @@ public class ProgramE2ETest
         // Then
         // Validate prerendered contents.
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, outputStyle: OutputStyle.IndexHtmlInSubFolders);
+        ValidatePrerenderedContents(wwwrootDir, outputStyle: OutputStyle.IndexHtmlInSubFolders);
     }
 
     [TestCase(true)]
     [TestCase(false)]
+    [Parallelizable(ParallelScope.Children)]
     public async Task Including_ServerSide_Middleware_Legacy_TestAsync(bool deleteLoadingContents)
     {
         // Given
         // Publish the sample app which sets its titles by Toolbelt.Blazor.HeadElement
         using var publishDir = await SampleSite.BlazorWasmApp1.PublishAsync();
+        using var tcpPort = TcpPortPool.GetAvailableTcpPort();
+        using var intermediateDir = new WorkDirectory();
 
         // When
         // Execute prerenderer
@@ -57,9 +61,10 @@ public class ProgramE2ETest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", SampleSite.BlazorWasmApp1.IntermediateDir,
+            "-i", intermediateDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
             "-f", "net5.0",
+            "--serverport", tcpPort,
             deleteLoadingContents ? "-d" : ""
         });
         exitCode.Is(0);
@@ -119,10 +124,13 @@ public class ProgramE2ETest
 
     [TestCase(true)]
     [TestCase(false)]
+    [Parallelizable(ParallelScope.Children)]
     public async Task Including_EasterEggPage_TestAsync(bool deleteLoadingContents)
     {
         // Given
+        using var intermediateDir = new WorkDirectory();
         using var publishDir = await SampleSite.BlazorWasmApp1.PublishAsync();
+        using var tcpPort = TcpPortPool.GetAvailableTcpPort();
 
         // When
         // Execute prerenderer
@@ -132,11 +140,12 @@ public class ProgramE2ETest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", SampleSite.BlazorWasmApp1.IntermediateDir,
+            "-i", intermediateDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
             "-f", "net5.0",
             "-o", "AppendHtmlExtension",
             "-u", "/easter-egg",
+            "--serverport", tcpPort,
             deleteLoadingContents? "-d" : ""
         });
         exitCode.Is(0);
@@ -202,11 +211,14 @@ public class ProgramE2ETest
 
     [TestCase(true)]
     [TestCase(false)]
+    [Parallelizable(ParallelScope.Children)]
     public async Task AppComponent_is_in_the_other_Assembly_TestAsync(bool deleteLoadingContents)
     {
         // Given
         // Publish the sample app
         using var publishDir = await SampleSite.BlazorWasmApp2.PublishAsync();
+        using var tcpPort = TcpPortPool.GetAvailableTcpPort();
+        using var intermediateDir = new WorkDirectory();
 
         // When
         // Execute prerenderer
@@ -216,9 +228,10 @@ public class ProgramE2ETest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", SampleSite.BlazorWasmApp2.IntermediateDir,
+            "-i", intermediateDir,
             "-m", "",
             "-f", "net5.0",
+            "--serverport", tcpPort,
             deleteLoadingContents? "-d" : ""
         });
         exitCode.Is(0);
@@ -239,11 +252,14 @@ public class ProgramE2ETest
 
     [TestCase(true)]
     [TestCase(false)]
+    [Parallelizable(ParallelScope.Children)]
     public async Task AppComponent_is_in_the_other_Assembly_and_FallBack_TestAsync(bool deleteLoadingContents)
     {
         // Given
         // Publish the sample app
         using var publishDir = await SampleSite.BlazorWasmApp2.PublishAsync();
+        using var tcpPort = TcpPortPool.GetAvailableTcpPort();
+        using var intermediateDir = new WorkDirectory();
 
         // When
         // Execute prerenderer
@@ -253,9 +269,10 @@ public class ProgramE2ETest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", SampleSite.BlazorWasmApp2.IntermediateDir,
+            "-i", intermediateDir,
             "-m", "",
             "-f", "net5.0",
+            "--serverport", tcpPort,
             deleteLoadingContents ? "-d" : ""
         });
         exitCode.Is(0);
@@ -278,9 +295,8 @@ public class ProgramE2ETest
     public async Task Publish_Test()
     {
         // Given
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
-        using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp0");
 
         var expectedHomeTitles = new Dictionary<int, string> { [1] = "Home", [2] = "My Home" };
         var expectedEnvNames = new Dictionary<int, string> { [1] = "Prerendering", [2] = "Foo" };
@@ -293,14 +309,14 @@ public class ProgramE2ETest
             // if 2nd time publishing, override the environment name.
             if (i == 2) arg += " -p:BlazorWasmPrerenderingEnvironment=" + expectedEnvNames[2];
 
-            var dotnetCLI = await XProcess.Start("dotnet", arg, workDir).WaitForExitAsync();
+            var dotnetCLI = await Start("dotnet", arg, projectDir).WaitForExitAsync();
             dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
 
             // Then
 
             // Validate prerendered contents.
-            var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
-            ValidatePrerenderedContents_of_BlazorWasmApp0(
+            var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
+            ValidatePrerenderedContents(
                 wwwrootDir,
                 homeTitle: expectedHomeTitles[i],
                 environment: expectedEnvNames[i]);
@@ -341,22 +357,29 @@ public class ProgramE2ETest
 
             // Validate prerendered contents.
             var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
-            ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
+            ValidatePrerenderedContents(wwwrootDir);
         }
     }
 
     [TestCase("ExceptionTest", false, false)]
     [TestCase("ServiceNotRegisteredTest", true, false)]
     [TestCase("JSInvokeOnServerTest", false, true)]
+    [Parallelizable(ParallelScope.Children)]
     public async Task Publish_with_HTTP500_Test(string env, bool msg1, bool msg2)
     {
         // Given
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp1");
-        using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp1");
+        using var tcpPort = TcpPortPool.GetAvailableTcpPort();
 
         // When (Set the hoting environment name to "ExceptionTest")
-        var dotnetCLI = await XProcess.Start("dotnet", $"publish -c:Release -p:BlazorWasmPrerenderingEnvironment={env} -p:BlazorEnableCompression=false --nologo", workDir).WaitForExitAsync();
+        var dotnetCLI = await Start("dotnet", "publish " +
+            $"-c:Release " +
+            $"-p:BlazorWasmPrerenderingEnvironment={env} " +
+            $"-p:BlazorEnableCompression=false " +
+            $"-p:BlazorWasmPrerenderingServerPort={tcpPort} " +
+            $"--nologo",
+            projectDir).WaitForExitAsync();
 
         // Then (Exit code is NOT 0)
         var output = dotnetCLI.Output;
@@ -373,25 +396,58 @@ public class ProgramE2ETest
         output.Contains(message2).Is(msg2);
     }
 
+    [TestCase("", "FizzBuzz")]
+    [TestCase("ChangeHeaders", "")]
+    [TestCase("Xor", "")]
+    [Parallelizable(ParallelScope.Children)]
+    public async Task Publish_BlazorWasmAntivirusProtection_Test(string obfuscationMode, string xorKey)
+    {
+        // Given
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmAVP");
+        using var tcpPort = TcpPortPool.GetAvailableTcpPort();
+
+        // When
+        var args = new List<string>()
+        {
+            $"publish",
+            $"-c:Release",
+            $"-p:BlazorEnableCompression=false",
+            $"-p:UsingBrowserRuntimeWorkload=false",
+            $"-p:BlazorWasmPrerenderingServerPort={tcpPort}",
+            $"-o:bin/publish",
+        };
+        if (obfuscationMode != "") args.Add($"-p:ObfuscationMode={obfuscationMode}");
+        if (xorKey != "") args.Add($"-p:XorKey={xorKey}");
+
+        var dotnetCLI = await Start(
+            "dotnet", string.Join(" ", args),
+            projectDir).WaitForExitAsync();
+
+        // Then
+        dotnetCLI.ExitCode.Is(0, message: dotnetCLI.Output);
+
+        var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
+        ValidatePrerenderedContents(wwwrootDir, homeTitle: "Home of BlazorWasmAVP", aboutTitle: "About of BlazorWasmAVP", outputStyle: OutputStyle.IndexHtmlInSubFolders);
+    }
+
     [Test]
     public async Task AppSettings_Test()
     {
         // Given
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
-        using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
-
-        File.WriteAllText(Path.Combine(workDir, "wwwroot", "appsettings.json"), @"{""HomeTitle"":""127.0.0.1""}");
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp0");
+        File.WriteAllText(Path.Combine(projectDir, "wwwroot", "appsettings.json"), @"{""HomeTitle"":""127.0.0.1""}");
 
         // When
-        var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Debug -p:BlazorEnableCompression=false -o:bin/publish", workDir).WaitForExitAsync();
+        var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Debug -p:BlazorEnableCompression=false -o:bin/publish", projectDir).WaitForExitAsync();
         dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
 
         // Then
 
         // Validate prerendered contents.
-        var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
-        ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, homeTitle: "127.0.0.1");
+        var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
+        ValidatePrerenderedContents(wwwrootDir, homeTitle: "127.0.0.1");
     }
 
     [Test]
@@ -400,6 +456,7 @@ public class ProgramE2ETest
         // Given
         // Publish the sample app that is localized.
         using var publishDir = await SampleSite.BlazorWasmApp0.PublishAsync();
+        using var intermediateDir = new WorkDirectory();
 
         // When
         // Execute prerenderer
@@ -409,7 +466,7 @@ public class ProgramE2ETest
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
-            "-i", SampleSite.BlazorWasmApp0.IntermediateDir,
+            "-i", intermediateDir,
             "-m", "",
             "-f", "net6.0",
             "--locale", "ja,en"
@@ -419,9 +476,8 @@ public class ProgramE2ETest
         // Then
         // Validate prerendered contents: the title of the "/about" page is localized.
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, aboutTitle: "アバウト", outputStyle: OutputStyle.IndexHtmlInSubFolders);
+        ValidatePrerenderedContents(wwwrootDir, aboutTitle: "アバウト", outputStyle: OutputStyle.IndexHtmlInSubFolders);
     }
-
 
     [Test]
     public async Task ServeDotFile_Test()
@@ -461,7 +517,7 @@ public class ProgramE2ETest
         }
     }
 
-    private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir, string homeTitle = "Home", string aboutTitle = "About", string environment = "Prerendering", OutputStyle outputStyle = OutputStyle.AppendHtmlExtension)
+    private static void ValidatePrerenderedContents(string wwwrootDir, string homeTitle = "Home", string aboutTitle = "About", string environment = "Prerendering", OutputStyle outputStyle = OutputStyle.AppendHtmlExtension)
     {
         var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
         var aboutIndexHtmlPath = outputStyle == OutputStyle.AppendHtmlExtension ?
@@ -475,8 +531,8 @@ public class ProgramE2ETest
         using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
 
         // NOTICE: The document title was rendered by the <HeadOutlet> component of .NET 6.
-        rootIndexHtml.Title.Is($"{homeTitle} | Blazor Wasm App 0");
-        aboutIndexHtml.Title.Is($"{aboutTitle} | Blazor Wasm App 0");
+        rootIndexHtml.Title.IsNotNull().StartsWith($"{homeTitle} | Blazor Wasm App").IsTrue(message: $"rootIndexHtml.Title is: \"{rootIndexHtml.Title}\"");
+        aboutIndexHtml.Title.IsNotNull().StartsWith($"{aboutTitle} | Blazor Wasm App").IsTrue(message: $"aboutIndexHtml.Title is: \"{aboutIndexHtml.Title}\"");
 
         rootIndexHtml.QuerySelector("h1")!.TextContent.Is(homeTitle);
         aboutIndexHtml.QuerySelector("h1")!.TextContent.Is(aboutTitle);

@@ -39,16 +39,13 @@ public class SampleSite : IDisposable
 
     public string ProjectDir { get; } = "";
 
-    /// <summary>
-    /// Get the intermediate directory path of this sample site project. (ex. "~/obj/Release/net6.0")
-    /// </summary>
-    public string IntermediateDir { get; } = "";
-
     private string PublishSrcDir { get; } = "";
 
     private WorkDirectory? SampleAppsWorkDir { get; }
 
     private bool PublishedOnce { get; set; } = false;
+
+    private readonly SemaphoreSlim _Syncer = new(1, 1);
 
     public SampleSite()
     {
@@ -63,22 +60,26 @@ public class SampleSite : IDisposable
         this.SampleAppsWorkDir = CreateSampleAppsWorkDir();
 
         this.ProjectDir = Path.Combine($"{this.SampleAppsWorkDir}/{projectName}".Split('/'));
-        this.IntermediateDir = Path.Combine(this.ProjectDir, "obj", this.Configuration, this.TargetFramework);
         this.PublishSrcDir = Path.Combine(this.ProjectDir, "bin", this.Configuration, this.TargetFramework, "publish");
     }
 
     public async ValueTask<WorkDirectory> PublishAsync()
     {
-        if (!this.PublishedOnce)
+        await this._Syncer.WaitAsync();
+        try
         {
-            var publishProcess = XProcess.Start(
-                "dotnet",
-                $"publish -c:{this.Configuration} -p:BlazorWasmPrerendering=disable -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false",
-                workingDirectory: this.ProjectDir);
-            await publishProcess.WaitForExitAsync();
-            publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);
-            this.PublishedOnce = true;
+            if (!this.PublishedOnce)
+            {
+                var publishProcess = XProcess.Start(
+                    "dotnet",
+                    $"publish -c:{this.Configuration} -p:BlazorWasmPrerendering=disable -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false",
+                    workingDirectory: this.ProjectDir);
+                await publishProcess.WaitForExitAsync();
+                publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);
+                this.PublishedOnce = true;
+            }
         }
+        finally { this._Syncer.Release(); }
 
         return WorkDirectory.CreateCopyFrom(this.PublishSrcDir, _ => true);
     }

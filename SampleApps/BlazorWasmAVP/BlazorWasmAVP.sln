@@ -1,0 +1,36 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.32804.182
+MinimumVisualStudioVersion = 16.0.0.0
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWasmAVP", "BlazorWasmAVP.csproj", "{55393FE8-8D9E-4115-AE98-C596F31A0037}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Debug|x64.Build.0 = Debug|Any CPU
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Debug|x86.Build.0 = Debug|Any CPU
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Release|x64.ActiveCfg = Release|Any CPU
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Release|x64.Build.0 = Release|Any CPU
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Release|x86.ActiveCfg = Release|Any CPU
+		{55393FE8-8D9E-4115-AE98-C596F31A0037}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7E352626-5A6B-41EF-A2BE-B9509CA4DB76}
+	EndGlobalSection
+EndGlobal
