@@ -38,7 +38,7 @@ public class ProgramE2ETest
         // Then
         // Validate prerendered contents.
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, outputStyle: OutputStyle.IndexHtmlInSubFolders);
+        ValidatePrerenderedContents(wwwrootDir, outputStyle: OutputStyle.IndexHtmlInSubFolders);
     }
 
     [TestCase(true)]
@@ -278,9 +278,8 @@ public class ProgramE2ETest
     public async Task Publish_Test()
     {
         // Given
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
-        using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp0");
 
         var expectedHomeTitles = new Dictionary<int, string> { [1] = "Home", [2] = "My Home" };
         var expectedEnvNames = new Dictionary<int, string> { [1] = "Prerendering", [2] = "Foo" };
@@ -293,14 +292,14 @@ public class ProgramE2ETest
             // if 2nd time publishing, override the environment name.
             if (i == 2) arg += " -p:BlazorWasmPrerenderingEnvironment=" + expectedEnvNames[2];
 
-            var dotnetCLI = await XProcess.Start("dotnet", arg, workDir).WaitForExitAsync();
+            var dotnetCLI = await Start("dotnet", arg, projectDir).WaitForExitAsync();
             dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
 
             // Then
 
             // Validate prerendered contents.
-            var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
-            ValidatePrerenderedContents_of_BlazorWasmApp0(
+            var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
+            ValidatePrerenderedContents(
                 wwwrootDir,
                 homeTitle: expectedHomeTitles[i],
                 environment: expectedEnvNames[i]);
@@ -341,7 +340,7 @@ public class ProgramE2ETest
 
             // Validate prerendered contents.
             var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
-            ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir);
+            ValidatePrerenderedContents(wwwrootDir);
         }
     }
 
@@ -373,25 +372,55 @@ public class ProgramE2ETest
         output.Contains(message2).Is(msg2);
     }
 
+    //[TestCase("", "FizzBuzz")]
+    //[TestCase("ChangeHeaders", "")]
+    [TestCase("Xor", "")]
+    public async Task Publish_BlazorWasmAntivirusProtection_Test(string obfuscationMode, string xorKey)
+    {
+        // Given
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmAVP");
+
+        // When
+        var args = new List<string>()
+        {
+            "publish",
+            "-c:Release",
+            "-p:BlazorEnableCompression=false",
+            "-p:UsingBrowserRuntimeWorkload=false",
+            "-o:bin/publish",
+        };
+        if (obfuscationMode != "") args.Add($"-p:ObfuscationMode={obfuscationMode}");
+        if (xorKey != "") args.Add($"-p:XorKey={xorKey}");
+
+        var dotnetCLI = await Start(
+            "dotnet", string.Join(" ", args),
+            projectDir).WaitForExitAsync();
+
+        // Then
+        dotnetCLI.ExitCode.Is(0, message: dotnetCLI.Output);
+
+        var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
+        ValidatePrerenderedContents(wwwrootDir, homeTitle: "Home of BlazorWasmAVP", aboutTitle: "About of BlazorWasmAVP");
+    }
+
     [Test]
     public async Task AppSettings_Test()
     {
         // Given
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
-        using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
-
-        File.WriteAllText(Path.Combine(workDir, "wwwroot", "appsettings.json"), @"{""HomeTitle"":""127.0.0.1""}");
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp0");
+        File.WriteAllText(Path.Combine(projectDir, "wwwroot", "appsettings.json"), @"{""HomeTitle"":""127.0.0.1""}");
 
         // When
-        var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Debug -p:BlazorEnableCompression=false -o:bin/publish", workDir).WaitForExitAsync();
+        var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Debug -p:BlazorEnableCompression=false -o:bin/publish", projectDir).WaitForExitAsync();
         dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
 
         // Then
 
         // Validate prerendered contents.
-        var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
-        ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, homeTitle: "127.0.0.1");
+        var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
+        ValidatePrerenderedContents(wwwrootDir, homeTitle: "127.0.0.1");
     }
 
     [Test]
@@ -419,9 +448,8 @@ public class ProgramE2ETest
         // Then
         // Validate prerendered contents: the title of the "/about" page is localized.
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        ValidatePrerenderedContents_of_BlazorWasmApp0(wwwrootDir, aboutTitle: "アバウト", outputStyle: OutputStyle.IndexHtmlInSubFolders);
+        ValidatePrerenderedContents(wwwrootDir, aboutTitle: "アバウト", outputStyle: OutputStyle.IndexHtmlInSubFolders);
     }
-
 
     [Test]
     public async Task ServeDotFile_Test()
@@ -461,7 +489,7 @@ public class ProgramE2ETest
         }
     }
 
-    private static void ValidatePrerenderedContents_of_BlazorWasmApp0(string wwwrootDir, string homeTitle = "Home", string aboutTitle = "About", string environment = "Prerendering", OutputStyle outputStyle = OutputStyle.AppendHtmlExtension)
+    private static void ValidatePrerenderedContents(string wwwrootDir, string homeTitle = "Home", string aboutTitle = "About", string environment = "Prerendering", OutputStyle outputStyle = OutputStyle.AppendHtmlExtension)
     {
         var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
         var aboutIndexHtmlPath = outputStyle == OutputStyle.AppendHtmlExtension ?
@@ -475,8 +503,8 @@ public class ProgramE2ETest
         using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
 
         // NOTICE: The document title was rendered by the <HeadOutlet> component of .NET 6.
-        rootIndexHtml.Title.Is($"{homeTitle} | Blazor Wasm App 0");
-        aboutIndexHtml.Title.Is($"{aboutTitle} | Blazor Wasm App 0");
+        rootIndexHtml.Title.IsNotNull().StartsWith($"{homeTitle} | Blazor Wasm App").IsTrue();
+        aboutIndexHtml.Title.IsNotNull().StartsWith($"{aboutTitle} | Blazor Wasm App").IsTrue();
 
         rootIndexHtml.QuerySelector("h1")!.TextContent.Is(homeTitle);
         aboutIndexHtml.QuerySelector("h1")!.TextContent.Is(aboutTitle);
