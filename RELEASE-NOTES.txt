@@ -1,4 +1,4 @@
-v.2.0.0-preview.3
+v.2.0.0-preview.3.1
 Fix: Add support for an URL parameter, included dot.
 Fix: Could not serve static files that its name starting with a dot.
 

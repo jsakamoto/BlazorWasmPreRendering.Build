@@ -34,11 +34,9 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
             if (!File.Exists(assemblyPath))
             {
                 // TODO: Console.WriteLine($"{assemblyName} in {assemblyDir} - not found.");
-                File.AppendAllText("c:\\temp\\log.txt", $"NOT FOUND: {assemblyName.Name}({assemblyName.CultureName}) in {assemblyDir}\r\n");
                 return null;
             }
             // TODO: Console.WriteLine($"{assemblyName} in {assemblyDir} - FOUND.");
-            File.AppendAllText("c:\\temp\\log.txt", $"FOUND    : {assemblyName.Name}({assemblyName.CultureName}) in {assemblyDir}\r\n");
             var assembly = AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(File.ReadAllBytes(assemblyPath)));
             return assembly;
         }
