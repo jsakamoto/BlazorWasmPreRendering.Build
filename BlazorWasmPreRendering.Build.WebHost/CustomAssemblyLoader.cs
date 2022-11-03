@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Text;
 
 namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 {
@@ -11,9 +12,15 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
     {
         private readonly List<string> _AssemblySearchDirs = new();
 
-        public CustomAssemblyLoader()
+        private readonly AssemblyLoadContext _Context;
+
+        private readonly string _XorKey;
+
+        public CustomAssemblyLoader(AssemblyLoadContext? context = null, string? xorKey = null)
         {
-            AssemblyLoadContext.Default.Resolving += (context, name) =>
+            this._Context = context ?? AssemblyLoadContext.Default;
+            this._XorKey = xorKey ?? "bwap";
+            this._Context.Resolving += (context, name) =>
             {
                 return this._AssemblySearchDirs
                     .Select(dir => this.LoadAssemblyFrom(dir, name))
@@ -30,17 +37,47 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
                 Path.Combine(assemblyDir, assemblyName.Name) :
                 Path.Combine(assemblyDir, assemblyName.CultureName, assemblyName.Name);
             if (!assemblyPath.ToLower().EndsWith(".dll")) assemblyPath += ".dll";
+            var secondaryAssemblyPath = Path.ChangeExtension(assemblyPath, ".bin");
 
-            if (!File.Exists(assemblyPath))
+            var foundAssemblyPath = new[] { assemblyPath, secondaryAssemblyPath }
+                .Where(path => File.Exists(path))
+                .FirstOrDefault();
+
+            if (foundAssemblyPath == null)
             {
                 // TODO: Console.WriteLine($"{assemblyName} in {assemblyDir} - not found.");
-                File.AppendAllText("c:\\temp\\log.txt", $"NOT FOUND: {assemblyName.Name}({assemblyName.CultureName}) in {assemblyDir}\r\n");
                 return null;
             }
             // TODO: Console.WriteLine($"{assemblyName} in {assemblyDir} - FOUND.");
-            File.AppendAllText("c:\\temp\\log.txt", $"FOUND    : {assemblyName.Name}({assemblyName.CultureName}) in {assemblyDir}\r\n");
-            var assembly = AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(File.ReadAllBytes(assemblyPath)));
+            var assemblyBytes = this.GetAssemblyBytes(foundAssemblyPath);
+            var assembly = this._Context.LoadFromStream(new MemoryStream(assemblyBytes));
             return assembly;
+        }
+
+        private byte[] GetAssemblyBytes(string assemblyPath)
+        {
+            var assemblyBytes = File.ReadAllBytes(assemblyPath);
+
+            // [Blazor Wasm Antivirus Protection support]
+            // https://github.com/stavroskasidis/BlazorWasmAntivirusProtection
+            // If the bytes of assembly start with "BZ", this loader assumes that the assembly is obfuscated with the "ChangeHeader" mode.
+            if (assemblyBytes[0] == 0x42/*'B'*/ && assemblyBytes[1] == 0x5a/*'Z'*/)
+            {
+                assemblyBytes[0] = 0x4d; // 'M'
+                assemblyBytes[1] = 0x5a; // 'Z'
+            }
+
+            // [Blazor Wasm Antivirus Protection support]
+            // https://github.com/stavroskasidis/BlazorWasmAntivirusProtection
+            // If the bytes of assembly doesn't start with "MZ", this loader assumes that the assembly is obfuscated with the "Xor" mode.
+            if (assemblyBytes[0] != 0x4d/*'M'*/ || assemblyBytes[1] != 0x5a/*'Z'*/)
+            {
+                var key = Encoding.ASCII.GetBytes(this._XorKey);
+                for (var i = 0; i < assemblyBytes.Length; i++)
+                    assemblyBytes[i] = (byte)(assemblyBytes[i] ^ key[i % key.Length]);
+            }
+
+            return assemblyBytes;
         }
 
         public void AddSerachDir(string searchDir)
@@ -52,7 +89,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
         {
             try
             {
-                return AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(assemblyName));
+                return this._Context.LoadFromAssemblyName(new AssemblyName(assemblyName));
             }
             catch (Exception ex)
             {
