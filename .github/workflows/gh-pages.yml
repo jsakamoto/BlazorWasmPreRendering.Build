@@ -17,8 +17,8 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: | 
-            5.0.x
-            7.0.100-preview.6.22352.1
+            6.0.x
+            7.0.x
 
       # Publish the site
       - name: Publish
