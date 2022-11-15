@@ -18,7 +18,7 @@ public class BuildProgramTests
         };
 
         // When
-        var outputDir = BuildProgram.GenerateProjectToGetMiddleware(middlewarePackages, workFolder, "net5.0");
+        var outputDir = BuildProgram.GenerateProjectToGetMiddleware(middlewarePackages, workFolder, "net6.0");
 
         // Then
         outputDir.IsNotNull();
@@ -40,7 +40,7 @@ public class BuildProgramTests
         var middlewarePackages = Enumerable.Empty<MiddlewarePackageReference>();
 
         // When
-        var outputDir = BuildProgram.GenerateProjectToGetMiddleware(middlewarePackages, workFolder, "net5.0");
+        var outputDir = BuildProgram.GenerateProjectToGetMiddleware(middlewarePackages, workFolder, "net6.0");
 
         // Then
         outputDir.IsNull();
@@ -56,10 +56,10 @@ public class BuildProgramTests
         File.Copy(templateProjectFilePath, targetProjectFilePath);
 
         // When
-        var outputDir = BuildProgram.GetMiddlewareDlls(workFolder, frameworkName: "net5.0");
+        var outputDir = BuildProgram.GetMiddlewareDlls(workFolder, frameworkName: "net6.0");
 
         // Then
-        outputDir.Is(Path.Combine(workFolder, "bin", "Release", "net5.0"));
+        outputDir.Is(Path.Combine(workFolder, "bin", "Release", "net6.0"));
         var targetAssemblyPath = Path.Combine(outputDir, "Toolbelt.Blazor.HeadElement.ServerPrerendering.dll");
         File.Exists(targetAssemblyPath).IsTrue();
     }

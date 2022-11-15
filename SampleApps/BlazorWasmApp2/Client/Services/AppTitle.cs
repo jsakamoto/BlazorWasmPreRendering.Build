@@ -1,12 +1,11 @@
 ﻿using BlazorWasmApp2.Components.Services;
 
-namespace BlazorWasmApp2.Client.Services
+namespace BlazorWasmApp2.Client.Services;
+
+public class AppTitle : IAppTitle
 {
-    public class AppTitle : IAppTitle
+    public string GetAppTitle()
     {
-        public string GetAppTitle()
-        {
-            return "Blazor Wasm App 2";
-        }
+        return "Blazor Wasm App 2";
     }
 }

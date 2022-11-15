@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
     <BlazorEnableCompression>true</BlazorEnableCompression>
     <BlazorWasmPrerenderingUrlPathToExplicitFetch>/easter-egg</BlazorWasmPrerenderingUrlPathToExplicitFetch>
 
@@ -11,10 +14,10 @@
 
   <ItemGroup>
     <PackageReference Include="BlazorWasmPreRendering.Build" Version="2.0.0-preview.4" />
-    <PackageReference Include="PublishSPAforGitHubPages.Build" Version="2.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.2" PrivateAssets="all" />
-    <PackageReference Include="Toolbelt.Blazor.HeadElement" Version="7.0.0" />
+    <PackageReference Include="PublishSPAforGitHubPages.Build" Version="2.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.11" PrivateAssets="all" />
+    <PackageReference Include="Toolbelt.Blazor.HeadElement" Version="7.3.0" />
   </ItemGroup>
 
 </Project>

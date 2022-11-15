@@ -1,7 +1,6 @@
-﻿namespace BlazorWasmApp2.Components.Services
+﻿namespace BlazorWasmApp2.Components.Services;
+
+public interface IAppTitle
 {
-    public interface IAppTitle
-    {
-        string GetAppTitle();
-    }
+    string GetAppTitle();
 }

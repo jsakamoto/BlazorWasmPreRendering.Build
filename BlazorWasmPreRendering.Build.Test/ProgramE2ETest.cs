@@ -63,7 +63,7 @@ public class ProgramE2ETest
             "-p", publishDir,
             "-i", intermediateDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
-            "-f", "net5.0",
+            "-f", "net6.0",
             "--serverport", tcpPort,
             deleteLoadingContents ? "-d" : ""
         });
@@ -142,7 +142,7 @@ public class ProgramE2ETest
             "-p", publishDir,
             "-i", intermediateDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
-            "-f", "net5.0",
+            "-f", "net6.0",
             "-o", "AppendHtmlExtension",
             "-u", "/easter-egg",
             "--serverport", tcpPort,
@@ -230,7 +230,7 @@ public class ProgramE2ETest
             "-p", publishDir,
             "-i", intermediateDir,
             "-m", "",
-            "-f", "net5.0",
+            "-f", "net6.0",
             "--serverport", tcpPort,
             deleteLoadingContents? "-d" : ""
         });
@@ -271,7 +271,7 @@ public class ProgramE2ETest
             "-p", publishDir,
             "-i", intermediateDir,
             "-m", "",
-            "-f", "net5.0",
+            "-f", "net6.0",
             "--serverport", tcpPort,
             deleteLoadingContents ? "-d" : ""
         });

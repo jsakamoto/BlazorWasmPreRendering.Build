@@ -17,21 +17,21 @@ public class SampleSite : IDisposable
     public static SampleSite BlazorWasmApp0 { get; } = new SampleSite("BlazorWasmApp0", "net7.0");
 
     /// <summary>
-    /// - .NET 5<br/>
+    /// - .NET 6<br/>
     /// - its titles by Toolbelt.Blazor.HeadElemnt.
     /// </summary>
-    public static SampleSite BlazorWasmApp1 { get; } = new SampleSite("BlazorWasmApp1", "net5.0");
+    public static SampleSite BlazorWasmApp1 { get; } = new SampleSite("BlazorWasmApp1", "net6.0");
 
     /// <summary>
-    /// - .NET 5<br/>
+    /// - .NET 6<br/>
     /// - Consist with separated component project.
     /// </summary>
-    public static SampleSite BlazorWasmApp2 { get; } = new SampleSite("BlazorWasmApp2/Client", "net5.0");
+    public static SampleSite BlazorWasmApp2 { get; } = new SampleSite("BlazorWasmApp2/Client", "net6.0");
 
     public string ProjectName { get; } = "";
 
     /// <summary>
-    /// Get the target framework of this sample site project. (ex."net5.0", "net6.0")
+    /// Get the target framework of this sample site project. (ex."net6.0", "net7.0")
     /// </summary>
     public string TargetFramework { get; } = "";
 
