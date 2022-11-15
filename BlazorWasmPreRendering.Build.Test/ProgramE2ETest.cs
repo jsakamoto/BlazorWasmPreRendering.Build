@@ -468,7 +468,7 @@ public class ProgramE2ETest
             "-p", publishDir,
             "-i", intermediateDir,
             "-m", "",
-            "-f", "net6.0",
+            "-f", "net7.0",
             "--locale", "ja,en"
         });
         exitCode.Is(0);

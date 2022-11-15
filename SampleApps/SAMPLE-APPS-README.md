@@ -2,7 +2,7 @@
 
 |                |BlazorWasmApp0|BlazorWasmApp1    |BlazorWasmApp2
 |----------------|--------------|------------------|--------------
-|Framework       | .NET 6.0     | .NET 5.0         | .NET 5.0
+|Framework       | .NET 7.0     | .NET 5.0         | .NET 5.0
 |Projects        |Client + RCLIb| Client           | Component + Client   
 |Root element    | `<app>`      | `<div id='app'>` | `<app>`
 |Used in E2E test| ✅ Yes       | ✅ Yes          | ✅ Yes

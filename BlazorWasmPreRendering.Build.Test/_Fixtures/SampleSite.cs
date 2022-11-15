@@ -8,13 +8,13 @@ namespace BlazorWasmPreRendering.Build.Test;
 public class SampleSite : IDisposable
 {
     /// <summary>
-    /// - .NET 6<br/>
-    /// - its titles by .NET 6 &lt;PageTitle&gt;.<br/>
+    /// - .NET 7<br/>
+    /// - its titles by .NET 6+ &lt;PageTitle&gt;.<br/>
     /// - PWA<br/>
     /// - Use HtmlSanitizer package<br/>
     /// - Localization
     /// </summary>
-    public static SampleSite BlazorWasmApp0 { get; } = new SampleSite("BlazorWasmApp0", "net6.0");
+    public static SampleSite BlazorWasmApp0 { get; } = new SampleSite("BlazorWasmApp0", "net7.0");
 
     /// <summary>
     /// - .NET 5<br/>

@@ -17,7 +17,7 @@ public class SetUpFixture
 
         var dotnetCLI = await XProcess.Start(
             "dotnet",
-            $"publish -c:Release -f:net6.0 -o:\"{targetDir}\"",
+            $"publish -c:Release -f:net7.0 -o:\"{targetDir}\"",
             webHostProjDir)
             .WaitForExitAsync();
         dotnetCLI.ExitCode.Is(0, message: dotnetCLI.Output);

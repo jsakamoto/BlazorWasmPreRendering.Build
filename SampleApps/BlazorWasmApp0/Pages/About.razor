@@ -3,7 +3,7 @@
 @inject PersistentComponentState ApplicationState
 @inject IStringLocalizer<Localization> Text
 
-<PageTitle>@_State.Title | Blazor Wasm App 0</PageTitle>
+<PageTitle>@_State?.Title | Blazor Wasm App 0</PageTitle>
 
 @if (_State != null)
 {
@@ -22,12 +22,12 @@ else
 {
 	public class AboutPageState
 	{
-		public string Title{ get; set; }
+		public string? Title{ get; set; }
 	}
 
-	private AboutPageState _State = null;
+	private AboutPageState? _State = null;
 
-	private IDisposable _PersistingSubscription;
+	private IDisposable? _PersistingSubscription;
 
 	protected override async Task OnInitializedAsync()
 	{
