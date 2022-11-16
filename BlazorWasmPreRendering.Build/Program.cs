@@ -267,6 +267,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
                 IndexHtmlFragments = prerenderingOptions.IndexHtmlFragments,
                 DeleteLoadingContents = prerenderingOptions.DeleteLoadingContents,
                 Environment = commandLineOptions.Environment,
+                EmulateAuthMe = commandLineOptions.EmulateAuthMe,
                 Locales = prerenderingOptions.Locales,
                 ServerPort = serverPort,
                 BWAPOptionsXorKey = commandLineOptions.BWAPOptionsXorKey

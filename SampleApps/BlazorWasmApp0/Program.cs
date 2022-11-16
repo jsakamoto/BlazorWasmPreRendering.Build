@@ -10,12 +10,13 @@ if (!builder.RootComponents.Any())
     builder.RootComponents.Add<HeadOutlet>("head::after");
 }
 
-ConfigureServices(builder.Services);
+ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
 
 await builder.Build().RunAsync();
 
-static void ConfigureServices(IServiceCollection services)
+static void ConfigureServices(IServiceCollection services, string baseAddress)
 {
+    services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
     services.AddLocalization();
     services.AddScoped<IHtmlSanitizer, HtmlSanitizer>(_ =>
     {

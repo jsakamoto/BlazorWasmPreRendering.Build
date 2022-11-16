@@ -24,6 +24,8 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
 
         public string? Environment { get; set; }
 
+        public bool EmulateAuthMe { get; set; }
+
         public string? Locale { get; set; }
 
         public RenderMode RenderMode { get; set; } = RenderMode.Static;

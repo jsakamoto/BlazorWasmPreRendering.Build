@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -134,6 +136,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
                     return Task.CompletedTask;
                 });
 
+                this.MapAuthMe(endpoints);
                 endpoints.MapRazorPages();
                 endpoints.MapFallbackToPage(pattern: "/{*catch-all}", "/_Host");
             });
@@ -162,6 +165,18 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
                 {
                     useMethod.Invoke(null, new object[] { app });
                 }
+            }
+        }
+
+        private void MapAuthMe(IEndpointRouteBuilder endpoints)
+        {
+            if (this.PrerenderingContext.EmulateAuthMe)
+            {
+                endpoints.MapGet("/.auth/me", async context =>
+                {
+                    context.Response.ContentType = "application/json";
+                    await context.Response.WriteAsync("{\"clientPrincipal\":null}");
+                });
             }
         }
     }

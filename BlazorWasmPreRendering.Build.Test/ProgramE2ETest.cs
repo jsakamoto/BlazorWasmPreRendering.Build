@@ -32,7 +32,8 @@ public class ProgramE2ETest
             "-p", publishDir,
             "-i", intermediateDir,
             "-m", "",
-            "-f", "net6.0"
+            "-f", "net6.0",
+            "--emulateauthme", "true"
         });
         exitCode.Is(0);
 
@@ -469,6 +470,7 @@ public class ProgramE2ETest
             "-i", intermediateDir,
             "-m", "",
             "-f", "net7.0",
+            "--emulateauthme", "true",
             "--locale", "ja,en"
         });
         exitCode.Is(0);

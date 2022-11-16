@@ -72,6 +72,7 @@ public class BuildProgramTests
             AssemblyName = "Project",
             DeleteLoadingContents = true,
             Environment = "Production",
+            EmulateAuthMe = false,
             IndexHtmlFragments = {
                 FirstPart = "<html>\r\n<head>\r\n",
                 LastPart = "</body>\r\n</html>",
@@ -96,6 +97,7 @@ public class BuildProgramTests
             .Select(item => $"{item.Key}|{item.Value}")
             .Is("X_AssemblyName|Project",
                 "X_DeleteLoadingContents|True",
+                "X_EmulateAuthMe|False",
                 "X_Environment|Production",
                 "X_IndexHtmlFragments:FirstPart|<html>\r\n<head>\r\n",
                 "X_IndexHtmlFragments:LastPart|</body>\r\n</html>",
@@ -123,6 +125,7 @@ public class BuildProgramTests
             AssemblyName = "Project",
             DeleteLoadingContents = false,
             Environment = "Development",
+            EmulateAuthMe = true,
             IndexHtmlFragments = {
                 FirstPart = "<html>\r\n<head>\r\n",
                 LastPart = "</body>\r\n</html>",
@@ -142,6 +145,7 @@ public class BuildProgramTests
             .Select(item => $"{item.Key}|{item.Value}")
             .Is("~AssemblyName|Project",
                 "~DeleteLoadingContents|False",
+                "~EmulateAuthMe|True",
                 "~Environment|Development",
                 "~IndexHtmlFragments:FirstPart|<html>\r\n<head>\r\n",
                 "~IndexHtmlFragments:LastPart|</body>\r\n</html>",

@@ -1,0 +1,10 @@
+{
+  "clientPrincipal": {
+    "identityProvider": "example",
+    "userId": "9f827824-575d-4dc9-91a7-83d16ceccd86",
+    "userDetails": "foo",
+    "userRoles": [
+      "fieldStaff"
+    ]
+  }
+}

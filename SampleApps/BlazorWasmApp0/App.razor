@@ -1,11 +1,27 @@
-<Router AppAssembly="@typeof(App).Assembly">
-	<Found Context="routeData">
-		<RouteView RouteData="@routeData" />
-	</Found>
-	<NotFound>
-		<LayoutView>
-			<p>Sorry, there's nothing at this address.</p>
-		</LayoutView>
-	</NotFound>
-</Router>
+@inject IConfiguration Configuration
+@inject HttpClient HttpClient
 
+<CascadingValue Value="_Me">
+	<Router AppAssembly="@typeof(App).Assembly">
+		<Found Context="routeData">
+			<RouteView RouteData="@routeData" />
+		</Found>
+		<NotFound>
+			<LayoutView>
+				<p>Sorry, there's nothing at this address.</p>
+			</LayoutView>
+		</NotFound>
+	</Router>
+</CascadingValue>
+
+@code
+{
+	private ClientPrincipal? _Me = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var authenticationDataUrl = Configuration.GetValue("StaticWebAppsAuthentication:AuthenticationDataUrl", "/.auth/me");
+		var authenticationData = await HttpClient.GetFromJsonAsync<AuthenticationData>(authenticationDataUrl);
+		_Me = authenticationData?.ClientPrincipal;
+	}
+}

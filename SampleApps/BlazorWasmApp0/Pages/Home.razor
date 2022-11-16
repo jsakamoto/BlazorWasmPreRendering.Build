@@ -18,10 +18,13 @@
 	Environment: @HostEnv.Environment
 </div>
 
-<RazorClassLib1.Component1 />
+<RazorClassLib1.Component1 Name="@Me?.UserDetails" />
 
 @code {
 	private string _Title = "";
+
+	[CascadingParameter]
+	public ClientPrincipal? Me { get; set; }
 
 	protected override void OnInitialized()
 	{

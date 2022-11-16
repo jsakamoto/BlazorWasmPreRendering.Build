@@ -1,3 +1,12 @@
 ﻿<div class="my-component">
+    @if (Name != null)
+    {
+        <text>Hello <strong>@Name</strong>, </text>
+    }
     This component is defined in the <strong>RazorClassLib1</strong> library.
 </div>
+
+@code {
+    [Parameter]
+    public string? Name { get; set; }
+}
