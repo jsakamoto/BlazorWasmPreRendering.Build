@@ -18,7 +18,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.0" PrivateAssets="all" />
     <PackageReference Include="BlazorWasmAntivirusProtection" Version="2.2.1" />
-    <PackageReference Include="BlazorWasmPreRendering.Build" Version="2.0.0-preview.5.10" />
+    <PackageReference Include="BlazorWasmPreRendering.Build" Version="2.0.0-preview.5.11" />
   </ItemGroup>
 
 </Project>
