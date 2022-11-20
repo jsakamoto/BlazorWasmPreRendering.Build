@@ -1,3 +1,7 @@
+v.2.0.0-preview.6
+- Improve: Add support for the latest version of the "Blazor Wasm Antivirus Protection".
+  - Change the strategy of getting the "xorKey" to reading the "avp-settings.json" file.
+
 v.2.0.0-preview.5
 - Improve: the pre-rendering server emulates the "/.auth/me" endpoint that is a part of Azure App Services Auth.
 
