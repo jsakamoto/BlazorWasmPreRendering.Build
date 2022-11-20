@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -37,7 +38,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
             if (options.IndexHtmlFragments == null) throw new ArgumentException("The IndexHtmlFragments parameter is required.");
             if (options.MiddlewarePackages == null) throw new ArgumentException("The MiddlewarePackages parameter is required.");
 
-            var assemblyLoader = SetupCustomAssemblyLoader(options.WebRootPath, options.MiddlewareDllsDir, options.BWAPOptionsXorKey);
+            var assemblyLoader = SetupCustomAssemblyLoader(options.WebRootPath, options.MiddlewareDllsDir, options.BWAPOptionsDllExt);
 
             var appAssembly = assemblyLoader.LoadAssembly(options.AssemblyName);
             if (appAssembly == null) throw new ArgumentException($"The application assembly \"{options.AssemblyName}\" colud not load.");
@@ -104,9 +105,18 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
             return appComponentType;
         }
 
-        private static CustomAssemblyLoader SetupCustomAssemblyLoader(string webRootPath, string middlewareDllsDir, string? xorKey)
+        private static CustomAssemblyLoader SetupCustomAssemblyLoader(string webRootPath, string middlewareDllsDir, string? secondaryDllExt)
         {
-            var assemblyLoader = new CustomAssemblyLoader(xorKey: xorKey);
+            var xorKey = "bwap";
+            var avpSettingsPath = Path.Combine(webRootPath, "avp-settings.json");
+            if (File.Exists(avpSettingsPath))
+            {
+                var avpSettingsJson = File.ReadAllText(avpSettingsPath);
+                var avpSettings = JsonSerializer.Deserialize<AntiVirusProtectionSettings>(avpSettingsJson);
+                xorKey = avpSettings?.xorKey ?? xorKey;
+            }
+
+            var assemblyLoader = new CustomAssemblyLoader(xorKey: xorKey, secondaryDllExt: secondaryDllExt);
 
             var appAssemblyDir = Path.Combine(webRootPath, "_framework");
             assemblyLoader.AddSerachDir(appAssemblyDir);

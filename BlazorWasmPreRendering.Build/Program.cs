@@ -270,7 +270,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
                 EmulateAuthMe = commandLineOptions.EmulateAuthMe,
                 Locales = prerenderingOptions.Locales,
                 ServerPort = serverPort,
-                BWAPOptionsXorKey = commandLineOptions.BWAPOptionsXorKey
+                BWAPOptionsDllExt = commandLineOptions.BWAPOptionsDllExt
             };
             StoreOptionsToEnvironment(webHostOptions, Constants.ConfigurationPrefix, webHostStartInfo.Environment);
 

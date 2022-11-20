@@ -27,8 +27,8 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared
 
         public int ServerPort { get; init; }
 
-        /// <summary>Options for Blazor Wasm Antivirus Protection - XorKey</summary>
-        public string? BWAPOptionsXorKey { get; init; }
+        /// <summary>Options for Blazor Wasm Antivirus Protection - Dll Extension</summary>
+        public string? BWAPOptionsDllExt { get; set; }
 
         public bool EmulateAuthMe { get; init; }
     }

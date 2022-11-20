@@ -16,10 +16,13 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 
         private readonly string _XorKey;
 
-        public CustomAssemblyLoader(AssemblyLoadContext? context = null, string? xorKey = null)
+        private readonly string _SecondaryDllExt;
+
+        public CustomAssemblyLoader(AssemblyLoadContext? context = null, string? xorKey = null, string? secondaryDllExt = null)
         {
             this._Context = context ?? AssemblyLoadContext.Default;
             this._XorKey = string.IsNullOrEmpty(xorKey) ? "bwap" : xorKey;
+            this._SecondaryDllExt = string.IsNullOrEmpty(secondaryDllExt) ? "dll" : secondaryDllExt;
             this._Context.Resolving += (context, name) =>
             {
                 return this._AssemblySearchDirs
@@ -37,7 +40,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
                 Path.Combine(assemblyDir, assemblyName.Name) :
                 Path.Combine(assemblyDir, assemblyName.CultureName, assemblyName.Name);
             if (!assemblyPath.ToLower().EndsWith(".dll")) assemblyPath += ".dll";
-            var secondaryAssemblyPath = Path.ChangeExtension(assemblyPath, ".bin");
+            var secondaryAssemblyPath = Path.ChangeExtension(assemblyPath, "." + this._SecondaryDllExt.TrimStart('.'));
 
             var foundAssemblyPath = new[] { assemblyPath, secondaryAssemblyPath }
                 .Where(path => File.Exists(path))
