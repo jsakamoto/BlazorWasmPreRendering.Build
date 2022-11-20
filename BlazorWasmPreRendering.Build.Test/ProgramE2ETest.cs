@@ -421,9 +421,7 @@ public class ProgramE2ETest
         if (obfuscationMode != "") args.Add($"-p:ObfuscationMode={obfuscationMode}");
         if (xorKey != "") args.Add($"-p:XorKey={xorKey}");
 
-        var dotnetCLI = await Start(
-            "dotnet", string.Join(" ", args),
-            projectDir).WaitForExitAsync();
+        var dotnetCLI = await Start("dotnet", string.Join(" ", args), projectDir).WaitForExitAsync();
 
         // Then
         dotnetCLI.ExitCode.Is(0, message: dotnetCLI.Output);

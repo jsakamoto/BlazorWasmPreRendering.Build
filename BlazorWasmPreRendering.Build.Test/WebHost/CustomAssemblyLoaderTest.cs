@@ -20,7 +20,7 @@ internal class CustomAssemblyLoaderTest
         try
         {
             // Given
-            var loader = new CustomAssemblyLoader(context, xorKey);
+            var loader = new CustomAssemblyLoader(context, xorKey, ext.TrimStart('.'));
             loader.AddSerachDir(workDir);
 
             // When

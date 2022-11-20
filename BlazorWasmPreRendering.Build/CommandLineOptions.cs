@@ -52,5 +52,8 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
 
         /// <summary>Options for Blazor Wasm Antivirus Protection - XorKey</summary>
         public string? BWAPOptionsXorKey { get; set; }
+
+        /// <summary>Options for Blazor Wasm Antivirus Protection - Dll Extension</summary>
+        public string? BWAPOptionsDllExt { get; set; }
     }
 }

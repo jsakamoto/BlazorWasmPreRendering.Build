@@ -37,7 +37,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
             if (options.IndexHtmlFragments == null) throw new ArgumentException("The IndexHtmlFragments parameter is required.");
             if (options.MiddlewarePackages == null) throw new ArgumentException("The MiddlewarePackages parameter is required.");
 
-            var assemblyLoader = SetupCustomAssemblyLoader(options.WebRootPath, options.MiddlewareDllsDir, options.BWAPOptionsXorKey);
+            var assemblyLoader = SetupCustomAssemblyLoader(options.WebRootPath, options.MiddlewareDllsDir, options.BWAPOptionsXorKey, options.BWAPOptionsDllExt);
 
             var appAssembly = assemblyLoader.LoadAssembly(options.AssemblyName);
             if (appAssembly == null) throw new ArgumentException($"The application assembly \"{options.AssemblyName}\" colud not load.");
@@ -104,9 +104,9 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
             return appComponentType;
         }
 
-        private static CustomAssemblyLoader SetupCustomAssemblyLoader(string webRootPath, string middlewareDllsDir, string? xorKey)
+        private static CustomAssemblyLoader SetupCustomAssemblyLoader(string webRootPath, string middlewareDllsDir, string? xorKey, string? secondaryDllExt)
         {
-            var assemblyLoader = new CustomAssemblyLoader(xorKey: xorKey);
+            var assemblyLoader = new CustomAssemblyLoader(xorKey: xorKey, secondaryDllExt: secondaryDllExt);
 
             var appAssemblyDir = Path.Combine(webRootPath, "_framework");
             assemblyLoader.AddSerachDir(appAssemblyDir);
