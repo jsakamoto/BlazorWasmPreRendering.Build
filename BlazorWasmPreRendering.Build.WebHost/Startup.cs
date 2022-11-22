@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.Components.WebAssembly.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -16,6 +17,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
+using Microsoft.JSInterop;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost.Services;
 
 namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 {
@@ -41,6 +44,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
         {
             services.AddSingleton(this.HostEnvironment);
             services.AddSingleton(this.PrerenderingContext); // Pre-rendering context is used from _Host.cshtml and _Layout.cshtml via DI container.
+            services.AddSingleton(this.PrerenderingContext.AssemblyLoader);
 
             this.ConfigureApplicationServices(services);
 
@@ -50,6 +54,11 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
             services.AddServerSideBlazor();
             services.AddLocalization();
             services.AddSingleton<ResetHeadOutletScript>();
+            services.TryAddScoped<LazyAssemblyLoader>();
+
+            var jsruntimeDescriptor = services.FirstOrDefault(sd => sd.ServiceType == typeof(IJSRuntime));
+            if (jsruntimeDescriptor != null) services.Remove(jsruntimeDescriptor);
+            services.AddScoped<IJSRuntime, ServerSideRenderingJSRuntime>();
         }
 
         private void ConfigureApplicationServices(IServiceCollection services)

@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorWasmPreRendering.Build" Version="2.0.0-preview.6" />
+    <PackageReference Include="BlazorWasmPreRendering.Build" Version="2.0.0-preview.7" />
     <PackageReference Include="PublishSPAforGitHubPages.Build" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.0" PrivateAssets="all" />
@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RazorClassLib1\RazorClassLib1.csproj" />
+    <ProjectReference Include="..\RazorClassLib2\RazorClassLib2.csproj" />
     <BlazorWasmPrerenderMiddleware Include="MiddlewarePackage2" Assembly="Middleware2" Version="1.0.0" />
   </ItemGroup>
 
@@ -39,6 +40,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Localization.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <BlazorWebAssemblyLazyLoad Include="RazorClassLib2.dll" />
   </ItemGroup>
 
 </Project>

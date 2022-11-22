@@ -40,7 +40,7 @@ public class ProgramE2ETest
         // Then
         // Validate prerendered contents.
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        ValidatePrerenderedContents(wwwrootDir, outputStyle: OutputStyle.IndexHtmlInSubFolders);
+        ValidatePrerenderedContentsOfApp0(wwwrootDir, outputStyle: OutputStyle.IndexHtmlInSubFolders);
     }
 
     [TestCase(true)]
@@ -306,7 +306,7 @@ public class ProgramE2ETest
             Console.WriteLine($"{(i == 1 ? "1st" : "2nd")} time publishing...");
 
             // When
-            var arg = "publish -c:Debug -p:BlazorEnableCompression=false -o:bin/publish";
+            var arg = "publish -c:Release -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false -o:bin/publish";
             // if 2nd time publishing, override the environment name.
             if (i == 2) arg += " -p:BlazorWasmPrerenderingEnvironment=" + expectedEnvNames[2];
 
@@ -317,7 +317,7 @@ public class ProgramE2ETest
 
             // Validate prerendered contents.
             var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
-            ValidatePrerenderedContents(
+            ValidatePrerenderedContentsOfApp0(
                 wwwrootDir,
                 homeTitle: expectedHomeTitles[i],
                 environment: expectedEnvNames[i]);
@@ -341,24 +341,25 @@ public class ProgramE2ETest
     public async Task Publish_by_msbuild_Test()
     {
         // Given
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
-        var srcDir = Path.Combine(solutionDir, "SampleApps", "BlazorWasmApp0");
-        using var workDir = WorkDirectory.CreateCopyFrom(srcDir, dst => dst.Name is not "obj" and not "bin");
+        using var workDir = SampleSite.CreateSampleAppsWorkDir();
+        var app0Dir = Path.Combine(workDir, "BlazorWasmApp0");
 
         for (var i = 0; i < 2; i++)
         {
             Console.WriteLine($"{(i == 0 ? "1st" : "2nd")} time publishing...");
 
             // When
-            await XProcess.Start("dotnet", "restore", workDir).WaitForExitAsync();
-            var dotnetCLI = await XProcess.Start("dotnet", "msbuild -p:Configuration=Debug -p:BlazorEnableCompression=false -p:DeployOnBuild=true -p:PublishUrl=bin/publish", workDir).WaitForExitAsync();
+            await Start("dotnet", "restore", app0Dir).WaitForExitAsync();
+            var dotnetCLI = await Start("dotnet",
+                "msbuild -p:Configuration=Debug -p:BlazorEnableCompression=false -p:DeployOnBuild=true -p:PublishUrl=bin/publish",
+                app0Dir).WaitForExitAsync();
             dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
 
             // Then
 
             // Validate prerendered contents.
-            var wwwrootDir = Path.Combine(workDir, "bin", "publish", "wwwroot");
-            ValidatePrerenderedContents(wwwrootDir);
+            var wwwrootDir = Path.Combine(app0Dir, "bin", "publish", "wwwroot");
+            ValidatePrerenderedContentsOfApp0(wwwrootDir);
         }
     }
 
@@ -427,7 +428,10 @@ public class ProgramE2ETest
         dotnetCLI.ExitCode.Is(0, message: dotnetCLI.Output);
 
         var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
-        ValidatePrerenderedContents(wwwrootDir, homeTitle: "Home of BlazorWasmAVP", aboutTitle: "About of BlazorWasmAVP", outputStyle: OutputStyle.IndexHtmlInSubFolders);
+        ValidatePrerenderedContents(OutputStyle.IndexHtmlInSubFolders, wwwrootDir, new PageExpectation[] {
+            new("/",      "Home of BlazorWasmAVP",  new[]{ "<a href=/about>about</a>" }, Environment: "Prerendering"),
+            new("/about", "About of BlazorWasmAVP", new[]{ "<a href=/>home</a>" })
+        });
     }
 
     [Test]
@@ -446,7 +450,7 @@ public class ProgramE2ETest
 
         // Validate prerendered contents.
         var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
-        ValidatePrerenderedContents(wwwrootDir, homeTitle: "127.0.0.1");
+        ValidatePrerenderedContentsOfApp0(wwwrootDir, homeTitle: "127.0.0.1");
     }
 
     [Test]
@@ -476,7 +480,7 @@ public class ProgramE2ETest
         // Then
         // Validate prerendered contents: the title of the "/about" page is localized.
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        ValidatePrerenderedContents(wwwrootDir, aboutTitle: "アバウト", outputStyle: OutputStyle.IndexHtmlInSubFolders);
+        ValidatePrerenderedContentsOfApp0(wwwrootDir, aboutTitle: "アバウト", outputStyle: OutputStyle.IndexHtmlInSubFolders);
     }
 
     [Test]
@@ -517,31 +521,77 @@ public class ProgramE2ETest
         }
     }
 
-    private static void ValidatePrerenderedContents(string wwwrootDir, string homeTitle = "Home", string aboutTitle = "About", string environment = "Prerendering", OutputStyle outputStyle = OutputStyle.AppendHtmlExtension)
+    private record PageExpectation(string RouteName, string Title, string[] Links, string Environment = "");
+
+    private static void ValidatePrerenderedContentsOfApp0(string wwwrootDir, string homeTitle = "Home", string aboutTitle = "About", string environment = "Prerendering", OutputStyle outputStyle = OutputStyle.AppendHtmlExtension)
     {
-        var rootIndexHtmlPath = Path.Combine(wwwrootDir, "index.html");
-        var aboutIndexHtmlPath = outputStyle == OutputStyle.AppendHtmlExtension ?
-            Path.Combine(wwwrootDir, "about.html") :
-            Path.Combine(wwwrootDir, "about", "index.html");
-        File.Exists(rootIndexHtmlPath).IsTrue();
-        File.Exists(aboutIndexHtmlPath).IsTrue();
+        ValidatePrerenderedContents(outputStyle, wwwrootDir, new PageExpectation[] {
+            new("/", homeTitle, new[]{
+                "<a href=/about>about</a>",
+                "<a href=/lazy-loading-page>lazy loading page</a>",
+            }, environment),
+            new("/about", aboutTitle, new[]{
+                "<a href=/>home</a>",
+                "<a href=/lazy-loading-page>lazy loading page</a>",
+            }),
+            new("/lazy-loading-page", "Lazy Loading Page", new[]{
+                "<a href=/>home</a>",
+                "<a href=/about>about</a>",
+            }),
+        });
+    }
+
+    private static void ValidatePrerenderedContents(OutputStyle outputStyle, string wwwrootDir, IEnumerable<PageExpectation> pageExpectations)
+    {
+        string buildFileName(string name) => name switch
+        {
+            "" or "/" => "index.html",
+            _ => outputStyle switch
+            {
+                OutputStyle.AppendHtmlExtension => $"{name.TrimStart('/')}.html",
+                OutputStyle.IndexHtmlInSubFolders => Path.Combine(name.TrimStart('/'), "index.html"),
+                _ => throw new Exception($"Unknown outputStyle: {outputStyle}")
+            }
+        };
+
+        IEnumerable<string> dumpAnchors(IHtmlDocument htmlDocument) => htmlDocument
+            .QuerySelectorAll("app a, #app a")
+            .Cast<IHtmlAnchorElement>()
+            .Select(a => $"<a href={Regex.Replace(a.Href, "^about://", "")}>{a.TextContent}</a>");
 
         var htmlParser = new HtmlParser();
-        using var rootIndexHtml = htmlParser.ParseDocument(File.ReadAllText(rootIndexHtmlPath));
-        using var aboutIndexHtml = htmlParser.ParseDocument(File.ReadAllText(aboutIndexHtmlPath));
 
-        // NOTICE: The document title was rendered by the <HeadOutlet> component of .NET 6.
-        rootIndexHtml.Title.IsNotNull().StartsWith($"{homeTitle} | Blazor Wasm App").IsTrue(message: $"rootIndexHtml.Title is: \"{rootIndexHtml.Title}\"");
-        aboutIndexHtml.Title.IsNotNull().StartsWith($"{aboutTitle} | Blazor Wasm App").IsTrue(message: $"aboutIndexHtml.Title is: \"{aboutIndexHtml.Title}\"");
+        foreach (var pageExpectation in pageExpectations)
+        {
+            // 1. Validate the existance of the static prerendered HTML file
+            var fileName = buildFileName(pageExpectation.RouteName);
+            var htmlPath = Path.Combine(wwwrootDir, fileName);
+            File.Exists(htmlPath).IsTrue(message: $"The HTML file \"{fileName}\" was not found.");
 
-        rootIndexHtml.QuerySelector("h1")!.TextContent.Is(homeTitle);
-        aboutIndexHtml.QuerySelector("h1")!.TextContent.Is(aboutTitle);
+            // 2. Validate the page title
+            using var htmlDocument = htmlParser.ParseDocument(File.ReadAllText(htmlPath));
+            htmlDocument.Title
+                .IsNotNull(message: $"The page title in {pageExpectation.RouteName} was not found.")
+                .StartsWith($"{pageExpectation.Title} | Blazor Wasm App")
+                .IsTrue(message: $"The title of {pageExpectation.RouteName} is: \"{htmlDocument.Title}\"");
 
-        rootIndexHtml.QuerySelector("a")!.TextContent.Is("about");
-        (rootIndexHtml.QuerySelector("a") as IHtmlAnchorElement)!.Href.Is("about:///about");
-        aboutIndexHtml.QuerySelector("a")!.TextContent.Is("home");
-        (aboutIndexHtml.QuerySelector("a") as IHtmlAnchorElement)!.Href.Is("about:///");
+            // 3. Validate the h1 element
+            htmlDocument.QuerySelector("h1")
+                .IsNotNull(message: $"The h1 element in {pageExpectation.RouteName} was not found.")
+                .TextContent.Is(pageExpectation.Title);
 
-        rootIndexHtml.QuerySelector(".environment")!.TextContent.Trim().Is($"Environment: {environment}");
+            // 4. Validate the included anchor elements
+            dumpAnchors(htmlDocument).Is(pageExpectation.Links);
+
+            // 5. Validate the hosting environment name
+            if (!string.IsNullOrEmpty(pageExpectation.Environment))
+            {
+                htmlDocument.QuerySelector(".environment")
+                    .IsNotNull(message: $"The .environment element in {pageExpectation.RouteName} was not found.")
+                    .TextContent
+                    .Trim()
+                    .Is($"Environment: {pageExpectation.Environment}");
+            }
+        }
     }
 }

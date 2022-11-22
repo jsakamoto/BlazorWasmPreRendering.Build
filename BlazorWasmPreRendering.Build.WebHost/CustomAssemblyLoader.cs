@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -25,14 +26,20 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
             this._SecondaryDllExt = string.IsNullOrEmpty(secondaryDllExt) ? "dll" : secondaryDllExt;
             this._Context.Resolving += (context, name) =>
             {
-                return this._AssemblySearchDirs
-                    .Select(dir => this.LoadAssemblyFrom(dir, name))
-                    .Where(asm => asm != null)
-                    .FirstOrDefault();
+                return this.TryGetAssemblyBytes(name, out var assemblyBytes) ? this._Context.LoadFromStream(new MemoryStream(assemblyBytes)) : null;
             };
         }
 
-        private Assembly? LoadAssemblyFrom(string assemblyDir, AssemblyName assemblyName)
+        public bool TryGetAssemblyBytes(AssemblyName name, [NotNullWhen(true)] out byte[]? assemblyBytes)
+        {
+            assemblyBytes = this._AssemblySearchDirs
+                    .Select(dir => this.GetAssemblyBytesFromName(dir, name))
+                    .Where(bytes => bytes != null)
+                    .FirstOrDefault();
+            return assemblyBytes != null;
+        }
+
+        private byte[]? GetAssemblyBytesFromName(string assemblyDir, AssemblyName assemblyName)
         {
             if (assemblyName.Name == null) return null;
 
@@ -52,12 +59,13 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
                 return null;
             }
             // TODO: Console.WriteLine($"{assemblyName} in {assemblyDir} - FOUND.");
-            var assemblyBytes = this.GetAssemblyBytes(foundAssemblyPath);
-            var assembly = this._Context.LoadFromStream(new MemoryStream(assemblyBytes));
-            return assembly;
+            return this.GetAssemblyBytesFromPath(foundAssemblyPath);
+
+            //var assembly = this._Context.LoadFromStream(new MemoryStream(assemblyBytes));
+            //return assembly;
         }
 
-        private byte[] GetAssemblyBytes(string assemblyPath)
+        private byte[] GetAssemblyBytesFromPath(string assemblyPath)
         {
             var assemblyBytes = File.ReadAllBytes(assemblyPath);
 

@@ -1,17 +1,18 @@
 ﻿# Sample Apps
 
-|                |BlazorWasmApp0|BlazorWasmApp1    |BlazorWasmApp2
-|----------------|--------------|------------------|--------------
-|Framework       | .NET 7.0     | .NET 6.0         | .NET 6.0
-|Projects        |Client + RCLIb| Client           | Component + Client   
-|Root element    | `<app>`      | `<div id='app'>` | `<app>`
-|Used in E2E test| ✅ Yes       | ✅ Yes          | ✅ Yes
-|Page title      | `<PageTitle>`| `<Title>`        | -
-|PWA             | ✅ Yes       | -                | -
-|Has easter-egg  | -            | ✅ Yes           | -
-|Deploy to GitHub Pages | -     | ✅ Yes           | -
-|Has AngleSharp dependency| ✅Yes | -              | -
-|Localization    | ✅ Yes       | -                | -
+|                   |BlazorWasmApp0| BlazorWasmApp1   | BlazorWasmApp2
+|-------------------|--------------|------------------|--------------
+|Framework          | .NET 7.0     | .NET 6.0         | .NET 6.0
+|Projects           |Client + RCLIb| Client           | Component + Client   
+|Root element       | `<app>`      | `<div id='app'>` | `<app>`
+|Used in E2E test   | ✅ Yes       | ✅ Yes          | ✅ Yes
+|Page title         | `<PageTitle>`| `<Title>`        | -
+|PWA                | ✅ Yes       | -                | -
+|Has easter-egg     | -            | ✅ Yes           | -
+|Deploy to GitHub Pages| -         | ✅ Yes           | -
+|Has AngleSharp dependency| ✅Yes  | -                | -
+|Localization       | ✅ Yes       | -                | -
+|Lazy Load Assembly | ✅ Yes       | -                | -
 
 ## Appendix
 

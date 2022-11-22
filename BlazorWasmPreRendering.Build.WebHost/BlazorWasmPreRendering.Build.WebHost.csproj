@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <!-- Version, Author, Copyright, Description are defined in the VersionInfo.props -->
-  <Import Project="../VersionInfo.props"/>
+  <Import Project="../VersionInfo.props" />
 
   <ItemGroup>
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />

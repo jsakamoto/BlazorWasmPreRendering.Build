@@ -1,27 +1,43 @@
+@using System.Reflection;
+@using Microsoft.AspNetCore.Components.WebAssembly.Services;
 @inject IConfiguration Configuration
 @inject HttpClient HttpClient
+@inject LazyAssemblyLoader AssemblyLoader
 
 <CascadingValue Value="_Me">
-	<Router AppAssembly="@typeof(App).Assembly">
-		<Found Context="routeData">
-			<RouteView RouteData="@routeData" />
-		</Found>
-		<NotFound>
-			<LayoutView>
-				<p>Sorry, there's nothing at this address.</p>
-			</LayoutView>
-		</NotFound>
-	</Router>
+    <Router AppAssembly="@typeof(App).Assembly"
+            AdditionalAssemblies="_LazyLoadedAssemblies"
+            OnNavigateAsync="@OnNavigateAsync">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" />
+        </Found>
+        <NotFound>
+            <LayoutView>
+                <p>Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
 </CascadingValue>
 
 @code
 {
-	private ClientPrincipal? _Me = null;
+    private ClientPrincipal? _Me = null;
 
-	protected override async Task OnInitializedAsync()
-	{
-		var authenticationDataUrl = Configuration.GetValue("StaticWebAppsAuthentication:AuthenticationDataUrl", "/.auth/me");
-		var authenticationData = await HttpClient.GetFromJsonAsync<AuthenticationData>(authenticationDataUrl);
-		_Me = authenticationData?.ClientPrincipal;
-	}
+    private readonly List<Assembly> _LazyLoadedAssemblies = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationDataUrl = Configuration.GetValue("StaticWebAppsAuthentication:AuthenticationDataUrl", "/.auth/me");
+        var authenticationData = await HttpClient.GetFromJsonAsync<AuthenticationData>(authenticationDataUrl);
+        _Me = authenticationData?.ClientPrincipal;
+    }
+
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+        if (args.Path.Contains("lazy-loading-page", StringComparison.OrdinalIgnoreCase))
+        {
+            var assembly = await AssemblyLoader.LoadAssembliesAsync(new[] { "RazorClassLib2.dll" });
+            _LazyLoadedAssemblies.AddRange(assembly);
+        }
+    }
 }
