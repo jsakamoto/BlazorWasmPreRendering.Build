@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <RootNamespace>Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared</RootNamespace>
@@ -11,10 +11,10 @@
   </PropertyGroup>
 
   <!-- Version, Author, Copyright, Description are defined in the VersionInfo.props -->
-  <Import Project="../VersionInfo.props"/>
+  <Import Project="../VersionInfo.props" />
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
@@ -27,6 +27,10 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0-preview.2.23128.3" />
   </ItemGroup>
 
 </Project>

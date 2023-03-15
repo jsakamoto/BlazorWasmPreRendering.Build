@@ -1,3 +1,6 @@
+v.2.0.0-preview.8
+- Add support for .NET 8
+
 v.2.0.0-preview.7
 - Improve: Add support for lazy loading assemblies.
 

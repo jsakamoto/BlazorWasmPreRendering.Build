@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <RootNamespace>Toolbelt.Blazor.WebAssembly.PreRendering.Build</RootNamespace>
@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <!-- Version, Author, Copyright, Description are defined in the VersionInfo.props -->
-  <Import Project="../VersionInfo.props"/>
+  <Import Project="../VersionInfo.props" />
 
   <PropertyGroup>
     <PackageId>BlazorWasmPreRendering.Build</PackageId>
@@ -45,6 +45,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0-preview.2.23153.2" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\BlazorWasmPreRendering.Build.Shared\BlazorWasmPreRendering.Build.Shared.csproj" />
   </ItemGroup>
@@ -63,11 +67,13 @@
     <Exec Command="dotnet publish -c:$(Configuration) -f:net5.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net6.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net7.0 --nologo" />
+    <Exec Command="dotnet publish -c:$(Configuration) -f:net8.0 --nologo" />
 
     <!-- Publish WebHost Program -->
     <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net5.0 --nologo" />
     <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net6.0 --nologo" />
     <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net7.0 --nologo" />
+    <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net8.0 --nologo" />
 
     <ItemGroup>
       <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\Microsoft.*.dll" />

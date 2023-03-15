@@ -274,6 +274,9 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
             };
             StoreOptionsToEnvironment(webHostOptions, Constants.ConfigurationPrefix, webHostStartInfo.Environment);
 
+            using var proc = await XProcess.Start("dotnet", "--version", AppDomain.CurrentDomain.BaseDirectory).WaitForExitAsync();
+            var dotnetVer = proc.Output;
+
             var webHostProcess = XProcess.Start(webHostStartInfo);
             await webHostProcess.WaitForOutputAsync(predicate: output => output.Contains(baseUrl), millsecondsTimeout: 20000);
             return webHostProcess;

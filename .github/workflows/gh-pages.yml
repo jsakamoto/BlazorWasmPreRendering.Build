@@ -10,19 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checkout the code
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      # Install .NET Core SDK
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v2
+      # Install .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: | 
-            6.0.x
-            7.0.x
+           global-json-file: ./global.json
 
       # Publish the site
       - name: Publish
-        run: dotnet publish SampleApps/BlazorWasmApp1/BlazorWasmApp1.csproj -c:Release -o:public -p:GHPages=true --nologo
+        run: dotnet publish SampleApps/BlazorWasmApp1/BlazorWasmApp1.csproj -c Release -o public -p GHPages=true --nologo
 
       # Deploy the site
       - name: Deploy

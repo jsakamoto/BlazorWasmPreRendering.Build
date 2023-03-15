@@ -64,7 +64,7 @@ public class ProgramE2ETest
             "-p", publishDir,
             "-i", intermediateDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
-            "-f", "net6.0",
+            "-f", SampleSite.BlazorWasmApp1.TargetFramework,
             "--serverport", tcpPort,
             deleteLoadingContents ? "-d" : ""
         });
@@ -143,7 +143,7 @@ public class ProgramE2ETest
             "-p", publishDir,
             "-i", intermediateDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
-            "-f", "net6.0",
+            "-f", SampleSite.BlazorWasmApp1.TargetFramework,
             "-o", "AppendHtmlExtension",
             "-u", "/easter-egg",
             "--serverport", tcpPort,
