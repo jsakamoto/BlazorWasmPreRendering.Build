@@ -183,7 +183,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
             {
                 using var buildProcess = Process.Start(new ProcessStartInfo
                 {
-                    FileName = "dotnet",
+                    FileName = DotNetCLI.Path,
                     ArgumentList = { "build", "-c:Release", "-v:q", "--nologo" },
                     WorkingDirectory = projectDir
                 });
@@ -251,7 +251,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
             var webHostDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".webhost", "BlazorWasmPreRendering.Build.WebHost.dll");
             var webHostStartInfo = new ProcessStartInfo
             {
-                FileName = "dotnet",
+                FileName = DotNetCLI.Path,
                 ArgumentList = { "exec", webHostDllPath },
                 WorkingDirectory = Path.Combine(prerenderingOptions.WebRootPath, "_framework")
             };
@@ -274,7 +274,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
             };
             StoreOptionsToEnvironment(webHostOptions, Constants.ConfigurationPrefix, webHostStartInfo.Environment);
 
-            using var proc = await XProcess.Start("dotnet", "--version", AppDomain.CurrentDomain.BaseDirectory).WaitForExitAsync();
+            using var proc = await XProcess.Start(DotNetCLI.Path, "--version", AppDomain.CurrentDomain.BaseDirectory).WaitForExitAsync();
             var dotnetVer = proc.Output;
 
             var webHostProcess = XProcess.Start(webHostStartInfo);

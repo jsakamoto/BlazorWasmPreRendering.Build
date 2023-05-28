@@ -1,3 +1,7 @@
+v.2.0.0-preview.9
+- Improve: Detect appropriate dotnet CLI path
+- Add support for .NET 8 Preview 4
+
 v.2.0.0-preview.8
 - Add support for .NET 8
 

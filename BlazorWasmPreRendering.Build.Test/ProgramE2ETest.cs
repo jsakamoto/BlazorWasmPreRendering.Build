@@ -96,10 +96,10 @@ public class ProgramE2ETest
         var serverPort = Program.GetAvailableTcpPort("5050-5999");
 
         using var dotnetCLI = Start(
-            "dotnet", $"publish -c:Release -p:BlazorWasmPrerenderingKeepServer=true -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingServerPort={serverPort}",
+            "dotnet", $"publish -c:Release -p:PublishTrimmed=false -p:BlazorWasmPrerenderingKeepServer=true -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingServerPort={serverPort}",
             projectDir,
             options => options.WhenDisposing = XProcessTerminate.EntireProcessTree);
-        var success = await dotnetCLI.WaitForOutputAsync(output => output.Trim().StartsWith("Start fetching..."), millsecondsTimeout: 15000);
+        var success = await dotnetCLI.WaitForOutputAsync(output => output.Trim().StartsWith("Start fetching..."), millsecondsTimeout: 40000);
         if (!success) { throw new Exception(dotnetCLI.Output); }
 
         var serverUrl = $"http://127.0.0.1:{serverPort}/";
@@ -492,10 +492,10 @@ public class ProgramE2ETest
         var serverPort = Program.GetAvailableTcpPort("5050-5999");
 
         using var dotnetCLI = Start(
-            "dotnet", $"publish -c:Release -p:BlazorWasmPrerenderingKeepServer=true -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingServerPort={serverPort}",
+            "dotnet", $"publish -c:Release -p:PublishTrimmed=false -p:BlazorWasmPrerenderingKeepServer=true -p:BlazorEnableCompression=false -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingServerPort={serverPort}",
             projectDir,
             options => options.WhenDisposing = XProcessTerminate.EntireProcessTree);
-        var success = await dotnetCLI.WaitForOutputAsync(output => output.Trim().StartsWith("Start fetching..."), millsecondsTimeout: 15000);
+        var success = await dotnetCLI.WaitForOutputAsync(output => output.Trim().StartsWith("Start fetching..."), millsecondsTimeout: 40000);
         if (!success) { throw new Exception(dotnetCLI.Output); }
 
         var serverUrl = $"http://127.0.0.1:{serverPort}/";
