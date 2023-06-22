@@ -299,6 +299,89 @@ You can set a comma-separated locale list such as "en", "ja-JP,en-US", etc. thos
     <BlazorWasmPrerenderingLocale>ja-JP,en-US</BlazorWasmPrerenderingLocale>
     ...
 ```
+### Lazy Loading
+When using this in combination with LazyLoading assemblies on a standalone Blazor WASM app, it is beneficial to make sure that all dlls are loaded for your page before the builder runs. In some hosting environments, 'OnNavigatingAsync' will be triggered in the 'Router' Component on your 'App.razor' page after prerendering has complete and your dlls will load correctly. This is my experience with IIS. On others, 'OnNavigatingAsync' will not be triggered and you will have to handle the everything yourself. The best solution is the abstract the LazyLoading done in 'OnNavigatingAsync' into your own 'LazyLoader' service.
+#### Lazy Loader
+```csharp
+public class LazyLoader
+{
+    public static bool UploadDllsLoaded { get; set; }
+    public static List<Assembly> AdditionalAssemblies { get; set; } = new();
+    private static List<string> UploadAssemblies { get; set; } = new() { "System.Linq.Expressions.dll" };
+    private readonly NavigationManager _navigationManager;
+    private readonly LazyAssemblyLoader _lazyAssemblyLoader;
+    public LazyLoader(LazyAssemblyLoader lazyAssemblyLoader, NavigationManager navigationManager)
+    {
+        _lazyAssemblyLoader = lazyAssemblyLoader;
+        _navigationManager = navigationManager;
+    }
+    public async Task OnNavigating()
+    {
+        var uri = NavigationManager?.Uri;
+        try
+        {
+            if (uri?.Contains("Upload") || uri?.Contains("Collection/"))
+            {
+                if (UploadLoaded) return;
+                await _lazyAssemblyLoader.LoadAssembliesAsync(UploadAssemblies);
+                UploadLoaded = true;
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+}
+```
+#### New Router
+```html
+    <Router AppAssembly="@typeof(App).Assembly" OnNavigateAsync="OnNavigateAsync" AdditionalAssemblies="LazyLoader.AdditionalAssemblies">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+        <Navigating >
+            @SplashScreen()
+        </Navigating>
+    </Router>
+@code
+{
+    [Inject] private LazyLoader LazyLoader { get; set; } = null!;
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+        await LazyLoader.OnNavigating();
+    }
+}
+```
+##### New Program.cs
+```csharp
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+if (!builder.RootComponents.Any())
+{
+    builder.RootComponents.Add<App>("#app");
+    builder.RootComponents.Add<HeadOutlet>("head::after");
+}
+ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
+var host = builder.Build();
+var wasmEnvironment = host.Services.GetService<IWebAssemblyHostEnvironment>();
+if (wasmEnvironment?.Environment != "Prerendering")
+{
+    var lazyLoader = host.Services.GetService<LazyLoader>();
+    if (lazyLoader != null)
+    {
+        await lazyLoader.OnNavigating();
+    }
+
+}
+await host.RunAsync();
+```
+Now, your pages will be prerendered and then correctly rendered without any flicker even if it is a page with lazy loaded dlls. Attempting other solutions will result in a runtime exception or a flicker becaase the builder will strip #app, then the dlls will begin to load, then the page will load and throw an exception, or be blank while it waits for dlls to load (flicker).
+
 ## 🛠️Troubleshooting
 
 If any exceptions happen in the prerendering process, the exception messages and stack traces will be shown in the console output of the `dotnet publish` command.
