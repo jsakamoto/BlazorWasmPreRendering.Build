@@ -300,7 +300,7 @@ You can set a comma-separated locale list such as "en", "ja-JP,en-US", etc. thos
     ...
 ```
 ### Lazy Loading
-When using this in combination with LazyLoading assemblies on a standalone Blazor WASM app, it is beneficial to make sure that all dlls are loaded for your page before the builder runs. In some hosting environments, 'OnNavigatingAsync' will be triggered in the 'Router' Component on your 'App.razor' page after prerendering has complete and your dlls will load correctly. This is my experience with IIS. On others, 'OnNavigatingAsync' will not be triggered and you will have to handle the everything yourself. The best solution is the abstract the LazyLoading done in 'OnNavigatingAsync' into your own 'LazyLoader' service.
+When using this in combination with LazyLoading assemblies on an app with 'BlazorWasmPrerenderingMode' set to 'WebAssemblyPrerendered', it is beneficial to make sure that all dlls are loaded before your page before the builder runs. In some hosting environments, 'OnNavigatingAsync' will be triggered on the 'Router' Component in your 'App.razor' page after prerendering has complete and your dlls will load correctly. This is my experience with IIS. On other hosting services, 'OnNavigatingAsync' will not be triggered and you will have to handle dll loading yourself. The current best solution is to abstract the LazyLoading normally done in 'OnNavigatingAsync' into your own 'LazyLoader' service.
 #### Lazy Loader
 ```csharp
 public class LazyLoader
