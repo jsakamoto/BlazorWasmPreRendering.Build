@@ -8,6 +8,12 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
     {
         public string WebRootPath { get; init; } = "";
 
+        /// <summary>
+        /// The directory path where the application's assembly files are located.<br/>
+        /// (ex."/project/bin/Release/net8.0/")
+        /// </summary>
+        public string AssemblyDir { get; init; } = "";
+
         public RenderMode RenderMode { get; init; }
 
         public IndexHtmlFragments IndexHtmlFragments { get; init; } = null!;

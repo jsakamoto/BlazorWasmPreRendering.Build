@@ -7,6 +7,12 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared
     {
         public string? WebRootPath { get; init; }
 
+        /// <summary>
+        /// The directory path where the application's assembly files are located.<br/>
+        /// (ex."/project/bin/Release/net8.0/")
+        /// </summary>
+        public string? AssemblyDir { get; init; }
+
         public string? MiddlewareDllsDir { get; init; }
 
         public List<MiddlewarePackageReference> MiddlewarePackages { get; set; } = new();

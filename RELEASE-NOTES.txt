@@ -1,3 +1,6 @@
+v.3.0.0-preview.1
+- Improve: Add support for .NET 8 Preview 5 (WebCIL format enabled build is now supported).
+
 v.2.0.0-preview.9
 - Improve: Detect appropriate dotnet CLI path
 - Add support for .NET 8 Preview 4

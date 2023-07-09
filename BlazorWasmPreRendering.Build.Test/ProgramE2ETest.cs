@@ -25,12 +25,13 @@ public class ProgramE2ETest
         // When
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
-            "-a", "BlazorWasmApp0",
+            "--assemblyname", "BlazorWasmApp0",
             "-t", "BlazorWasmApp0.App",
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
             "-i", intermediateDir,
+            "--assemblydir", SampleSite.BlazorWasmApp0.TargetDir,
             "-m", "",
             "-f", "net6.0",
             "--emulateauthme", "true"
@@ -57,12 +58,13 @@ public class ProgramE2ETest
         // When
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
-            "-a", "BlazorWasmApp1",
+            "--assemblyname", "BlazorWasmApp1",
             "-t", "BlazorWasmApp1.App",
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
             "-i", intermediateDir,
+            "--assemblydir", SampleSite.BlazorWasmApp1.TargetDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
             "-f", SampleSite.BlazorWasmApp1.TargetFramework,
             "--serverport", tcpPort,
@@ -136,12 +138,13 @@ public class ProgramE2ETest
         // When
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
-            "-a", "BlazorWasmApp1",
+            "--assemblyname", "BlazorWasmApp1",
             "-t", "BlazorWasmApp1.App",
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
             "-i", intermediateDir,
+            "--assemblydir", SampleSite.BlazorWasmApp1.TargetDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
             "-f", SampleSite.BlazorWasmApp1.TargetFramework,
             "-o", "AppendHtmlExtension",
@@ -224,12 +227,13 @@ public class ProgramE2ETest
         // When
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
-            "-a", "BlazorWasmApp2.Client",
+            "--assemblyname", "BlazorWasmApp2.Client",
             "-t", "BlazorWasmApp2.Components.App, BlazorWasmApp2.Components", // INCLUDES ASSEMBLY NAME
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
             "-i", intermediateDir,
+            "--assemblydir", SampleSite.BlazorWasmApp2.TargetDir,
             "-m", "",
             "-f", "net6.0",
             "--serverport", tcpPort,
@@ -265,12 +269,13 @@ public class ProgramE2ETest
         // When
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
-            "-a", "BlazorWasmApp2.Client",
+            "--assemblyname", "BlazorWasmApp2.Client",
             "-t", "BlazorWasmApp2.Client.App", // INVALID TYPE NAME OF ROOT COMPONENT
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
             "-i", intermediateDir,
+            "--assemblydir", SampleSite.BlazorWasmApp2.TargetDir,
             "-m", "",
             "-f", "net6.0",
             "--serverport", tcpPort,
@@ -464,12 +469,13 @@ public class ProgramE2ETest
         // When
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
-            "-a", "BlazorWasmApp0",
+            "--assemblyname", "BlazorWasmApp0",
             "-t", "BlazorWasmApp0.App",
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
             "-i", intermediateDir,
+            "--assemblydir", SampleSite.BlazorWasmApp0.TargetDir,
             "-m", "",
             "-f", "net7.0",
             "--emulateauthme", "true",
