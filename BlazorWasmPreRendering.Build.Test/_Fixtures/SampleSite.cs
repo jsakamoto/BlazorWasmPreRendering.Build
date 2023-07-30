@@ -39,6 +39,12 @@ public class SampleSite : IDisposable
 
     public string ProjectDir { get; } = "";
 
+    /// <summary>
+    /// The directory path where the application's assembly files are located.<br/>
+    /// (ex."/project/bin/Release/net8.0/")
+    /// </summary>
+    public string TargetDir { get; } = "";
+
     private string PublishSrcDir { get; } = "";
 
     private WorkDirectory? SampleAppsWorkDir { get; }
@@ -60,7 +66,8 @@ public class SampleSite : IDisposable
         this.SampleAppsWorkDir = CreateSampleAppsWorkDir();
 
         this.ProjectDir = Path.Combine($"{this.SampleAppsWorkDir}/{projectName}".Split('/'));
-        this.PublishSrcDir = Path.Combine(this.ProjectDir, "bin", this.Configuration, this.TargetFramework, "publish");
+        this.TargetDir = Path.Combine(this.ProjectDir, "bin", this.Configuration, this.TargetFramework);
+        this.PublishSrcDir = Path.Combine(this.TargetDir, "publish");
     }
 
     public async ValueTask<WorkDirectory> PublishAsync()

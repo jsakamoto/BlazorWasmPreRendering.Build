@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorWasmPreRendering.Build" Version="2.0.0-preview.9" />
+    <PackageReference Include="BlazorWasmPreRendering.Build" Version="3.0.0-preview.1" />
     <PackageReference Include="PublishSPAforGitHubPages.Build" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0-preview.4.23260.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0-preview.4.23260.4" PrivateAssets="all" />

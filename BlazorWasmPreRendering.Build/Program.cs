@@ -73,7 +73,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
                 Console.WriteLine("The pre-rendering server will keep running because the \"-k\" option switch is specified.");
                 Console.WriteLine("To stop the pre - rendering server and stop build, press Ctrl + C.");
 
-                ConsoleCancelEventHandler cancelKeyHandler = (object? sender, ConsoleCancelEventArgs args) => CancelKeyHandler(webHostProcess, baseUrl);
+                void cancelKeyHandler(object? sender, ConsoleCancelEventArgs args) => CancelKeyHandler(webHostProcess, baseUrl);
                 Console.CancelKeyPress += cancelKeyHandler;
                 await webHostProcess.WaitForExitAsync();
                 Console.CancelKeyPress -= cancelKeyHandler;
@@ -88,7 +88,8 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
         {
             if (string.IsNullOrEmpty(commandLineOptions.IntermediateDir)) throw new ArgumentException("The -i|--intermediatedir parameter is required.");
             if (string.IsNullOrEmpty(commandLineOptions.PublishedDir)) throw new ArgumentException("The -p|--publisheddir parameter is required.");
-            if (string.IsNullOrEmpty(commandLineOptions.AssemblyName)) throw new ArgumentException("The -a|--assemblyname parameter is required.");
+            if (string.IsNullOrEmpty(commandLineOptions.AssemblyDir)) throw new ArgumentException("The --assemblydir parameter is required.");
+            if (string.IsNullOrEmpty(commandLineOptions.AssemblyName)) throw new ArgumentException("The --assemblyname parameter is required.");
             if (string.IsNullOrEmpty(commandLineOptions.TypeNameOfRootComponent)) throw new ArgumentException("The -t|--typenameofrootcomponent parameter is required.");
             if (string.IsNullOrEmpty(commandLineOptions.SelectorOfRootComponent)) throw new ArgumentException("The --selectorofrootcomponent parameter is required.");
 #if ENABLE_HEADOUTLET
@@ -98,12 +99,10 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
             if (commandLineOptions.RenderMode != RenderMode.Static && commandLineOptions.RenderMode != RenderMode.WebAssemblyPrerendered)
                 throw new ArgumentException($"The -r|--rendermode parameter value \"{commandLineOptions.RenderMode}\" is not supported. (Only \"Static\" and \"WebAssemblyPrerendered\" are supported.)");
 
-            var webRootPath = Path.Combine(commandLineOptions.PublishedDir, "wwwroot");
-            var frameworkDir = Path.Combine(webRootPath, "_framework");
-
-            var middlewarePackages = MiddlewarePackageReferenceBuilder.Build(folderToScan: frameworkDir, commandLineOptions.MiddlewarePackages);
+            var middlewarePackages = MiddlewarePackageReferenceBuilder.Build(folderToScan: commandLineOptions.AssemblyDir, commandLineOptions.MiddlewarePackages);
             var middlewareDllsDir = PrepareMiddlewareDlls(middlewarePackages, commandLineOptions.IntermediateDir, commandLineOptions.FrameworkName);
 
+            var webRootPath = Path.Combine(commandLineOptions.PublishedDir, "wwwroot");
             var indexHtmlPath = Path.Combine(webRootPath, "index.html");
             var enableGZipCompression = File.Exists(indexHtmlPath + ".gz");
             var enableBrotliCompression = File.Exists(indexHtmlPath + ".br");
@@ -121,6 +120,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
             var options = new BlazorWasmPrerenderingOptions
             {
                 WebRootPath = webRootPath,
+                AssemblyDir = commandLineOptions.AssemblyDir,
                 RenderMode = commandLineOptions.RenderMode,
                 IndexHtmlFragments = htmlFragment,
                 DeleteLoadingContents = commandLineOptions.DeleteLoadingContents,
@@ -253,12 +253,13 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
             {
                 FileName = DotNetCLI.Path,
                 ArgumentList = { "exec", webHostDllPath },
-                WorkingDirectory = Path.Combine(prerenderingOptions.WebRootPath, "_framework")
+                WorkingDirectory = prerenderingOptions.AssemblyDir
             };
 
             var webHostOptions = new ServerSideRenderingOptions
             {
                 WebRootPath = prerenderingOptions.WebRootPath,
+                AssemblyDir = prerenderingOptions.AssemblyDir,
                 MiddlewareDllsDir = prerenderingOptions.MiddlewareDllsDir,
                 MiddlewarePackages = prerenderingOptions.MiddlewarePackages,
                 AssemblyName = commandLineOptions.AssemblyName,

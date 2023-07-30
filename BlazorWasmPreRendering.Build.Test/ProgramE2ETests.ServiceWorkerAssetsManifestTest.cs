@@ -20,12 +20,13 @@ public class ServiceWorkerAssetsManifestTest
         // When
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
-            "-a", "BlazorWasmApp0",
+            "--assemblyname", "BlazorWasmApp0",
             "-t", "BlazorWasmApp0.App",
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
             "-i", intermediateDir,
+            "--assemblydir", SampleSite.BlazorWasmApp0.TargetDir,
             "-m", "",
             "-f", "net6.0",
             "--emulateauthme", "true",
@@ -63,12 +64,13 @@ public class ServiceWorkerAssetsManifestTest
         // When
         // Execute prerenderer
         var exitCode = await Program.Main(new[] {
-            "-a", "BlazorWasmApp0",
+            "--assemblyname", "BlazorWasmApp0",
             "-t", "BlazorWasmApp0.App",
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
             "-p", publishDir,
             "-i", intermediateDir,
+            "--assemblydir", SampleSite.BlazorWasmApp0.TargetDir,
             "-m", "",
             "-f", "net6.0",
             "--emulateauthme", "true",

@@ -32,13 +32,14 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
         internal static ServerSideRenderingContext BuildPrerenderingContext(ServerSideRenderingOptions options)
         {
             if (string.IsNullOrEmpty(options.WebRootPath)) throw new ArgumentException("The WebRootPath parameter is required.");
+            if (string.IsNullOrEmpty(options.AssemblyDir)) throw new ArgumentException("The AssemblyDir parameter is required.");
             if (options.MiddlewareDllsDir == null) throw new ArgumentException("The MiddlewareDllsDir parameter is required.");
             if (string.IsNullOrEmpty(options.AssemblyName)) throw new ArgumentException("The AssemblyName parameter is required.");
             if (string.IsNullOrEmpty(options.RootComponentTypeName)) throw new ArgumentException("The RootComponentTypeName parameter is required.");
             if (options.IndexHtmlFragments == null) throw new ArgumentException("The IndexHtmlFragments parameter is required.");
             if (options.MiddlewarePackages == null) throw new ArgumentException("The MiddlewarePackages parameter is required.");
 
-            var assemblyLoader = SetupCustomAssemblyLoader(options.WebRootPath, options.MiddlewareDllsDir, options.BWAPOptionsDllExt);
+            var assemblyLoader = SetupCustomAssemblyLoader(options.WebRootPath, options.AssemblyDir, options.MiddlewareDllsDir, options.BWAPOptionsDllExt);
 
             var appAssembly = assemblyLoader.LoadAssembly(options.AssemblyName);
             if (appAssembly == null) throw new ArgumentException($"The application assembly \"{options.AssemblyName}\" colud not load.");
@@ -105,7 +106,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
             return appComponentType;
         }
 
-        private static CustomAssemblyLoader SetupCustomAssemblyLoader(string webRootPath, string middlewareDllsDir, string? secondaryDllExt)
+        private static CustomAssemblyLoader SetupCustomAssemblyLoader(string webRootPath, string assemblyDir, string middlewareDllsDir, string? secondaryDllExt)
         {
             var xorKey = "bwap";
             var avpSettingsPath = Path.Combine(webRootPath, "avp-settings.json");
@@ -118,8 +119,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 
             var assemblyLoader = new CustomAssemblyLoader(xorKey: xorKey, secondaryDllExt: secondaryDllExt);
 
-            var appAssemblyDir = Path.Combine(webRootPath, "_framework");
-            assemblyLoader.AddSerachDir(appAssemblyDir);
+            assemblyLoader.AddSerachDir(assemblyDir);
 
             if (!string.IsNullOrEmpty(middlewareDllsDir))
                 assemblyLoader.AddSerachDir(middlewareDllsDir);

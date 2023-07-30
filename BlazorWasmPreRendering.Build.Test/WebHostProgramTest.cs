@@ -11,14 +11,16 @@ public class WebHostProgramTest
     {
         // Given
         using var workFolder = new WorkDirectory();
+        File.Copy(Assets.GetAssetPathOf("BlazorWasmApp1.dll"), Path.Combine(workFolder, "BlazorWasmApp1.dll"));
+
         var webRoot = Path.Combine(workFolder, "wwwroot");
-        Directory.CreateDirectory(Path.Combine(webRoot, "_framework"));
-        File.Copy(Assets.GetAssetPathOf("BlazorWasmApp1.dll"), Path.Combine(webRoot, "_framework", "BlazorWasmApp1.dll"));
+        Directory.CreateDirectory(webRoot);
         File.Copy(Assets.GetAssetPathOf("index.html"), Path.Combine(webRoot, "index.html"));
 
         var options = new ServerSideRenderingOptions
         {
             WebRootPath = webRoot,
+            AssemblyDir = workFolder,
             MiddlewareDllsDir = webRoot,
             AssemblyName = "BlazorWasmApp1",
             RootComponentTypeName = "BlazorWasmApp1.App",
