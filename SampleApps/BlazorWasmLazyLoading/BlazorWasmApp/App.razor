@@ -1,0 +1,24 @@
+﻿@*
+  Inject the "LazyLoader" service into the "App" component.
+*@
+@inject LazyLoader LazyLoader
+
+@*
+  Assign the "AdditionalAssemblies" and "OnNavigateAsync" properties of
+  the "LazyLoading" service to the parameters of the "Router" component
+  with the same name.
+*@
+<Router AppAssembly="@typeof(App).Assembly"
+        AdditionalAssemblies="@LazyLoader.AdditionalAssemblies"
+        OnNavigateAsync="@LazyLoader.OnNavigateAsync">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
