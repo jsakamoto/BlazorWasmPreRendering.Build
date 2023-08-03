@@ -300,66 +300,101 @@ You can set a comma-separated locale list such as "en", "ja-JP,en-US", etc. thos
     ...
 ```
 ### Lazy Loading
-When using this in combination with LazyLoading assemblies on an app with 'BlazorWasmPrerenderingMode' set to 'WebAssemblyPrerendered', it is beneficial to make sure that all dlls are loaded before your page before the builder runs. In some hosting environments, 'OnNavigatingAsync' will be triggered on the 'Router' Component in your 'App.razor' page after prerendering has complete and your dlls will load correctly. This is my experience with IIS. On other hosting services, 'OnNavigatingAsync' will not be triggered and you will have to handle dll loading yourself. The current best solution is to abstract the LazyLoading normally done in 'OnNavigatingAsync' into your own 'LazyLoader' service.
-#### Lazy Loader
+
+When using this in combination with LazyLoading assemblies on an app with the `<BlazorWasmPrerenderingMode>` MSBuild property set to `WebAssemblyPrerendered`, it is beneficial to make sure that all dlls are loaded before your page before the builder runs. In some hosting environments, 'OnNavigatingAsync' will be triggered on the `Router` Component in your `App.razor` page after prerendering has complete and your dlls will load correctly. This is my experience with IIS. On other hosting services, `OnNavigatingAsync` will not be triggered and you will have to handle dll loading yourself. The current best solution is to abstract the LazyLoading normally done in `OnNavigatingAsync` into your own `LazyLoader` service.
+
+#### Lazy Loader service (LazyLoader.cs)
+
 ```csharp
+using System.Reflection;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components.WebAssembly.Services;
+
 public class LazyLoader
 {
-    public static bool UploadDllsLoaded { get; set; }
-    public static List<Assembly> AdditionalAssemblies { get; set; } = new();
-    private static List<string> UploadAssemblies { get; set; } = new() { "System.Linq.Expressions.dll" };
-    private readonly NavigationManager _navigationManager;
+    public List<Assembly> AdditionalAssemblies { get; } = new();
+
     private readonly LazyAssemblyLoader _lazyAssemblyLoader;
-    public LazyLoader(LazyAssemblyLoader lazyAssemblyLoader, NavigationManager navigationManager)
+
+    private readonly NavigationManager _navigationManager;
+
+    private readonly ILogger<LazyLoader> _logger;
+
+    public LazyLoader(
+        LazyAssemblyLoader lazyAssemblyLoader,
+        NavigationManager navigationManager,
+        ILogger<LazyLoader> logger)
     {
-        _lazyAssemblyLoader = lazyAssemblyLoader;
-        _navigationManager = navigationManager;
+        this._lazyAssemblyLoader = lazyAssemblyLoader;
+        this._navigationManager = navigationManager;
+        this._logger = logger;
     }
-    public async Task OnNavigating()
+
+    public async Task OnNavigateAsync(NavigationContext context) =>
+        await this.OnNavigateAsync(context.Path.Trim('/'));
+
+    public async Task PreloadAsync()
     {
-        var uri = NavigationManager?.Uri;
+        var uri = new Uri(this._navigationManager.Uri);
+        await this.OnNavigateAsync(uri.LocalPath.Trim('/'));
+    }
+
+    public async Task OnNavigateAsync(string path)
+    {
         try
         {
-            if (uri?.Contains("Upload") || uri?.Contains("Collection/"))
+            // 👇 Load lazy assemblies that are needed for the current URL path. 
+            if (path == "counter")
             {
-                if (UploadLoaded) return;
-                await _lazyAssemblyLoader.LoadAssembliesAsync(UploadAssemblies);
-                UploadLoaded = true;
+                var assemblies = await this._lazyAssemblyLoader
+                    .LoadAssembliesAsync(new[] { "CounterPage.dll" });
+                this.AdditionalAssemblies.AddRange(assemblies);
             }
         }
         catch (Exception ex)
         {
+            this._logger.LogError(ex, "Error loading assemblies");
         }
     }
 }
 ```
-#### New Router
+
+#### New Router (App.razor)
+
 ```html
-    <Router AppAssembly="@typeof(App).Assembly" OnNavigateAsync="OnNavigateAsync" AdditionalAssemblies="LazyLoader.AdditionalAssemblies">
-        <Found Context="routeData">
-            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        </Found>
-        <NotFound>
-            <PageTitle>Not found</PageTitle>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
-            </LayoutView>
-        </NotFound>
-        <Navigating >
-            @SplashScreen()
-        </Navigating>
-    </Router>
-@code
-{
-    [Inject] private LazyLoader LazyLoader { get; set; } = null!;
-    private async Task OnNavigateAsync(NavigationContext args)
-    {
-        await LazyLoader.OnNavigating();
-    }
-}
+@*
+  Inject the "LazyLoader" service into the "App" component.
+*@
+@inject LazyLoader LazyLoader
+
+@*
+  Assign the "AdditionalAssemblies" and "OnNavigateAsync" properties of
+  the "LazyLoading" service to the parameters of the "Router" component
+  with the same name.
+*@
+<Router AppAssembly="@typeof(App).Assembly"
+        AdditionalAssemblies="@LazyLoader.AdditionalAssemblies"
+        OnNavigateAsync="@LazyLoader.OnNavigateAsync">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
 ```
+
 ##### New Program.cs
+
 ```csharp
+using BlazorWasmApp;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 if (!builder.RootComponents.Any())
 {
@@ -368,18 +403,25 @@ if (!builder.RootComponents.Any())
 }
 ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
 var host = builder.Build();
-var wasmEnvironment = host.Services.GetService<IWebAssemblyHostEnvironment>();
-if (wasmEnvironment?.Environment != "Prerendering")
-{
-    var lazyLoader = host.Services.GetService<LazyLoader>();
-    if (lazyLoader != null)
-    {
-        await lazyLoader.OnNavigating();
-    }
 
-}
+// 👇 Invoke the "PreloadAsync" method of the "LazyLoader" service
+//    to preload lazy assemblies needed for the current URL path before running.
+var lazyLoader = host.Services.GetRequiredService<LazyLoader>();
+await lazyLoader.PreloadAsync();
+
 await host.RunAsync();
+
+static void ConfigureServices(IServiceCollection services, string baseAddress)
+{
+    // 👇 Register the "LazyLoader" service
+    services.AddSingleton<LazyLoader>();
+
+    services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
+}
 ```
+
+> You can reference the complete sample code [here](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/tree/master/SampleApps/BlazorWasmLazyLoading)
+
 Now, your pages will be prerendered and then correctly rendered without any flicker even if it is a page with lazy loaded dlls. Attempting other solutions will result in a runtime exception or a flicker becaase the builder will strip #app, then the dlls will begin to load, then the page will load and throw an exception, or be blank while it waits for dlls to load (flicker).
 
 ## 🛠️Troubleshooting
