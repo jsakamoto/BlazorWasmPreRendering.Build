@@ -299,9 +299,10 @@ You can set a comma-separated locale list such as "en", "ja-JP,en-US", etc. thos
     <BlazorWasmPrerenderingLocale>ja-JP,en-US</BlazorWasmPrerenderingLocale>
     ...
 ```
-### Lazy Loading
 
-When using this in combination with LazyLoading assemblies on an app with the `<BlazorWasmPrerenderingMode>` MSBuild property set to `WebAssemblyPrerendered`, it is beneficial to make sure that all dlls are loaded before your page before the builder runs. In some hosting environments, 'OnNavigatingAsync' will be triggered on the `Router` Component in your `App.razor` page after prerendering has complete and your dlls will load correctly. This is my experience with IIS. On other hosting services, `OnNavigatingAsync` will not be triggered and you will have to handle dll loading yourself. The current best solution is to abstract the LazyLoading normally done in `OnNavigatingAsync` into your own `LazyLoader` service.
+### To avoid flicker with Lazy Assembly Loading
+
+When using this in combination with Lazy Loading assemblies on an app with the `<BlazorWasmPrerenderingMode>` MSBuild property set to `WebAssemblyPrerendered`, it is beneficial to make sure that all required assemblies are loaded before your page runs. In some hosting environments, 'OnNavigatingAsync' will be triggered on the `Router` Component in your `App.razor` page after completing prerendering, and your assemblies will load correctly. This is my experience with IIS. On other hosting services, `OnNavigatingAsync` will not be triggered, and you will have to handle assembly loading yourself. The current best solution is to abstract the lazy loading normally done in `OnNavigatingAsync` into your own `LazyLoader` service.
 
 #### Lazy Loader service (LazyLoader.cs)
 
@@ -422,7 +423,7 @@ static void ConfigureServices(IServiceCollection services, string baseAddress)
 
 > You can reference the complete sample code [here](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/tree/master/SampleApps/BlazorWasmLazyLoading)
 
-Now, your pages will be prerendered and then correctly rendered without any flicker even if it is a page with lazy loaded dlls. Attempting other solutions will result in a runtime exception or a flicker becaase the builder will strip #app, then the dlls will begin to load, then the page will load and throw an exception, or be blank while it waits for dlls to load (flicker).
+Now, your pages will be prerendered and then correctly rendered without any flicker, even if it is a page with lazy-loaded assemblies. Attempting other solutions will result in a runtime exception or a flicker because the builder will strip #app, then the assemblies will begin to load, then the page will load and throw an exception or be blank while it waits for assemblies to load (flicker).
 
 ## 🛠️Troubleshooting
 
