@@ -14,10 +14,6 @@
   <!-- Version, Author, Copyright, Description are defined in the VersionInfo.props -->
   <Import Project="../VersionInfo.props" />
 
-  <ItemGroup>
-    <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
-  </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.0" />
   </ItemGroup>
@@ -32,12 +28,6 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0-preview.6.*" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="bundleconfig.json" />
-    <None Include="bundleconfig.json" />
-    <EmbeddedResource Include="Scripts\*" />
   </ItemGroup>
 
   <ItemGroup>

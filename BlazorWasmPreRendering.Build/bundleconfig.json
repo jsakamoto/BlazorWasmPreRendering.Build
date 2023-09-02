@@ -1,0 +1,8 @@
+[
+  {
+    "outputFileName": "StaticWebAssets/BlazorWasmPreRendering.Build.lib.module.min.js",
+    "inputFiles": [
+      "StaticWebAssets/BlazorWasmPreRendering.Build.lib.module.js"
+    ]
+  }
+]

@@ -27,7 +27,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="bundleconfig.json" />
+    <None Include="bundleconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.16.1" />
+    <PackageReference Include="BuildBundlerMinifier2022" Version="2.9.9" />
     <PackageReference Include="CommandLineSwitchParser" Version="1.1.0" />
     <PackageReference Include="XProcess" Version="1.3.0" />
     <PackageReference Include="NuGet.Versioning" Version="6.3.1" />

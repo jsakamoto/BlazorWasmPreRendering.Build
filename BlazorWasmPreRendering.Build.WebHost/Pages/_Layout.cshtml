@@ -2,12 +2,10 @@
 @using Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @inject ServerSideRenderingContext PrerenderingContext
-@inject ResetHeadOutletScript ResetHeadOutletScript
 @Html.Raw(PrerenderingContext.IndexHtmlFragments.FirstPart)
 @if (PrerenderingContext.HeadOutletComponentType != null) {<!-- %%-PRERENDERING-HEADOUTLET-BEGIN-%% -->
 <component type="PrerenderingContext.HeadOutletComponentType" render-mode="@PrerenderingContext.RenderMode" />
 <!-- %%-PRERENDERING-HEADOUTLET-END-%% -->
-@if (PrerenderingContext.RenderMode != Microsoft.AspNetCore.Mvc.Rendering.RenderMode.WebAssemblyPrerendered) {<script src="data:text/javascript;base64,@ResetHeadOutletScript.Base64Text"></script>}
 }
 @Html.Raw(PrerenderingContext.IndexHtmlFragments.MiddlePart)
 <!-- %%-PRERENDERING-BEGIN-%% -->

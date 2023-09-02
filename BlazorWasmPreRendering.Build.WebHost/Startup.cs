@@ -53,7 +53,6 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddLocalization();
-            services.AddSingleton<ResetHeadOutletScript>();
             services.TryAddScoped<LazyAssemblyLoader>();
 
             var jsruntimeDescriptor = services.FirstOrDefault(sd => sd.ServiceType == typeof(IJSRuntime));

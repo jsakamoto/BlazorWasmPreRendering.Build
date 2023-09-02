@@ -1,0 +1,1 @@
+export const afterStarted=()=>{((n,t,i)=>{for(var u=n.createNodeIterator(n.head,128),r,f;u.nextNode();)if(r=u.referenceNode,t.test(r.textContent.trim())){while(i=r.nextSibling)if(f=i.textContent.trim(),i.remove(),t.test(f))break;r.remove();break}})(document,/^%%-PRERENDERING-HEADOUTLET-(BEGIN|END)-%%$/)};
