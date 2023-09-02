@@ -1,3 +1,7 @@
+v.3.1.0-preview.1
+- Fix: Google Crawler could not recognize the pre-rendered header elements. (Issue #26)
+- Improve: Enabling the "data:" script source is no longer required when specifying a Content Security Policy (CSP).
+
 v.3.0.0-preview.2
 - Update README: Add the instructions to avoid flicker with Lazy Assembly Loading
 - Add support for .NET 8 Preview 6
