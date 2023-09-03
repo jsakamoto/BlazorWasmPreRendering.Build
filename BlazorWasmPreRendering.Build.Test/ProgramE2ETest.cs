@@ -342,6 +342,32 @@ public class ProgramE2ETest
         }
     }
 
+    [Test, Platform("Win")]
+    public async Task Publish_by_native_msbuild_Test()
+    {
+        // Given
+        var processorArchitecture = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE")?.ToLower() ?? ".";
+        var vsInstallDir = Environment.GetEnvironmentVariable("VSINSTALLDIR");
+        if (vsInstallDir == null) Assert.Inconclusive(@"This test requires Visual Studio and the definition of the ""VSINSTALLDIR"" environment variable to point out the directory where Visual Studio is installed. (ex: VSINSTALLDIR=C:\Program Files\Microsoft Visual Studio\2022\Community\)");
+        var msbuildPath = Path.Combine(vsInstallDir, "MSBuild", "Current", "Bin", processorArchitecture, "MSBuild.exe");
+
+        using var workDir = SampleSite.CreateSampleAppsWorkDir();
+        var app0Dir = Path.Combine(workDir, "BlazorWasmApp0");
+
+        // When
+        await Start("dotnet", "restore", app0Dir).WaitForExitAsync();
+        var msbuild = await Start(msbuildPath,
+            "-p:Configuration=Debug -p:BlazorEnableCompression=false -p:DeployOnBuild=true -p:PublishUrl=bin/publish",
+            app0Dir).WaitForExitAsync();
+        msbuild.ExitCode.Is(0, message: msbuild.StdOutput + msbuild.StdError);
+
+        // Then
+
+        // Validate prerendered contents.
+        var wwwrootDir = Path.Combine(app0Dir, "bin", "publish", "wwwroot");
+        ValidatePrerenderedContentsOfApp0(wwwrootDir);
+    }
+
     [Test]
     public async Task Publish_by_msbuild_Test()
     {
