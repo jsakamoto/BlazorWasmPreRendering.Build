@@ -1,3 +1,6 @@
+v.3.1.0-preview.2
+- Fix: The publishing process on Visual Studio IDE was failed.
+
 v.3.1.0-preview.1
 - Fix: Google Crawler could not recognize the pre-rendered header elements. (Issue #26)
 - Improve: Enabling the "data:" script source is no longer required when specifying a Content Security Policy (CSP).

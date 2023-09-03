@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <Version>3.1.0-preview.1</Version>
+    <Version>3.1.0-preview.2</Version>
     <Authors>J.Sakamoto</Authors>
     <Copyright>Copyright © 2021-2023 J.Sakamoto, Mozilla Public License 2.0</Copyright>
     <Description>When you publish your Blazor Wasm app, this package pre-renders and saves the app as static HTML files in your public folder.</Description>
