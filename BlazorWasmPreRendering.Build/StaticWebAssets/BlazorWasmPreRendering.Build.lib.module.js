@@ -1,17 +1,18 @@
 export const afterStarted = () => {
-    ((document, marker, nextSibling) => {
-        var nodeIterator = document.createNodeIterator(document.head, 128/*NodeFilter.SHOW_COMMENT*/);
+    if (typeof WorkerGlobalScope !== "undefined") return;
+    ((document, test, nextSibling, nodeIterator, node) => {
+        nodeIterator = document.createNodeIterator(document.head, 128/*NodeFilter.SHOW_COMMENT*/);
         while (nodeIterator.nextNode()) {
-            var node = nodeIterator.referenceNode;
-            if (marker.test(node.textContent.trim())) {
-                while (nextSibling = node.nextSibling) {
-                    var textContent = nextSibling.textContent.trim();
+            node = nodeIterator.referenceNode;
+            if (test(node)) {
+                do {
+                    nextSibling = node.nextSibling
                     nextSibling.remove();
-                    if (marker.test(textContent)) break;
-                }
+                } while (!test(nextSibling));
                 node.remove();
                 break;
             }
         }
-    })(document, /^%%-PRERENDERING-HEADOUTLET-(BEGIN|END)-%%$/);
+        Array.from(document.querySelectorAll('script')).pop()?.remove();
+    })(document, node => /^%%-PRERENDERING-HEADOUTLET-(BEGIN|END)-%%$/.test(node.textContent.trim()));
 }
