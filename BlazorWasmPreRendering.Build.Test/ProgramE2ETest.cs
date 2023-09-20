@@ -347,9 +347,9 @@ public class ProgramE2ETest
     {
         // Given
         var processorArchitecture = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE")?.ToLower() ?? ".";
-        var vsInstallDir = Environment.GetEnvironmentVariable("VSINSTALLDIR");
-        if (vsInstallDir == null) Assert.Inconclusive(@"This test requires Visual Studio and the definition of the ""VSINSTALLDIR"" environment variable to point out the directory where Visual Studio is installed. (ex: VSINSTALLDIR=C:\Program Files\Microsoft Visual Studio\2022\Community\)");
-        var msbuildPath = Path.Combine(vsInstallDir, "MSBuild", "Current", "Bin", processorArchitecture, "MSBuild.exe");
+        var vsAppDir = Environment.GetEnvironmentVariable("VSAPPIDDIR");
+        if (vsAppDir == null) Assert.Inconclusive(@"This test requires Visual Studio and the definition of the ""VSAPPIDDIR"" environment variable to point out the directory where Visual Studio is installed. (ex: VSINSTALLDIR=C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE)");
+        var msbuildPath = Path.GetFullPath(Path.Combine(vsAppDir, "..", "..", "MSBuild", "Current", "Bin", processorArchitecture, "MSBuild.exe"));
 
         using var workDir = SampleSite.CreateSampleAppsWorkDir();
         var app0Dir = Path.Combine(workDir, "BlazorWasmApp0");
