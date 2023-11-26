@@ -47,7 +47,7 @@ public class ProgramE2ETest
     [TestCase(true)]
     [TestCase(false)]
     [Parallelizable(ParallelScope.Children)]
-    public async Task Including_ServerSide_Middleware_Legacy_TestAsync(bool deleteLoadingContents)
+    public async Task Including_ServerSide_Middleware_Legacy_TestAsync(bool shouldDeleteLoadingContents)
     {
         // Given
         // Publish the sample app which sets its titles by Toolbelt.Blazor.HeadElement
@@ -68,7 +68,7 @@ public class ProgramE2ETest
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
             "-f", SampleSite.BlazorWasmApp1.TargetFramework,
             "--serverport", tcpPort,
-            deleteLoadingContents ? "-d" : ""
+            shouldDeleteLoadingContents ? "-d" : ""
         });
         exitCode.Is(0);
 
@@ -77,17 +77,25 @@ public class ProgramE2ETest
         // Validate prerendered contents.
 
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        var expectedHtmlFiles = GetFullPathList(wwwrootDir, "about/.net/index.html", "counter/index.html", "fetchdata/index.html", "index.html");
+        var expectedHtmlFiles = GetFullPathList(baseDir: wwwrootDir, pathList: [
+            "about/.net/index.html",
+            "about/index.html",
+            "counter/index.html",
+            "fetchdata/index.html",
+            "index.html",
+            "lazy-loading-page/index.html"]);
 
         var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
         actualHtmlFiles.Is(expectedHtmlFiles);
 
         // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
         const string loadingContents = "Loading...";
-        Validate(actualHtmlFiles[3], loadingContents, title_is: "Home", h1_is: "Hello, world!", deleteLoadingContents);
-        Validate(actualHtmlFiles[1], loadingContents, title_is: "Counter", h1_is: "Counter", deleteLoadingContents);
-        Validate(actualHtmlFiles[2], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", deleteLoadingContents);
-        Validate(actualHtmlFiles[0], loadingContents, title_is: "About .NET", h1_is: "About .NET", deleteLoadingContents);
+        Validate(actualHtmlFiles[4], loadingContents, title_is: "Home", h1_is: "Hello, world!", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[2], loadingContents, title_is: "Counter", h1_is: "Counter", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[3], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[0], loadingContents, title_is: "About .NET", h1_is: "About .NET", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[5], loadingContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[1], loadingContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.", shouldDeleteLoadingContents);
     }
 
     [Test]
@@ -128,7 +136,7 @@ public class ProgramE2ETest
     [TestCase(true)]
     [TestCase(false)]
     [Parallelizable(ParallelScope.Children)]
-    public async Task Including_EasterEggPage_TestAsync(bool deleteLoadingContents)
+    public async Task Including_EasterEggPage_TestAsync(bool shouldDeleteLoadingContents)
     {
         // Given
         using var intermediateDir = new WorkDirectory();
@@ -150,7 +158,7 @@ public class ProgramE2ETest
             "-o", "AppendHtmlExtension",
             "-u", "/easter-egg",
             "--serverport", tcpPort,
-            deleteLoadingContents? "-d" : ""
+            shouldDeleteLoadingContents? "-d" : ""
         });
         exitCode.Is(0);
 
@@ -159,18 +167,27 @@ public class ProgramE2ETest
         // Validate prerendered contents.
 
         var wwwrootDir = Path.Combine(publishDir, "wwwroot");
-        var expectedHtmlFiles = GetFullPathList(wwwrootDir, "about/.net.html", "counter.html", "easter-egg.html", "fetchdata.html", "index.html");
+        var expectedHtmlFiles = GetFullPathList(baseDir: wwwrootDir, pathList: [
+            "about.html",
+            "about/.net.html",
+            "counter.html",
+            "easter-egg.html",
+            "fetchdata.html",
+            "index.html",
+            "lazy-loading-page.html"]);
 
         var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
         actualHtmlFiles.Is(expectedHtmlFiles);
 
         // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
         const string loadingContents = "Loading...";
-        Validate(actualHtmlFiles[4], loadingContents, title_is: "Home", h1_is: "Hello, world!", deleteLoadingContents);
-        Validate(actualHtmlFiles[1], loadingContents, title_is: "Counter", h1_is: "Counter", deleteLoadingContents);
-        Validate(actualHtmlFiles[3], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", deleteLoadingContents);
-        Validate(actualHtmlFiles[0], loadingContents, title_is: "About .NET", h1_is: "About .NET", deleteLoadingContents);
-        Validate(actualHtmlFiles[2], loadingContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!", deleteLoadingContents);
+        Validate(actualHtmlFiles[5], loadingContents, title_is: "Home", h1_is: "Hello, world!", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[2], loadingContents, title_is: "Counter", h1_is: "Counter", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[4], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[1], loadingContents, title_is: "About .NET", h1_is: "About .NET", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[6], loadingContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[0], loadingContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[3], loadingContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!", shouldDeleteLoadingContents);
     }
 
     private static string[] GetFullPathList(string baseDir, params string[] pathList)

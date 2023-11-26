@@ -12,7 +12,7 @@
 |Deploy to GitHub Pages| -         | ✅ Yes           | -
 |Has AngleSharp dependency| ✅Yes  | -                | -
 |Localization       | ✅ Yes       | -                | -
-|Lazy Load Assembly | ✅ Yes       | -                | -
+|Lazy Load Assembly | ✅ Yes       | ✅ Yes           | -
 
 ## Appendix
 

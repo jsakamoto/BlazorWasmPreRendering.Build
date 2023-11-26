@@ -20,4 +20,12 @@
     <PackageReference Include="Toolbelt.Blazor.HeadElement" Version="7.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RazorClassLib2\RazorClassLib2.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <BlazorWebAssemblyLazyLoad Include="RazorClassLib2.wasm" />
+  </ItemGroup>
+
 </Project>

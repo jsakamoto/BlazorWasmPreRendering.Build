@@ -1,10 +1,28 @@
-﻿<Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Services
+@using System.Reflection
+@inject LazyAssemblyLoader AssemblyLoader
+
+<Router AppAssembly="@typeof(Program).Assembly" OnNavigateAsync="OnNavigateAsync" AdditionalAssemblies="_LazyLoadedAssemblies">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
     </Found>
     <NotFound>
         <LayoutView Layout="@typeof(MainLayout)">
-            <p>Sorry, there's nothing at this address.</p>
+            <h1>Sorry, there's nothing at this address.</h1>
         </LayoutView>
     </NotFound>
 </Router>
+
+@code
+{
+    private readonly List<Assembly> _LazyLoadedAssemblies = new();
+
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+        if (args.Path.Contains("lazy-loading-page", StringComparison.OrdinalIgnoreCase))
+        {
+            var assembly = await AssemblyLoader.LoadAssembliesAsync(new[] { "RazorClassLib2.wasm" });
+            _LazyLoadedAssemblies.AddRange(assembly);
+        }
+    }
+}
