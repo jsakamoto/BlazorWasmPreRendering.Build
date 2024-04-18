@@ -1,8 +1,7 @@
-﻿namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
+﻿namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build;
+
+public enum OutputStyle
 {
-    public enum OutputStyle
-    {
-        IndexHtmlInSubFolders,
-        AppendHtmlExtension
-    }
+    IndexHtmlInSubFolders,
+    AppendHtmlExtension
 }

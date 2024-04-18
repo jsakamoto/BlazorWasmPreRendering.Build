@@ -1,40 +1,36 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
-namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
+namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost;
+
+public class ServerSideRenderingContext
 {
-    public class ServerSideRenderingContext
-    {
-        public CustomAssemblyLoader AssemblyLoader { get; init; } = null!;
+    public CustomAssemblyLoader AssemblyLoader { get; init; } = null!;
 
-        public string WebRootPath { get; init; } = "";
+    public string WebRootPath { get; init; } = "";
 
-        public Assembly ApplicationAssembly { get; init; } = null!;
+    public Assembly ApplicationAssembly { get; init; } = null!;
 
-        public IEnumerable<MiddlewarePackageReference> MiddlewarePackages { get; init; } = Enumerable.Empty<MiddlewarePackageReference>();
+    public IEnumerable<MiddlewarePackageReference> MiddlewarePackages { get; init; } = Enumerable.Empty<MiddlewarePackageReference>();
 
 
-        public Type RootComponentType { get; init; } = null!;
+    public Type RootComponentType { get; init; } = null!;
 
-        public Type? HeadOutletComponentType { get; init; } = null;
+    public Type? HeadOutletComponentType { get; init; } = null;
 
-        public RenderMode RenderMode { get; init; }
+    public RenderMode RenderMode { get; init; }
 
-        public IndexHtmlFragments IndexHtmlFragments { get; init; } = null!;
+    public IndexHtmlFragments IndexHtmlFragments { get; init; } = null!;
 
-        public bool DeleteLoadingContents { get; init; }
+    public bool DeleteLoadingContents { get; init; }
 
 
-        public string? Environment { get; init; }
+    public string? Environment { get; init; }
 
-        public bool EmulateAuthMe { get; init; }
+    public bool EmulateAuthMe { get; init; }
 
-        public string[] Locales { get; init; } = new string[0];
+    public string[] Locales { get; init; } = new string[0];
 
-        public int ServerPort { get; init; }
-    }
+    public int ServerPort { get; init; }
 }

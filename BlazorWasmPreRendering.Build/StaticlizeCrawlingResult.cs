@@ -1,14 +1,11 @@
-﻿using System;
+﻿namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build;
 
-namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
+[Flags]
+internal enum StaticlizeCrawlingResult
 {
-    [Flags]
-    internal enum StaticlizeCrawlingResult
-    {
-        Nothing = 0b_0000_0001,
-        HasWarnings = 0b_0000_0010,
-        HasErrors = 0b_0000_0100,
-        HasErrorsOfServiceNotRegistered = 0b_0000_1000,
-        HasErrorsOfJSInvokeOnServer = 0b_0001_0000,
-    }
+    Nothing = 0b_0000_0001,
+    HasWarnings = 0b_0000_0010,
+    HasErrors = 0b_0000_0100,
+    HasErrorsOfServiceNotRegistered = 0b_0000_1000,
+    HasErrorsOfJSInvokeOnServer = 0b_0001_0000,
 }

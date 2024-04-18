@@ -1,9 +1,8 @@
-﻿namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Models
-{
-    public class AssetsManifestFileEntry
-    {
-        public string? url { get; set; }
+﻿namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Models;
 
-        public string? hash { get; set; }
-    }
+public class AssetsManifestFileEntry
+{
+    public string? url { get; set; }
+
+    public string? hash { get; set; }
 }

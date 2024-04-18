@@ -1,7 +1,6 @@
-﻿namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared
+﻿namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
+
+public static class Constants
 {
-    public static class Constants
-    {
-        public const string ConfigurationPrefix = "PRERENDERING_";
-    }
+    public const string ConfigurationPrefix = "PRERENDERING_";
 }

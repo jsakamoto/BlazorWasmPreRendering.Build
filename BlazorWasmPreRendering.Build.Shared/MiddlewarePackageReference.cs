@@ -1,13 +1,12 @@
-﻿namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared
+﻿namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
+
+public class MiddlewarePackageReference
 {
-    public class MiddlewarePackageReference
-    {
-        public string PackageIdentity { get; init; } = "";
+    public string PackageIdentity { get; init; } = "";
 
-        public string Assembly { get; init; } = "";
+    public string Assembly { get; init; } = "";
 
-        public string Version { get; init; } = "";
+    public string Version { get; init; } = "";
 
-        public override string ToString() => $"{this.PackageIdentity},{this.Assembly},{this.Version}";
-    }
+    public override string ToString() => $"{this.PackageIdentity},{this.Assembly},{this.Version}";
 }
