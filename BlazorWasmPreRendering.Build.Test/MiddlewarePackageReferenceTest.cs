@@ -23,10 +23,9 @@ public class MiddlewarePackageReferenceTest
     {
         // Given
         using var publishDir = await SampleSite.BlazorWasmApp0.PublishAsync();
-        var frameworkDir = Path.Combine(publishDir, "wwwroot", "_framework");
 
         // When
-        var middlewarePackages = MiddlewarePackageReferenceBuilder.Build(folderToScan: frameworkDir, "");
+        var middlewarePackages = MiddlewarePackageReferenceBuilder.Build(folderToScan: SampleSite.BlazorWasmApp0.TargetDir, "");
 
         // Then
         middlewarePackages
@@ -41,11 +40,10 @@ public class MiddlewarePackageReferenceTest
     {
         // Given
         using var publishDir = await SampleSite.BlazorWasmApp0.PublishAsync();
-        var frameworkDir = Path.Combine(publishDir, "wwwroot", "_framework");
 
         // When
         var middlewarePackages = MiddlewarePackageReferenceBuilder.Build(
-            folderToScan: frameworkDir,
+            folderToScan: SampleSite.BlazorWasmApp0.TargetDir,
             "MiddlewarePackage2,,2.0.0-beta.2;MiddlewarePackage1,Middleware1,1.2.0-preview.1");
 
         // Then

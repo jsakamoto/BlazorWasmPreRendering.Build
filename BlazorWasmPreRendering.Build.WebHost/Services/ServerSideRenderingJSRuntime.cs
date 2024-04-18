@@ -10,7 +10,10 @@ using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 
 namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost.Services
 {
-    internal class ServerSideRenderingJSRuntime : IJSRuntime, IJSUnmarshalledRuntime
+    internal class ServerSideRenderingJSRuntime : IJSRuntime
+#if !NET9_0_OR_GREATER
+        , IJSUnmarshalledRuntime
+#endif
     {
         private const string GetLazyAssemblies = "window.Blazor._internal.getLazyAssemblies";
         private const string ReadLazyAssemblies = "window.Blazor._internal.readLazyAssemblies";

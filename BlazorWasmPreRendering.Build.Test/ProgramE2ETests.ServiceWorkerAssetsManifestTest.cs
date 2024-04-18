@@ -19,7 +19,7 @@ public class ServiceWorkerAssetsManifestTest
 
         // When
         // Execute prerenderer
-        var exitCode = await Program.Main(new[] {
+        var exitCode = await Program.Main([
             "--assemblyname", "BlazorWasmApp0",
             "-t", "BlazorWasmApp0.App",
             "--selectorofrootcomponent", "#app,app",
@@ -28,11 +28,11 @@ public class ServiceWorkerAssetsManifestTest
             "-i", intermediateDir,
             "--assemblydir", SampleSite.BlazorWasmApp0.TargetDir,
             "-m", "",
-            "-f", "net6.0",
+            "-f", "net8.0",
             "--emulateauthme", "true",
             "-o", "IndexHtmlInSubFolders",
             "--serviceworkerassetsmanifest", "my-assets.js",
-        });
+        ]);
         exitCode.Is(0);
 
         // Then
@@ -63,7 +63,7 @@ public class ServiceWorkerAssetsManifestTest
 
         // When
         // Execute prerenderer
-        var exitCode = await Program.Main(new[] {
+        var exitCode = await Program.Main([
             "--assemblyname", "BlazorWasmApp0",
             "-t", "BlazorWasmApp0.App",
             "--selectorofrootcomponent", "#app,app",
@@ -72,11 +72,11 @@ public class ServiceWorkerAssetsManifestTest
             "-i", intermediateDir,
             "--assemblydir", SampleSite.BlazorWasmApp0.TargetDir,
             "-m", "",
-            "-f", "net6.0",
+            "-f", "net8.0",
             "--emulateauthme", "true",
             "-o", "AppendHtmlExtension",
             "--serviceworkerassetsmanifest", "my-assets.js",
-        });
+        ]);
         exitCode.Is(0);
 
         // Then

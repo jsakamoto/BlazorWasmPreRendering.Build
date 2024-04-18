@@ -22,6 +22,7 @@
         if (args.Path.Contains("lazy-loading-page", StringComparison.OrdinalIgnoreCase))
         {
             var assembly = await AssemblyLoader.LoadAssembliesAsync(new[] { "RazorClassLib2.wasm" });
+            Console.WriteLine($"Loaded Assemblies (Count: {assembly.Count()})");
             _LazyLoadedAssemblies.AddRange(assembly);
         }
     }
