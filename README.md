@@ -1,4 +1,6 @@
-﻿# BlazorWasmPreRendering.Build [![NuGet Package](https://img.shields.io/nuget/v/BlazorWasmPreRendering.Build.svg)](https://www.nuget.org/packages/BlazorWasmPreRendering.Build/)
+﻿# BlazorWasmPreRendering.Build
+
+[![NuGet Package](https://img.shields.io/nuget/v/BlazorWasmPreRendering.Build.svg)](https://www.nuget.org/packages/BlazorWasmPreRendering.Build/) [![Discord](https://img.shields.io/discord/798312431893348414?style=flat&logo=discord&logoColor=white&label=Blazor%20Community&labelColor=5865f2&color=gray)](https://discord.com/channels/798312431893348414/1202165955900473375)
 
 ## 📝Summary
 
@@ -17,7 +19,7 @@ This will help make the contents of your Blazor WebAssembly static apps findable
 Install this package to your Blazor WebAssembly project.
 
 ```
-dotnet add package BlazorWasmPreRendering.Build --prerelease
+dotnet add package BlazorWasmPreRendering.Build
 ```
 
 Basically, **that's all**.
@@ -28,56 +30,14 @@ Basically, **that's all**.
 
 ### Services registration
 
-If you are registering any services (except HttpClient that isn't specially configured) to the service provider at the startup of your Blazor WebAssembly app, please extract that process to the static method named `static void ConfigureServices(IServiceCollection services, string baseAddress)`.
+In the `Program.cs` of your Blazor WebAssembly app, you must extract the service registration part into the static local function named `static void ConfigureServices(IServiceCollection services, string baseAddress)`, like below.
 
 ```csharp
-public class Program
-{
-  public static async Task Main(string[] args)
-  {
-    var builder = WebAssemblyHostBuilder.CreateDefault(args);
-    builder.RootComponents.Add<App>("#app");
-
-    // 👇 Extract service registration...
-    services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
-    services.AddScoped<IFoo, MyFoo>();
-
-    await builder.Build().RunAsync();
-  }
-}
-```
-
-```csharp
-public class Program
-{
-  public static async Task Main(string[] args)
-  {
-    var builder = WebAssemblyHostBuilder.CreateDefault(args);
-    builder.RootComponents.Add<App>("#app");
-
-    ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
-
-    await builder.Build().RunAsync();
-  }
-
-  // 👇 ... to this named static method.
-  private static void ConfigureServices(IServiceCollection services, string baseAddress)
-  {
-    services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
-    services.AddScoped<IFoo, MyFoo>();
-  }
-}
-```
-
-And, if you implement the entry point as C# 9 top-level statement style, then you have to also extract the service-registration process to the static local function named `static void ConfigureServices(IServiceCollection services, string baseAddress)`.
-
-> _**NOTICE:** The "ConfigureServices" local function must be **"static"** local function._
-
-```csharp
-// The "Program.cs" that is C# 9 top-level statement style entry point.
+// Program.cs
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
 
 ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
 
@@ -91,15 +51,13 @@ static void ConfigureServices(IServiceCollection services, string baseAddress)
 }
 ```
 
-> _Aside: C# 9 top-level statement style entry point can be used for only .NET6 or above._
+This package calls the `ConfigureServices(...)` static local function inside of your Blazor WebAssembly app when the pre-rendering process starts if that function exists.
 
-This package calls the `ConfigureServices()` static method (or static local function) inside of your Blazor WebAssembly app when pre-renders it if that method exists.
+This is important for your Blazor WebAssembly components to work fine in the pre-rendering process.
 
-This is important to your Blazor WebAssembly components work fine in the pre-rendering process.
+#### Note: other arguments of ConfigureServices() function
 
-#### Note: other arguments of ConfigureServices() method
-
-The `ConfigureServices()` method can also have an `IConfiguration` argument reflected with the contents of the `wwwroot/appsetting.json` JSON file.
+The `ConfigureServices(...)` static local function can also have an `IConfiguration` argument that reflects the contents of the `wwwroot/appsetting.json` JSON file.
 
 ### Root component type and selector
 
@@ -235,7 +193,7 @@ To support that case, please **set the URL path list that you want to fetch expl
 
 As you may know, this package is based on the standard ASP.NET Core Blazor server-side prerendering support.
 
-- See also: ["Prerender and integrate ASP.NET Core Razor components | Microsoft Docs"](https://docs.microsoft.com/en-us/aspnet/core/blazor/components/prerendering-and-integration?view=aspnetcore-6.0&pivots=webassembly)
+- See also: ["Prerender and integrate ASP.NET Core Razor components | Microsoft Learn"](https://learn.microsoft.com/aspnet/core/blazor/components/prerendering-and-integration?pivots=webassembly)
 
 By default, the render mode of prerendering is `Static`.  
 And, **you can specify the render mode to `WebAssemblyPrerendered` via the `BlazorWasmPrerenderingMode` MSBuild property** if you want.
@@ -275,7 +233,7 @@ if (!builder.RootComponents.Any())
 
 That is because the root component types and their insertion positions are specified inside of the prerendered HTML contents, not inside of your C# code when the render mode is `WebAssemblyPrerendered`.
 
-Moreover, on .NET 6, you can also use the **"persisting prerendered state"** feature.
+Moreover, you can also use the **"persisting prerendered state"** feature.
 
 When the render mode is `WebAssemblyPrerendered`, this package injects the `<persist-component-state />` tag helper into the fallback page.
 
@@ -452,18 +410,9 @@ During the prerendering process is running, developers can investigate it.
 ## 🔗Appendix
 
 - If you would like to **change a title or any meta elements** for each page in your Blazor WebAssembly app, I recommend using the [**"Blazor Head Element Helper"** ![NuGet Package](https://img.shields.io/nuget/v/Toolbelt.Blazor.HeadElement.svg)](https://www.nuget.org/packages/Toolbelt.Blazor.HeadElement/) NuGet package.
-  - Since the ver.1.0.0 preview 8 of this package, **the .NET 6 `<PageTitle>` and `<HeadContent>` components** are also statically pre-rendered properly.
+- **The `<PageTitle>` and `<HeadContent>` components** are also statically pre-rendered properly.
 - If you would like to deploy your Blazor WebAssembly app to **GitHub Pages**, I recommend using the [**"Publish SPA for GitHub Pages"** ![NuGet Package](https://img.shields.io/nuget/v/PublishSPAforGitHubPages.Build.svg)](https://www.nuget.org/packages/PublishSPAforGitHubPages.Build/) NuGet package.
 - The **["Awesome Blazor Browser"](https://jsakamoto.github.io/awesome-blazor-browser/)** site is one of a good showcase of this package. That site is republishing every day by GitHub Actions with pre-rendering powered by this package.
-
-## ⚠️Notice
-
-This package is now experimental stage.
-
-We can expect this package will work fine with a simple Blazor WebAssembly project.  
-But I'm not sure this package works fine even with a complicated real-world Blazor WebAssembly project at this time.
-
-I welcome to fork and improve this project on your hand.
 
 ## 🎉Release notes
 
