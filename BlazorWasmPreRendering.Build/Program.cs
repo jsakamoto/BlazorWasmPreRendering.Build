@@ -92,9 +92,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build
             if (string.IsNullOrEmpty(commandLineOptions.AssemblyName)) throw new ArgumentException("The --assemblyname parameter is required.");
             if (string.IsNullOrEmpty(commandLineOptions.TypeNameOfRootComponent)) throw new ArgumentException("The -t|--typenameofrootcomponent parameter is required.");
             if (string.IsNullOrEmpty(commandLineOptions.SelectorOfRootComponent)) throw new ArgumentException("The --selectorofrootcomponent parameter is required.");
-#if ENABLE_HEADOUTLET
             if (string.IsNullOrEmpty(commandLineOptions.SelectorOfHeadOutletComponent)) throw new ArgumentException("The --selectorofheadoutletcomponent parameter is required.");
-#endif
             if (string.IsNullOrEmpty(commandLineOptions.FrameworkName)) throw new ArgumentException("The -f|--frameworkname parameter is required.");
             if (commandLineOptions.RenderMode != RenderMode.Static && commandLineOptions.RenderMode != RenderMode.WebAssemblyPrerendered)
                 throw new ArgumentException($"The -r|--rendermode parameter value \"{commandLineOptions.RenderMode}\" is not supported. (Only \"Static\" and \"WebAssemblyPrerendered\" are supported.)");

@@ -7,7 +7,6 @@
   <!-- Define Properties -->
   <Target Name="BlazorWasmPrerendering_DefineProperties" DependsOnTargets="$(BeforeBlazorWasmPrerendering)">
     <PropertyGroup>
-      <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net5')) ">net5.0</BlazorWasmPrerenderingTFM>
       <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net6')) ">net6.0</BlazorWasmPrerenderingTFM>
       <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net7')) ">net7.0</BlazorWasmPrerenderingTFM>
       <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net8')) ">net8.0</BlazorWasmPrerenderingTFM>

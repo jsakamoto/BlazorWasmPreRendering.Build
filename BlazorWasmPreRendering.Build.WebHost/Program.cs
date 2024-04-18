@@ -52,10 +52,7 @@ namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost
                 WebRootPath = options.WebRootPath,
                 ApplicationAssembly = appAssembly,
                 RootComponentType = rootComponentType,
-
-#if ENABLE_HEADOUTLET
                 HeadOutletComponentType = typeof(Microsoft.AspNetCore.Components.Web.HeadOutlet),
-#endif
                 RenderMode = options.RenderMode,
                 IndexHtmlFragments = options.IndexHtmlFragments,
 

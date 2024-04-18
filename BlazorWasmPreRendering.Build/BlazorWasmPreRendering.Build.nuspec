@@ -24,14 +24,12 @@
     <file src="StaticWebAssets\BlazorWasmPreRendering.Build.lib.module.min.js" target="staticwebassets/BlazorWasmPreRendering.Build.lib.module.js" />
 
     <!-- Publish Build Program -->
-    <file src="$projectDir$bin\$configuration$\net5.0\publish\*" target="tools\net5.0" />
     <file src="$projectDir$bin\$configuration$\net6.0\publish\*" target="tools\net6.0" />
     <file src="$projectDir$bin\$configuration$\net7.0\publish\*" target="tools\net7.0" />
     <file src="$projectDir$bin\$configuration$\net8.0\publish\*" target="tools\net8.0" />
     <file src="$projectDir$bin\$configuration$\net9.0\publish\*" target="tools\net9.0" />
 
     <!-- Publish WebHost Program -->
-    <file src="$projectDir$..\BlazorWasmPreRendering.Build.WebHost\bin\$configuration$\net5.0\publish\*" target="tools\net5.0\.webhost" />
     <file src="$projectDir$..\BlazorWasmPreRendering.Build.WebHost\bin\$configuration$\net6.0\publish\*" target="tools\net6.0\.webhost" />
     <file src="$projectDir$..\BlazorWasmPreRendering.Build.WebHost\bin\$configuration$\net7.0\publish\*" target="tools\net7.0\.webhost" />
     <file src="$projectDir$..\BlazorWasmPreRendering.Build.WebHost\bin\$configuration$\net8.0\publish\*" target="tools\net8.0\.webhost" />

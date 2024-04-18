@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <RootNamespace>Toolbelt.Blazor.WebAssembly.PreRendering.Build</RootNamespace>
-    <DefineConstants Condition=" '$(TargetFramework)' != 'net5.0' ">$(DefineConstants);ENABLE_HEADOUTLET;</DefineConstants>
     <IncludeBuildOutput>false</IncludeBuildOutput>
 
     <!-- https://andrewlock.net/fixing-build-warning-netsdk1138-when-building-end-of-life-projects-with-dotnet-5/#setting-checkeoltargetframework-to-remove-the-warning -->
@@ -39,10 +39,6 @@
     <PackageReference Include="NuGet.Versioning" Version="6.3.1" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.0" />
-  </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0" />
   </ItemGroup>
@@ -74,14 +70,12 @@
     <Message Importance="high" Text="[PublishForPackage]" />
 
     <!-- Publish Build Program -->
-    <Exec Command="dotnet publish -c:$(Configuration) -f:net5.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net6.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net7.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net8.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net9.0 --nologo" />
 
     <!-- Publish WebHost Program -->
-    <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net5.0 --nologo" />
     <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net6.0 --nologo" />
     <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net7.0 --nologo" />
     <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net8.0 --nologo" />
