@@ -13,8 +13,9 @@ internal class ServiceWorkerAssetsManifest
 
         var assetsManifestFile = await AssetsManifestFile.LoadAsync(serviceWorkerAssetsJsPath);
         if (assetsManifestFile == null) return;
-        if (assetsManifestFile.assets == null) assetsManifestFile.assets = new List<AssetsManifestFileEntry>();
+        assetsManifestFile.assets ??= new();
 
+        using var sha256 = SHA256.Create();
         foreach (var staticalizedFile in staticalizedFiles)
         {
             var relativeUrl = string.Join('/', Path.GetRelativePath(wwwrootDir, staticalizedFile).Split('\\'));
@@ -25,11 +26,8 @@ internal class ServiceWorkerAssetsManifest
                 assetsManifestFile.assets.Add(assetManifestEntry);
             }
 
-            await using (var indexHtmlStream = File.OpenRead(staticalizedFile))
-            {
-                using var sha256 = SHA256.Create();
-                assetManifestEntry.hash = "sha256-" + Convert.ToBase64String(await sha256.ComputeHashAsync(indexHtmlStream));
-            }
+            await using var indexHtmlStream = File.OpenRead(staticalizedFile);
+            assetManifestEntry.hash = "sha256-" + Convert.ToBase64String(await sha256.ComputeHashAsync(indexHtmlStream));
         }
 
         await assetsManifestFile.SaveAsync(serviceWorkerAssetsJsPath);
