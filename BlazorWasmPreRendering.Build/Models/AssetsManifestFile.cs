@@ -22,7 +22,7 @@ public class AssetsManifestFile
 
     public async Task SaveAsync(string serviceWorkerAssetsJsPath)
     {
-        await using var serviceWorkerAssetsStream = File.OpenWrite(serviceWorkerAssetsJsPath);
+        await using var serviceWorkerAssetsStream = File.Create(serviceWorkerAssetsJsPath);
         await using var streamWriter = new StreamWriter(serviceWorkerAssetsStream, Encoding.UTF8, 50, leaveOpen: true);
         streamWriter.Write("self.assetsManifest = ");
         streamWriter.Flush();

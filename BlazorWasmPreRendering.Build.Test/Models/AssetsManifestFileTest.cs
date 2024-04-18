@@ -30,27 +30,26 @@ public class AssetsManifestFileTest
     public async Task SaveAsync_Test()
     {
         // Given
+        using var workDir = new WorkDirectory();
+        var srcAssetsManifestFilePath = Assets.GetAssetPathOf("service-worker-assets.js");
+        var targetAssetsManifestFilePath = Path.Combine(workDir, "service-worker-assets.js");
+        var expectAssetsManifestFilePath = Assets.GetAssetPathOf("service-worker-assets - no-social-preview.js");
+        File.Copy(srcAssetsManifestFilePath, targetAssetsManifestFilePath);
+
+        // When
         var assetsManifestFile = new AssetsManifestFile()
         {
             version = "0NWDkJdM",
-            assets = new() {
-                new(){ url = "images/social-preview.png", hash = "sha256-9ypkDLoAy6RmO7iZHmZc3dXAZaItavrLA3c35f4puyU=" },
+            assets = [
                 new(){ url = "index.html", hash = "sha256-KhzlBHhh8jmcEoE/oSCHbgBXLJM+NtAIeedzu+JQILw=" },
                 new(){ url = "site.min.css", hash = "sha256-WxemB69D598vpN6bhltce1nR6942A8hm0GmDlVOsZw0=" },
-            }
+            ]
         };
-
-        // When
-        using var workDir = new WorkDirectory();
-        var savedAssetsManifestFilePath = Path.Combine(workDir, "service-worker-assets.js");
-        await assetsManifestFile.SaveAsync(savedAssetsManifestFilePath);
+        await assetsManifestFile.SaveAsync(targetAssetsManifestFilePath);
 
         // Then
-        var actualLines = File.ReadLines(savedAssetsManifestFilePath);
-
-        var expectedAssetsManifestFilePath = Assets.GetAssetPathOf("service-worker-assets.js");
-        var expectedLines = File.ReadLines(expectedAssetsManifestFilePath);
-
+        var actualLines = File.ReadLines(targetAssetsManifestFilePath);
+        var expectedLines = File.ReadLines(expectAssetsManifestFilePath);
         actualLines.Is(expectedLines);
     }
 }
