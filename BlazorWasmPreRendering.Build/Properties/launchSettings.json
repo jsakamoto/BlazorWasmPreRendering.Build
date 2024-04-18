@@ -10,7 +10,7 @@
     },
     "PreRender BlazorApp1": {
       "commandName": "Project",
-      "commandLineArgs": "-a \"BlazorWasmApp1\" -t \"BlazorWasmApp1.App\" --selectorofrootcomponent \"#app,app\" --selectorofheadoutletcomponent \"head::after\" -p \"$(SolutionDir)SampleApps\\BlazorWasmApp1\\bin\\Release\\net5.0\\publish\" -i \"$(SolutionDir)SampleApps\\BlazorWasmApp1\\obj\\Release\\net5.0\\.\" -m \"Toolbelt.Blazor.HeadElement.ServerPrerendering,,6.0.2\" -f \"net9.0\" --serviceworkerassetsmanifest \"\" -e \"Prerendering\" -o \"IndexHtmlInSubFolders\" -k",
+      "commandLineArgs": "-a \"BlazorWasmApp1\" -t \"BlazorWasmApp1.App\" --selectorofrootcomponent \"#app,app\" --selectorofheadoutletcomponent \"head::after\" -p \"$(SolutionDir)SampleApps\\BlazorWasmApp1\\bin\\Release\\net5.0\\publish\" -i \"$(SolutionDir)SampleApps\\BlazorWasmApp1\\obj\\Release\\net5.0\\.\" -m \"Toolbelt.Blazor.HeadElement.ServerPrerendering,,6.0.2\" -f \"net8.0\" --serviceworkerassetsmanifest \"\" -e \"Prerendering\" -o \"IndexHtmlInSubFolders\" -k",
       "hotReloadEnabled": false
     }
   }

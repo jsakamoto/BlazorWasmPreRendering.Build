@@ -17,10 +17,10 @@ public class SampleSite : IDisposable
     public static SampleSite BlazorWasmApp0 { get; } = new SampleSite("BlazorWasmApp0", "net8.0");
 
     /// <summary>
-    /// - .NET 9<br/>
+    /// - .NET 8<br/>
     /// - its titles by Toolbelt.Blazor.HeadElemnt.
     /// </summary>
-    public static SampleSite BlazorWasmApp1 { get; } = new SampleSite("BlazorWasmApp1", "net9.0");
+    public static SampleSite BlazorWasmApp1 { get; } = new SampleSite("BlazorWasmApp1", "net8.0");
 
     /// <summary>
     /// - .NET 6<br/>
