@@ -19,7 +19,7 @@ This will help make the contents of your Blazor WebAssembly static apps findable
 Install this package to your Blazor WebAssembly project.
 
 ```
-dotnet add package BlazorWasmPreRendering.Build
+dotnet add package BlazorWasmPreRendering.Build --prerelease
 ```
 
 Basically, **that's all**.
