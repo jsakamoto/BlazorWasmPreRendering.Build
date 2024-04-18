@@ -79,7 +79,7 @@ public class SampleSite : IDisposable
             {
                 var publishProcess = XProcess.Start(
                     "dotnet",
-                    $"publish -c:{this.Configuration} -p:BlazorWasmPrerendering=disable -p:CompressionEnabled=false -p:UsingBrowserRuntimeWorkload=false",
+                    $"publish -c:{this.Configuration} -p:BlazorWasmPrerendering=disable -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false",
                     workingDirectory: this.ProjectDir);
                 await publishProcess.WaitForExitAsync();
                 publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);

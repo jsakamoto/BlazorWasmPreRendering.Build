@@ -106,7 +106,7 @@ public class ProgramE2ETest
         var serverPort = Program.GetAvailableTcpPort("5050-5999");
 
         using var dotnetCLI = Start(
-            "dotnet", $"publish -c:Release -p:PublishTrimmed=false -p:BlazorWasmPrerenderingKeepServer=true -p:CompressionEnabled=false -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingServerPort={serverPort}",
+            "dotnet", $"publish -c:Release -p:PublishTrimmed=false -p:BlazorWasmPrerenderingKeepServer=true -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingServerPort={serverPort}",
             projectDir,
             options => options.WhenDisposing = XProcessTerminate.EntireProcessTree);
         var success = await dotnetCLI.WaitForOutputAsync(output => output.Trim().StartsWith("Start fetching..."), millsecondsTimeout: 40000);
@@ -328,7 +328,7 @@ public class ProgramE2ETest
             Console.WriteLine($"{(i == 1 ? "1st" : "2nd")} time publishing...");
 
             // When
-            var arg = "publish -c:Release -p:CompressionEnabled=false -p:UsingBrowserRuntimeWorkload=false -o:bin/publish";
+            var arg = "publish -c:Release -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false -o:bin/publish";
             // if 2nd time publishing, override the environment name.
             if (i == 2) arg += " -p:BlazorWasmPrerenderingEnvironment=" + expectedEnvNames[2];
 
@@ -374,7 +374,7 @@ public class ProgramE2ETest
         // When
         await Start("dotnet", "restore", app0Dir).WaitForExitAsync();
         var msbuild = await Start(msbuildPath,
-            "-p:Configuration=Debug -p:CompressionEnabled=false -p:DeployOnBuild=true -p:PublishUrl=bin/publish",
+            "-p:Configuration=Debug -p:CompressionEnabled=true -p:DeployOnBuild=true -p:PublishUrl=bin/publish",
             app0Dir).WaitForExitAsync();
         msbuild.ExitCode.Is(0, message: msbuild.StdOutput + msbuild.StdError);
 
@@ -399,7 +399,7 @@ public class ProgramE2ETest
             // When
             await Start("dotnet", "restore", app0Dir).WaitForExitAsync();
             var dotnetCLI = await Start("dotnet",
-                "msbuild -p:Configuration=Debug -p:CompressionEnabled=false -p:DeployOnBuild=true -p:PublishUrl=bin/publish",
+                "msbuild -p:Configuration=Debug -p:CompressionEnabled=true -p:DeployOnBuild=true -p:PublishUrl=bin/publish",
                 app0Dir).WaitForExitAsync();
             dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
 
@@ -426,7 +426,7 @@ public class ProgramE2ETest
         var dotnetCLI = await Start("dotnet", "publish " +
             $"-c:Release " +
             $"-p:BlazorWasmPrerenderingEnvironment={env} " +
-            $"-p:CompressionEnabled=false " +
+            $"-p:CompressionEnabled=true " +
             $"-p:BlazorWasmPrerenderingServerPort={tcpPort} " +
             $"--nologo",
             projectDir).WaitForExitAsync();
@@ -462,7 +462,7 @@ public class ProgramE2ETest
         {
             $"publish",
             $"-c:Release",
-            $"-p:CompressionEnabled=false",
+            $"-p:CompressionEnabled=true",
             $"-p:UsingBrowserRuntimeWorkload=false",
             $"-p:BlazorWasmPrerenderingServerPort={tcpPort}",
             $"-o:bin/publish",
@@ -491,7 +491,7 @@ public class ProgramE2ETest
         File.WriteAllText(Path.Combine(projectDir, "wwwroot", "appsettings.json"), @"{""HomeTitle"":""127.0.0.1""}");
 
         // When
-        var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Debug -p:CompressionEnabled=false -o:bin/publish", projectDir).WaitForExitAsync();
+        var dotnetCLI = await XProcess.Start("dotnet", "publish -c:Debug -p:CompressionEnabled=true -o:bin/publish", projectDir).WaitForExitAsync();
         dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
 
         // Then
@@ -541,7 +541,7 @@ public class ProgramE2ETest
         var serverPort = Program.GetAvailableTcpPort("5050-5999");
 
         using var dotnetCLI = Start(
-            "dotnet", $"publish -c:Release -p:PublishTrimmed=false -p:BlazorWasmPrerenderingKeepServer=true -p:CompressionEnabled=false -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingServerPort={serverPort}",
+            "dotnet", $"publish -c:Release -p:PublishTrimmed=false -p:BlazorWasmPrerenderingKeepServer=true -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingServerPort={serverPort}",
             projectDir,
             options => options.WhenDisposing = XProcessTerminate.EntireProcessTree);
         var success = await dotnetCLI.WaitForOutputAsync(output => output.Trim().StartsWith("Start fetching..."), millsecondsTimeout: 40000);
