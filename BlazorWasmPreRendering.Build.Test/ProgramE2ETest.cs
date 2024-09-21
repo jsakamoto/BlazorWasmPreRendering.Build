@@ -354,9 +354,38 @@ public class ProgramE2ETest
             serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, ";\\s*$", "");
             var assetsManifestFile = JsonSerializer.Deserialize<AssetsManifestFile>(serviceWorkerAssetsJs);
             var assetManifestEntry = assetsManifestFile?.assets?.First(a => a.url == "index.html");
-            assetManifestEntry.IsNotNull();
-            assetManifestEntry!.hash.Is(hash);
+            assetManifestEntry.IsNotNull().hash.Is(hash);
         }
+    }
+
+    [Test]
+    public async Task Publish_with_Compression_Test()
+    {
+        // Given
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp0");
+
+        // When
+        var dotnetCLI = await Start("dotnet", "publish -c:Release -o:bin/publish", projectDir).WaitForExitAsync();
+        dotnetCLI.ExitCode.Is(0, message: dotnetCLI.Output);
+
+        // Then
+
+        // Validate prerendered contents.
+        var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
+        ValidatePrerenderedContentsOfApp0(wwwrootDir);
+
+        // Validate PWA assets manifest.
+        var indexHtmlBytes = File.ReadAllBytes(Path.Combine(wwwrootDir, "index.html"));
+        using var sha256 = SHA256.Create();
+        var hash = "sha256-" + Convert.ToBase64String(sha256.ComputeHash(indexHtmlBytes));
+
+        var serviceWorkerAssetsJs = File.ReadAllText(Path.Combine(wwwrootDir, "my-assets.js"));
+        serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, @"^self\.assetsManifest\s*=\s*", "");
+        serviceWorkerAssetsJs = Regex.Replace(serviceWorkerAssetsJs, ";\\s*$", "");
+        var assetsManifestFile = JsonSerializer.Deserialize<AssetsManifestFile>(serviceWorkerAssetsJs);
+        var assetManifestEntry = assetsManifestFile?.assets?.First(a => a.url == "index.html");
+        assetManifestEntry.IsNotNull().hash.Is(hash);
     }
 
     [Test, Platform("Win")]
