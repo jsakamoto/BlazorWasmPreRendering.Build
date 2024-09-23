@@ -10,6 +10,7 @@
 |PWA                | ✅ Yes       | -                | -
 |Has easter-egg     | -            | ✅ Yes           | -
 |Deploy to GitHub Pages| -         | ✅ Yes           | -
+|Brotli Loader      | ✅ Yes       | -                | -
 |Has AngleSharp dependency| ✅Yes  | -                | -
 |Localization       | ✅ Yes       | -                | -
 |Lazy Load Assembly | ✅ Yes       | ✅ Yes           | -
