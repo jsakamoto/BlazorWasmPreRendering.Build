@@ -1,3 +1,6 @@
+v.4.0.1
+- Improve: Make it work correctly even when used with "BlazorWasmBrotliLoader.Build" NuGet package.
+
 v.4.0.0
 - This is the first official - not a preview - release.
 - Breaking Change: Drop the support for .NET 5.

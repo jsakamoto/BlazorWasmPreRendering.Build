@@ -14,6 +14,7 @@
     <tags>$tags$</tags>
     <releaseNotes>$releaseNotes$</releaseNotes>
     <readme>README.md</readme>
+    <repository type="$repositoryType$" url="$repositoryUrl$" />
   </metadata>
   <files>
     <file src="..\.assets\nupkg-icon.png" target="Icon.png" />

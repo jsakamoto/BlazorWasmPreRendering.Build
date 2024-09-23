@@ -19,6 +19,8 @@
     <PackageId>BlazorWasmPreRendering.Build</PackageId>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/jsakamoto/BlazorWasmPreRendering.Build</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
     <PackageTags>blazor,prerender</PackageTags>
     <PackageReleaseNotes>(Please write the package release notes in "../RELEASE-NOTES.txt")</PackageReleaseNotes>
     <PackageOutputPath>../_dist</PackageOutputPath>
@@ -94,7 +96,7 @@
       <PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
       <PackageReleaseNotes>$(PackageReleaseNotes)v.0.0.0</PackageReleaseNotes>
       <PackageReleaseNotes>$([System.Text.RegularExpressions.Regex]::Match($(PackageReleaseNotes), "^(v\.[\d\.]+.+?)v\.[\d\.]+", System.Text.RegularExpressions.RegexOptions.Singleline).Groups[1].Value)</PackageReleaseNotes>
-      <PackageReleaseNotes>$(PackageReleaseNotes)%0a%0aTo see all the change logs, please visit the following URL.%0a- https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/RELEASE-NOTES.txt</PackageReleaseNotes>
+      <PackageReleaseNotes>$(PackageReleaseNotes)%0aTo see all the change logs, please visit the following URL.%0a- https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/RELEASE-NOTES.txt</PackageReleaseNotes>
     </PropertyGroup>
     <PropertyGroup>
       <NuspecProperties>version=$(Version);$(NuspecProperties)</NuspecProperties>
@@ -105,6 +107,8 @@
       <NuspecProperties>authors=$(Authors);$(NuspecProperties)</NuspecProperties>
       <NuspecProperties>owners=$(Owners);$(NuspecProperties)</NuspecProperties>
       <NuspecProperties>projectUrl=$(PackageProjectUrl);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>repositoryType=$(RepositoryType);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>repositoryUrl=$(RepositoryUrl);$(NuspecProperties)</NuspecProperties>
       <NuspecProperties>description=$(Description);$(NuspecProperties)</NuspecProperties>
       <NuspecProperties>copyright=$(Copyright);$(NuspecProperties)</NuspecProperties>
       <NuspecProperties>license=$(PackageLicenseExpression);$(NuspecProperties)</NuspecProperties>

@@ -2,5 +2,6 @@
   <Import Project="Microsoft.AspNetCore.StaticWebAssets.props" />
   <PropertyGroup>
     <BeforePublishSPAforGHPages>$(BeforePublishSPAforGHPages);BlazorWasmPrerendering</BeforePublishSPAforGHPages>
+    <BeforeBlazorWasmBrotliLoader>$(BeforeBlazorWasmBrotliLoader);BlazorWasmPrerendering</BeforeBlazorWasmBrotliLoader>
   </PropertyGroup>
 </Project>
