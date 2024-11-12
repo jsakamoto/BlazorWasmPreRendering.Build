@@ -21,7 +21,7 @@
     <PackageProjectUrl>https://github.com/jsakamoto/BlazorWasmPreRendering.Build</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
-    <PackageTags>blazor,prerender</PackageTags>
+    <PackageTags>blazor,prerender,prerendering</PackageTags>
     <PackageReleaseNotes>(Please write the package release notes in "../RELEASE-NOTES.txt")</PackageReleaseNotes>
     <PackageOutputPath>../_dist</PackageOutputPath>
     <IsPackable>true</IsPackable>
@@ -54,7 +54,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0-rc.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
