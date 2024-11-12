@@ -7,7 +7,7 @@
 <CascadingValue Value="_Me">
     <Router AppAssembly="@typeof(App).Assembly"
             AdditionalAssemblies="_LazyLoadedAssemblies"
-            OnNavigateAsync="@OnNavigateAsync">
+        OnNavigateAsync="@OnNavigateAsync">
         <Found Context="routeData">
             <RouteView RouteData="@routeData" />
         </Found>
@@ -36,7 +36,7 @@
     {
         if (args.Path.Contains("lazy-loading-page", StringComparison.OrdinalIgnoreCase))
         {
-            var assembly = await AssemblyLoader.LoadAssembliesAsync(new[] { "RazorClassLib2.dll" });
+            var assembly = await AssemblyLoader.LoadAssembliesAsync(new[] { "RazorClassLib2.wasm" });
             _LazyLoadedAssemblies.AddRange(assembly);
         }
     }

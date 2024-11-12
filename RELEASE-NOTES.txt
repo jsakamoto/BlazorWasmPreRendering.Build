@@ -1,3 +1,6 @@
+v.5.0.0
+- .NET 9 preview support
+
 v.4.0.1
 - Improve: Make it work correctly even when used with "BlazorWasmBrotliLoader.Build" NuGet package.
 
