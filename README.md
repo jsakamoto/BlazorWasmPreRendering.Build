@@ -59,6 +59,22 @@ This is important for your Blazor WebAssembly components to work fine in the pre
 
 The `ConfigureServices(...)` static local function can also have an `IConfiguration` argument that reflects the contents of the `wwwroot/appsetting.json` JSON file.
 
+The prerendering package supposes that the `ConfigureServices` method has no or only one `string` argument and that the string argument means the app's base address if there is one. The package doesn't suppose that the `ConfigureServices` method has two or more string parameters and can't determine those argument names. (The argument names of methods are usually minified at the publishing time.)
+
+If you need to pass the environment name to the `ConfigureServices`, please pass the `IWebAssemblyHostEnvironment` to its argument like this.
+
+```cs
+// Program.cs
+...
+ConfigureServices(builder.Services, builder.HostEnvironment, builder.Configuration);
+...
+static void ConfigureServices(IServiceCollection services, IWebAssemblyHostEnvironment webHostEnv, IConfiguration configuration)
+{
+    // You can get the environment name via "webHostEnv.Environment".
+    // You can also get the app base address via "webHostEnv.BaseAddress".
+    ...
+```
+
 ### Root component type and selector
 
 In some cases, suppose the type and selector of the root component of your Blazor WebAssembly app are not `{RootNamespace}.App` and `#app` or `app`. 
