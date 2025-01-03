@@ -231,7 +231,7 @@ Usually, a startup code of the Blazor WebAssembly app should be like this.
 
 ```csharp
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("app");
+builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 ```
 However, if you use the `WebAssemblyPrerendered` render mode when prerendering, you should change the startup code below.
@@ -242,7 +242,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 //    already registered via prerednered HTML contents.
 if (!builder.RootComponents.Any())
 {
-    builder.RootComponents.Add<App>("app");
+    builder.RootComponents.Add<App>("#app");
     builder.RootComponents.Add<HeadOutlet>("head::after");
 }
 ```
