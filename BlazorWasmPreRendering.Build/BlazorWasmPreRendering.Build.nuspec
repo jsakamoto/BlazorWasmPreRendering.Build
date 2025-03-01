@@ -19,10 +19,14 @@
   <files>
     <file src="..\.assets\nupkg-icon.png" target="Icon.png" />
     <file src="..\README.md" target="README.md" />
+
     <file src="build\**" target="build" />
-    <file src="buildMultiTargeting\**" target="buildMultiTargeting" />
-    <file src="buildTransitive\**" target="buildTransitive" />
-    <file src="StaticWebAssets\BlazorWasmPreRendering.Build.lib.module.min.js" target="staticwebassets/BlazorWasmPreRendering.Build.lib.module.js" />
+    <file src="$projectDir$obj\$configuration$\net9.0\staticwebassets\msbuild.BlazorWasmPreRendering.Build.Microsoft.AspNetCore.StaticWebAssetEndpoints.props" target="build\Microsoft.AspNetCore.StaticWebAssetEndpoints.props" />
+    <file src="$projectDir$obj\$configuration$\net9.0\staticwebassets\msbuild.BlazorWasmPreRendering.Build.Microsoft.AspNetCore.StaticWebAssets.props" target="build\Microsoft.AspNetCore.StaticWebAssets.props" />
+    <file src="$projectDir$obj\$configuration$\net9.0\staticwebassets\msbuild.build.BlazorWasmPreRendering.Build.props" target="build\BlazorWasmPreRendering.Build.props" />
+    <file src="$projectDir$obj\$configuration$\net9.0\staticwebassets\msbuild.buildMultiTargeting.BlazorWasmPreRendering.Build.props" target="buildMultiTargeting\BlazorWasmPreRendering.Build.props" />
+    <file src="$projectDir$obj\$configuration$\net9.0\staticwebassets\msbuild.buildTransitive.BlazorWasmPreRendering.Build.props" target="buildTransitive\BlazorWasmPreRendering.Build.props" />
+    <file src="$projectDir$wwwroot\BlazorWasmPreRendering.Build.lib.module.js" target="$jsmodulePackagePath$" />
 
     <!-- Publish Build Program -->
     <file src="$projectDir$bin\$configuration$\net6.0\publish\*" target="tools\net6.0" />

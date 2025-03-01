@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <RootNamespace>Toolbelt.Blazor.WebAssembly.PreRendering.Build</RootNamespace>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
 
     <!-- https://andrewlock.net/fixing-build-warning-netsdk1138-when-building-end-of-life-projects-with-dotnet-5/#setting-checkeoltargetframework-to-remove-the-warning -->
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
@@ -27,11 +26,6 @@
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Remove="bundleconfig.json" />
-    <None Include="bundleconfig.json" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.16.1" />
@@ -61,10 +55,13 @@
     <ProjectReference Include="..\BlazorWasmPreRendering.Build.Shared\BlazorWasmPreRendering.Build.Shared.csproj" />
   </ItemGroup>
 
+  <Target Name="_Prepare_JSModule" BeforeTargets="ResolveStaticWebAssetsConfiguration">
+    <Copy SourceFiles="StaticWebAssets\BlazorWasmPreRendering.Build.lib.module.min.js" DestinationFiles="wwwroot\BlazorWasmPreRendering.Build.lib.module.js" SkipUnchangedFiles="true" />
+  </Target>
+  
   <!-- Pack settings -->
   <PropertyGroup>
-    <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);PublishForPackage</GenerateNuspecDependsOn>
-    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <CrossTargetingIncludeStaticWebAssetsDependsOn>PublishForPackage;$(CrossTargetingIncludeStaticWebAssetsDependsOn)</CrossTargetingIncludeStaticWebAssetsDependsOn>
     <NuspecFile>$(PackageId).nuspec</NuspecFile>
   </PropertyGroup>
 
@@ -87,6 +84,7 @@
       <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\Microsoft.*.dll" />
       <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\web.config" />
       <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\*.deps.json" />
+      <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\wwwroot\*" />
       <_ExcludeForNupkg Include="$(ProjectDir)..\BlazorWasmPreRendering.Build.WebHost\bin\$(Configuration)\net*\publish\Microsoft.*.dll" />
       <_ExcludeForNupkg Include="$(ProjectDir)..\BlazorWasmPreRendering.Build.WebHost\bin\$(Configuration)\net*\publish\web.config" />
       <_ExcludeForNupkg Include="$(ProjectDir)..\BlazorWasmPreRendering.Build.WebHost\bin\$(Configuration)\net*\publish\*.deps.json" />
@@ -98,6 +96,9 @@
     <ReadLinesFromFile File="../RELEASE-NOTES.txt">
       <Output TaskParameter="Lines" ItemName="ReleaseNoteLines" />
     </ReadLinesFromFile>
+    <ItemGroup>
+      <_JSModule Include="@(Content)" Condition="$([System.String]::Copy('%(Content.PackagePath)').StartsWith('staticwebassets\BlazorWasmPreRendering.Build.'))" />
+    </ItemGroup>
     <PropertyGroup>
       <PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
       <PackageReleaseNotes>$(PackageReleaseNotes)v.0.0.0</PackageReleaseNotes>
@@ -119,24 +120,8 @@
       <NuspecProperties>copyright=$(Copyright);$(NuspecProperties)</NuspecProperties>
       <NuspecProperties>license=$(PackageLicenseExpression);$(NuspecProperties)</NuspecProperties>
       <NuspecProperties>tags=$(PackageTags);$(NuspecProperties)</NuspecProperties>
+      <NuspecProperties>jsmodulePackagePath=%(_JSModule.PackagePath);$(NuspecProperties)</NuspecProperties>
       <NuspecProperties>releaseNotes=$(PackageReleaseNotes);$(NuspecProperties)</NuspecProperties>
-    </PropertyGroup>
-  </Target>
-
-  <!--
-  Before the "BeforePack" target will invoke, remove the "CrossTargetingIncludeStaticWebAssets" target in .NET 7 SDK 
-  from the dependencies of the "GenerateNuspec" target. If we don't do this, this project will cause the build error as below:
-  "Microsoft.NET.Sdk.Razor.StaticWebAssets.Pack.CrossTargeting.targets(105,5): error : Manifestfile at '...\obj\Release\net6.0\staticwebassets.pack.json' not found."
-  -->
-  <PropertyGroup>
-    <BeforePack>$(BeforePack);_SuppressCrossTargetingIncludeStaticWebAssets;</BeforePack>
-  </PropertyGroup>
-  <Target Name="_SuppressCrossTargetingIncludeStaticWebAssets">
-    <ItemGroup>
-      <_GenerateNuspecDependsOnItems Include="$(GenerateNuspecDependsOn.Replace(' ', '').Split(';'))" Exclude="CrossTargetingIncludeStaticWebAssets" />
-    </ItemGroup>
-    <PropertyGroup>
-      <GenerateNuspecDependsOn>@(_GenerateNuspecDependsOnItems)</GenerateNuspecDependsOn>
     </PropertyGroup>
   </Target>
 
