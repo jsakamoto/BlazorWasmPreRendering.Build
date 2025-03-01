@@ -1,3 +1,6 @@
+v.5.0.1
+- Fix: It didn't work correctly when the .NET SDK version is 10.
+
 v.5.0.0
 - .NET 9 support
 
