@@ -1,3 +1,6 @@
+v.6.0.0-preview.1
+- Start to support for .NET 10.0 Preview
+
 v.5.0.1
 - Fix: It didn't work correctly when the .NET SDK version is 10.
 
