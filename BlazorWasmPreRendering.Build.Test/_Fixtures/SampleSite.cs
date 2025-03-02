@@ -8,25 +8,25 @@ namespace BlazorWasmPreRendering.Build.Test;
 public class SampleSite : IDisposable
 {
     /// <summary>
-    /// - .NET 8<br/>
+    /// - .NET 10<br/>
     /// - its titles by .NET 6+ &lt;PageTitle&gt;.<br/>
     /// - PWA<br/>
     /// - Use HtmlSanitizer package<br/>
     /// - Localization
     /// </summary>
-    public static SampleSite BlazorWasmApp0 { get; } = new SampleSite("BlazorWasmApp0", "net8.0");
+    public static SampleSite BlazorWasmApp0 { get; } = new SampleSite("BlazorWasmApp0", "net10.0");
 
     /// <summary>
     /// - .NET 9<br/>
-    /// - its titles by Toolbelt.Blazor.HeadElemnt.
+    /// - its titles by Toolbelt.Blazor.HeadElement.
     /// </summary>
     public static SampleSite BlazorWasmApp1 { get; } = new SampleSite("BlazorWasmApp1", "net9.0");
 
     /// <summary>
-    /// - .NET 6<br/>
+    /// - .NET 8<br/>
     /// - Consist with separated component project.
     /// </summary>
-    public static SampleSite BlazorWasmApp2 { get; } = new SampleSite("BlazorWasmApp2/Client", "net6.0");
+    public static SampleSite BlazorWasmApp2 { get; } = new SampleSite("BlazorWasmApp2/Client", "net8.0");
 
     public string ProjectName { get; } = "";
 

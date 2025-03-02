@@ -17,7 +17,7 @@ public class SetUpFixture
 
         var dotnetCLI = await XProcess.Start(
             "dotnet",
-            $"publish -c:Release -f:net9.0 -o:\"{targetDir}\"",
+            $"publish -c:Release -f:{SampleSite.BlazorWasmApp0.TargetFramework} -o:\"{targetDir}\"",
             webHostProjDir)
             .WaitForExitAsync();
         dotnetCLI.ExitCode.Is(0, message: dotnetCLI.Output);

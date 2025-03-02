@@ -33,7 +33,7 @@ public class ProgramE2ETest
             "-i", intermediateDir,
             "--assemblydir", SampleSite.BlazorWasmApp0.TargetDir,
             "-m", "",
-            "-f", "net6.0",
+            "-f", SampleSite.BlazorWasmApp0.TargetFramework,
             "--emulateauthme", "true"
         });
         exitCode.Is(0);
@@ -549,7 +549,7 @@ public class ProgramE2ETest
             "-i", intermediateDir,
             "--assemblydir", SampleSite.BlazorWasmApp0.TargetDir,
             "-m", "",
-            "-f", "net7.0",
+            "-f", SampleSite.BlazorWasmApp0.TargetFramework,
             "--emulateauthme", "true",
             "--locale", "ja,en"
         });
