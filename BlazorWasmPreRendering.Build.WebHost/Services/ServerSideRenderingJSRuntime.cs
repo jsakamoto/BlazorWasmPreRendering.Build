@@ -73,6 +73,38 @@ internal class ServerSideRenderingJSRuntime : IJSRuntime
         throw new InvalidOperationException(ExceptionMessage);
     }
 
+#if NET10_0_OR_GREATER
+    public ValueTask<TValue> GetValueAsync<[DynamicallyAccessedMembers(PublicConstructors | PublicFields | PublicProperties)] TValue>(string identifier)
+    {
+        throw new InvalidOperationException(ExceptionMessage);
+    }
+
+    public ValueTask<TValue> GetValueAsync<[DynamicallyAccessedMembers(PublicConstructors | PublicFields | PublicProperties)] TValue>(string identifier, CancellationToken cancellationToken)
+    {
+        throw new InvalidOperationException(ExceptionMessage);
+    }
+
+    public ValueTask SetValueAsync<[DynamicallyAccessedMembers(PublicConstructors | PublicFields | PublicProperties)] TValue>(string identifier, TValue value)
+    {
+        throw new InvalidOperationException(ExceptionMessage);
+    }
+
+    public ValueTask SetValueAsync<[DynamicallyAccessedMembers(PublicConstructors | PublicFields | PublicProperties)] TValue>(string identifier, TValue value, CancellationToken cancellationToken)
+    {
+        throw new InvalidOperationException(ExceptionMessage);
+    }
+
+    public ValueTask<IJSObjectReference> InvokeNewAsync(string identifier, object?[]? args)
+    {
+        throw new InvalidOperationException(ExceptionMessage);
+    }
+
+    public ValueTask<IJSObjectReference> InvokeNewAsync(string identifier, CancellationToken cancellationToken, object?[]? args)
+    {
+        throw new InvalidOperationException(ExceptionMessage);
+    }
+#endif
+
     private int GetLazyAssembliesImplements(string[]? newAssembliesToLoad)
     {
         this._LazyAssemblyBytes.Clear();

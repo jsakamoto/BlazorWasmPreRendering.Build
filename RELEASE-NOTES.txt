@@ -1,3 +1,6 @@
+v.6.0.0-preview.2
+- .NET 10.0 Preview 4 support.
+
 v.6.0.0-preview.1
 - Start to support for .NET 10.0 Preview
 
