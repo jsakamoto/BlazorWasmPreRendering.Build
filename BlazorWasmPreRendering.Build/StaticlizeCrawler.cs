@@ -159,7 +159,6 @@ internal class StaticlizeCrawler
         var links = htmlDoc.Links
             .OfType<IHtmlAnchorElement>()
             .Where(link => string.IsNullOrEmpty(link.Origin))
-            .Where(link => string.IsNullOrEmpty(link.Target))
             .Where(link => !string.IsNullOrEmpty(link.PathName))
             .ToArray();
 
