@@ -179,6 +179,13 @@ internal class StaticlizeCrawler
 
     private string GetOutputPath(string path)
     {
+        // Ensure the path is valid for file system
+        var invalidChars = new[] { '<', '>', ':', '"', '|', '?', '*' };
+        foreach (var invalidChar in invalidChars)
+        {
+            path = path.Replace(invalidChar.ToString(), $"%{((int)invalidChar):x2}");
+        }
+
         var indexHtmlPath = default(string);
         if (this.OutputStyle == OutputStyle.IndexHtmlInSubFolders)
         {
