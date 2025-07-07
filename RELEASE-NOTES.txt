@@ -1,8 +1,5 @@
-v.6.0.0-preview.2
-- .NET 10.0 Preview 4 support.
-
-v.6.0.0-preview.1
-- Start to support for .NET 10.0 Preview
+v.7.0.0-preview.1
+- .NET 10.0 Preview 5 support.
 
 v.6.0.0
 - Fix: Anchor elements were incorrectly ignored even when they had a target attribute.
