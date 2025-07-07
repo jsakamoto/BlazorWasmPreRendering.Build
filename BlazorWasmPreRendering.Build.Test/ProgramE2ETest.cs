@@ -15,7 +15,7 @@ namespace BlazorWasmPreRendering.Build.Test;
 public class ProgramE2ETest
 {
     [Test]
-    public async Task dotNET6_HeadOutlet_TestAsync()
+    public async Task HeadOutlet_TestAsync()
     {
         // Given
         // Publish the sample app which sets its titles by .NET 6 <PageTitle>.
@@ -607,6 +607,9 @@ public class ProgramE2ETest
             new("/", homeTitle, new[]{
                 "<a href=/about>about</a>",
                 "<a href=/lazy-loading-page>lazy loading page</a>",
+                "<a href=https://blazor.net/>About Blazor</a>",
+                "<a href=/foo/bar/fizz:buzz>Invalid File Name</a>",
+                "<a href=/foo:bar/fizz/buzz>Invalid Directory Name</a>",
             }, environment),
             new("/about", aboutTitle, new[]{
                 "<a href=/>home</a>",

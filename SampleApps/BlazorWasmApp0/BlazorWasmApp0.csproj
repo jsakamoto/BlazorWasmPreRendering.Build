@@ -10,10 +10,10 @@
 
   <ItemGroup>
     <PackageReference Include="BlazorWasmPreRendering.Build" Version="6.0.0-preview.2" />
-    <PackageReference Include="BlazorWasmBrotliLoader.Build" Version="1.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0-preview.4.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0-preview.4.*" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.Localization" Version="10.0.0-preview.1.*" />
+    <PackageReference Include="BlazorWasmBrotliLoader.Build" Version="1.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.17" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.17" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.17" />
     <PackageReference Include="HtmlSanitizer" Version="5.0.372" />
   </ItemGroup>
 

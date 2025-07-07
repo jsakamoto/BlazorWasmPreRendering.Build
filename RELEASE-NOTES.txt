@@ -4,6 +4,10 @@ v.6.0.0-preview.2
 v.6.0.0-preview.1
 - Start to support for .NET 10.0 Preview
 
+v.6.0.0
+- Fix: Anchor elements were incorrectly ignored even when they had a target attribute.
+- Fix: It crashed when a URL path included invalid characters for file systems.
+
 v.5.0.1
 - Fix: It didn't work correctly when the .NET SDK version is 10.
 
