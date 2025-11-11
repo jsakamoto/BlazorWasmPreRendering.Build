@@ -11,6 +11,7 @@
       <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net7')) ">net7.0</BlazorWasmPrerenderingTFM>
       <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net8')) ">net8.0</BlazorWasmPrerenderingTFM>
       <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net9')) ">net9.0</BlazorWasmPrerenderingTFM>
+      <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net10')) ">net10.0</BlazorWasmPrerenderingTFM>
       <BlazorWasmPrerenderingMode Condition=" '$(BlazorWasmPrerenderingMode)' == '' ">Static</BlazorWasmPrerenderingMode>
       <BlazorWasmPrerenderingPublishDir Condition=" '$(BlazorWasmPrerenderingPublishDir)' == '' ">$([System.IO.Path]::GetFullPath('$(PublishDir)').TrimEnd('\').TrimEnd('/'))</BlazorWasmPrerenderingPublishDir>
       <BlazorWasmPrerenderingTargetDir Condition=" '$(BlazorWasmPrerenderingTargetDir)' == '' ">$([System.IO.Path]::GetFullPath('$(TargetDir)').TrimEnd('\').TrimEnd('/'))</BlazorWasmPrerenderingTargetDir>

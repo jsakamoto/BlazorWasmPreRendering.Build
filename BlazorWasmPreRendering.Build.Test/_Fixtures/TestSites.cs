@@ -15,7 +15,7 @@ public static class TestSites
         var webRootPath = Path.Combine(GetTestSitesDir(), "Site1");
         var webServer = WebApplication.CreateBuilder(new WebApplicationOptions
         {
-            Args = new[] { "--urls", baseUrl },
+            Args = ["--urls", baseUrl],
             ContentRootPath = webRootPath
         }).Build();
         webServer.UseDefaultFiles().UseStaticFiles();

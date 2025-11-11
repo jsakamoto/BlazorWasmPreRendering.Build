@@ -1,3 +1,6 @@
+v.7.0.0-preview.1
+- .NET 10.0 Preview 5 support.
+
 v.6.0.0
 - Fix: Anchor elements were incorrectly ignored even when they had a target attribute.
 - Fix: It crashed when a URL path included invalid characters for file systems.
