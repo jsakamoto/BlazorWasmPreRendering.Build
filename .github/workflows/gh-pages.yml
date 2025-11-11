@@ -12,11 +12,15 @@ jobs:
       # Checkout the code
       - uses: actions/checkout@v5
 
+      # Remove global.json before installing .NET SDK
+      - name: Remove global.json
+        run: rm -f global.json
+
       # Install .NET SDK
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-           dotnet-version: '9.0.x'
+          dotnet-version: "9.0.x"
       - name: Install .NET WebAssembly Tools
         run: dotnet workload install wasm-tools
 
