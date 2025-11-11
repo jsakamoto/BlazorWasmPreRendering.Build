@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.5.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
   </ItemGroup>
 
 </Project>
