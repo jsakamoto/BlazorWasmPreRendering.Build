@@ -93,7 +93,7 @@ public class SampleSite : IDisposable
 
     public static WorkDirectory CreateSampleAppsWorkDir()
     {
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.sln");
+        var solutionDir = FileIO.FindContainerDirToAncestor("*.slnx");
         var srcSampleAppsDir = Path.Combine(solutionDir, "SampleApps");
 
         return WorkDirectory.CreateCopyFrom(srcSampleAppsDir, arg => arg.Name is (not "obj" and not "bin"));

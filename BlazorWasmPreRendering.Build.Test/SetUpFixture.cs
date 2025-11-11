@@ -10,7 +10,7 @@ public class SetUpFixture
     [OneTimeSetUp]
     public async Task OneTimeSetup()
     {
-        var slnDir = FileIO.FindContainerDirToAncestor("*.sln");
+        var slnDir = FileIO.FindContainerDirToAncestor("*.slnx");
         var webHostProjDir = Path.Combine(slnDir, "BlazorWasmPreRendering.Build.WebHost");
         var targetDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".webhost");
         if (Directory.Exists(targetDir)) Directory.Delete(targetDir, recursive: true);

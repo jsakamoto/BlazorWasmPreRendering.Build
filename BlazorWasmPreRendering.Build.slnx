@@ -1,0 +1,30 @@
+<Solution>
+  <Folder Name="/- Solution Items -/">
+    <File Path="VersionInfo.props" />
+  </Folder>
+  <Folder Name="/README/">
+    <File Path="MSBUILD-PROPERTIES.md" />
+    <File Path="README.md" />
+    <File Path="RELEASE-NOTES.txt" />
+  </Folder>
+  <Folder Name="/SampleApps/">
+    <File Path="SampleApps/SAMPLE-APPS-README.md" />
+    <Project Path="SampleApps/BlazorWasmApp0/BlazorWasmApp0.csproj" />
+    <Project Path="SampleApps/BlazorWasmApp1/BlazorWasmApp1.csproj" />
+    <Project Path="SampleApps/BlazorWasmAVP/BlazorWasmAVP.csproj" />
+    <Project Path="SampleApps/MiddlewarePackage1/MiddlewarePackage1.csproj" />
+    <Project Path="SampleApps/MiddlewarePackage2/MiddlewarePackage2.csproj" />
+    <Project Path="SampleApps/RazorClassLib1/RazorClassLib1.csproj" />
+    <Project Path="SampleApps/RazorClassLib2/RazorClassLib2.csproj" />
+  </Folder>
+  <Folder Name="/SampleApps/BlazorWasmApp2/">
+    <Project Path="SampleApps/BlazorWasmApp2/Client/BlazorWasmApp2.Client.csproj" />
+    <Project Path="SampleApps/BlazorWasmApp2/Components/BlazorWasmApp2.Components.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="BlazorWasmPreRendering.Build.Test/BlazorWasmPreRendering.Build.Test.csproj" />
+  </Folder>
+  <Project Path="BlazorWasmPreRendering.Build.Shared/BlazorWasmPreRendering.Build.Shared.csproj" />
+  <Project Path="BlazorWasmPreRendering.Build.WebHost/BlazorWasmPreRendering.Build.WebHost.csproj" />
+  <Project Path="BlazorWasmPreRendering.Build/BlazorWasmPreRendering.Build.csproj" />
+</Solution>
