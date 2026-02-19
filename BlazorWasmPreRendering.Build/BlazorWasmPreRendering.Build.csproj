@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
@@ -55,6 +55,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net11.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="11.0.0-preview.1.*" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\BlazorWasmPreRendering.Build.Shared\BlazorWasmPreRendering.Build.Shared.csproj" />
   </ItemGroup>
@@ -78,6 +82,7 @@
     <Exec Command="dotnet publish -c:$(Configuration) -f:net8.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net9.0 --nologo" />
     <Exec Command="dotnet publish -c:$(Configuration) -f:net10.0 --nologo" />
+    <Exec Command="dotnet publish -c:$(Configuration) -f:net11.0 --nologo" />
 
     <!-- Publish WebHost Program -->
     <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net6.0 --nologo" />
@@ -85,6 +90,7 @@
     <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net8.0 --nologo" />
     <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net9.0 --nologo" />
     <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net10.0 --nologo" />
+    <Exec Command="dotnet publish ../BlazorWasmPreRendering.Build.WebHost -c:$(Configuration) -f:net11.0 --nologo" />
 
     <ItemGroup>
       <_ExcludeForNupkg Include="$(ProjectDir)bin\$(Configuration)\net*\publish\Microsoft.*.dll" />
