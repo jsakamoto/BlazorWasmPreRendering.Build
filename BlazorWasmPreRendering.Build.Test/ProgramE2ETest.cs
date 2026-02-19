@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using AngleSharp.Html.Dom;
@@ -89,13 +89,12 @@ public class ProgramE2ETest
         actualHtmlFiles.Is(expectedHtmlFiles);
 
         // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
-        const string loadingContents = "Loading...";
-        Validate(actualHtmlFiles[4], loadingContents, title_is: "Home", h1_is: "Hello, world!", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[2], loadingContents, title_is: "Counter", h1_is: "Counter", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[3], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[0], loadingContents, title_is: "About .NET", h1_is: "About .NET", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[5], loadingContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[1], loadingContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[4], LoadingContents.Net8, title_is: "Home", h1_is: "Hello, world!", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[2], LoadingContents.Net8, title_is: "Counter", h1_is: "Counter", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[3], LoadingContents.Net8, title_is: "Weather forecast", h1_is: "Weather forecast", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[0], LoadingContents.Net8, title_is: "About .NET", h1_is: "About .NET", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[5], LoadingContents.Net8, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[1], LoadingContents.Net8, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.", shouldDeleteLoadingContents);
     }
 
     [Test]
@@ -120,10 +119,10 @@ public class ProgramE2ETest
             httpResponse.EnsureSuccessStatusCode();
 
             httpResponse.Headers.TryGetValues("X-Middleware1-Version", out var values1).IsTrue();
-            values1.Is("1.0.0.0");
+            values1.Is("8.0.0.0");
 
             httpResponse.Headers.TryGetValues("X-Middleware2-Version", out var values2).IsTrue();
-            values2.Is("2.0.0.0");
+            values2.Is("8.0.0.0");
         }
         finally
         {
@@ -180,14 +179,13 @@ public class ProgramE2ETest
         actualHtmlFiles.Is(expectedHtmlFiles);
 
         // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
-        const string loadingContents = "Loading...";
-        Validate(actualHtmlFiles[5], loadingContents, title_is: "Home", h1_is: "Hello, world!", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[2], loadingContents, title_is: "Counter", h1_is: "Counter", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[4], loadingContents, title_is: "Weather forecast", h1_is: "Weather forecast", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[1], loadingContents, title_is: "About .NET", h1_is: "About .NET", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[6], loadingContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[0], loadingContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[3], loadingContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[5], LoadingContents.Net8, title_is: "Home", h1_is: "Hello, world!", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[2], LoadingContents.Net8, title_is: "Counter", h1_is: "Counter", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[4], LoadingContents.Net8, title_is: "Weather forecast", h1_is: "Weather forecast", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[1], LoadingContents.Net8, title_is: "About .NET", h1_is: "About .NET", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[6], LoadingContents.Net8, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[0], LoadingContents.Net8, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[3], LoadingContents.Net8, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!", shouldDeleteLoadingContents);
     }
 
     private static string[] GetFullPathList(string baseDir, params string[] pathList)
@@ -268,8 +266,8 @@ public class ProgramE2ETest
         var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
         actualHtmlFiles.Is(expectedHtmlFiles);
 
-        Validate(actualHtmlFiles[0], BlazorWasmApp2.LoadingContents, title_is: "BlazorWasmApp2.Client", h1_is: "About Page", deleteLoadingContents);
-        Validate(actualHtmlFiles[1], BlazorWasmApp2.LoadingContents, title_is: "BlazorWasmApp2.Client", h1_is: "Welcome to Blazor Wasm App 2!", deleteLoadingContents);
+        Validate(actualHtmlFiles[0], LoadingContents.Net8, title_is: "BlazorWasmApp2.Client", h1_is: "About Page", deleteLoadingContents);
+        Validate(actualHtmlFiles[1], LoadingContents.Net8, title_is: "BlazorWasmApp2.Client", h1_is: "Welcome to Blazor Wasm App 2!", deleteLoadingContents);
     }
 
     [TestCase(true)]
@@ -310,8 +308,8 @@ public class ProgramE2ETest
         var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
         actualHtmlFiles.Is(expectedHtmlFiles);
 
-        Validate(actualHtmlFiles[0], BlazorWasmApp2.LoadingContents, title_is: "BlazorWasmApp2.Client", h1_is: "About Page", deleteLoadingContents);
-        Validate(actualHtmlFiles[1], BlazorWasmApp2.LoadingContents, title_is: "BlazorWasmApp2.Client", h1_is: "Welcome to Blazor Wasm App 2!", deleteLoadingContents);
+        Validate(actualHtmlFiles[0], LoadingContents.Net8, title_is: "BlazorWasmApp2.Client", h1_is: "About Page", deleteLoadingContents);
+        Validate(actualHtmlFiles[1], LoadingContents.Net8, title_is: "BlazorWasmApp2.Client", h1_is: "Welcome to Blazor Wasm App 2!", deleteLoadingContents);
     }
 
     [Test]

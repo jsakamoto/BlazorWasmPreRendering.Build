@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build;
 
 namespace BlazorWasmPreRendering.Build.Test;
@@ -31,8 +31,8 @@ public class MiddlewarePackageReferenceTest
         middlewarePackages
             .Select(packref => packref.ToString())
             .OrderBy(packref => packref)
-            .Is("MiddlewarePackage1,,1.0.0",
-                "MiddlewarePackage2,Middleware2,2.0.0");
+            .Is("MiddlewarePackage1,,8.0.0",
+                "MiddlewarePackage2,Middleware2,8.0.0");
     }
 
     [Test]
@@ -50,7 +50,7 @@ public class MiddlewarePackageReferenceTest
         middlewarePackages
             .Select(packref => packref.ToString())
             .OrderBy(packref => packref)
-            .Is("MiddlewarePackage1,Middleware1,1.2.0-preview.1",
-                "MiddlewarePackage2,Middleware2,2.0.0");
+            .Is("MiddlewarePackage1,,8.0.0",
+                "MiddlewarePackage2,Middleware2,8.0.0");
     }
 }
