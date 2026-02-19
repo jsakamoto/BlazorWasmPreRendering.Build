@@ -1,26 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
     <ServiceWorkerAssetsManifest>my-assets.js</ServiceWorkerAssetsManifest>
     <BlazorWasmPrerenderingOutputStyle>AppendHtmlExtension</BlazorWasmPrerenderingOutputStyle>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorWasmPreRendering.Build" Version="7.0.0" />
+    <PackageReference Include="BlazorWasmPreRendering.Build" Version="8.0.0-preview.1" />
     <PackageReference Include="BlazorWasmBrotliLoader.Build" Version="1.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.22" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.22" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.17" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="11.0.0-preview.1.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="11.0.0-preview.1.*" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="11.0.0-preview.1.*" />
     <PackageReference Include="HtmlSanitizer" Version="5.0.372" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RazorClassLib1\RazorClassLib1.csproj" />
     <ProjectReference Include="..\RazorClassLib2\RazorClassLib2.csproj" />
-    <BlazorWasmPrerenderMiddleware Include="MiddlewarePackage2" Assembly="Middleware2" Version="1.0.0" />
+    <BlazorWasmPrerenderMiddleware Include="MiddlewarePackage2" Assembly="Middleware2" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
