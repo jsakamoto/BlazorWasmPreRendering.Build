@@ -423,6 +423,19 @@ During the prerendering process is running, developers can investigate it.
 
 ![fig.4 - an exception messaage and a stack trace](https://raw.githubusercontent.com/jsakamoto/BlazorWasmPreRendering.Build/master/.assets/fig05.keeprunning.png)
 
+## 🔍Improving Search Engine Indexing
+
+Pre-rendering your Blazor WebAssembly app as static HTML helps search engine crawlers index your content. However, crawlers may still attempt to download the large files in the `_framework` folder (the .NET WebAssembly runtime and app assemblies), which are unnecessary for indexing and can slow down or interfere with the crawling process.
+
+To prevent this, add a `robots.txt` file to your `wwwroot` folder that disallows crawlers from accessing the `_framework` directory:
+
+```
+User-agent: *
+Disallow: /_framework/
+```
+
+This tells search engine bots to skip the `_framework` folder while still allowing them to crawl and index your pre-rendered HTML pages.
+
 ## 🔗Appendix
 
 - If you would like to **change a title or any meta elements** for each page in your Blazor WebAssembly app, I recommend using the [**"Blazor Head Element Helper"** ![NuGet Package](https://img.shields.io/nuget/v/Toolbelt.Blazor.HeadElement.svg)](https://www.nuget.org/packages/Toolbelt.Blazor.HeadElement/) NuGet package.
