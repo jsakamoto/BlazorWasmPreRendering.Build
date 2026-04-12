@@ -101,6 +101,41 @@ public class StaticlizeCrawlerTest
     }
 
     [Test]
+    public async Task SaveToStaticFileAsync_FollowsAlternateLinks_Test()
+    {
+        // Given
+        const string baseUrl = "http://127.0.0.1:5057";
+        await using var testSiteServer = await TestSites.StartTestSite3(baseUrl);
+        using var outDir = new WorkDirectory();
+        var logger = new TestLogger();
+
+        // When
+        var crawler = new StaticlizeCrawler(
+            baseUrl,
+            urlPathToExplicitFetch: null,
+            webRootPath: outDir,
+            locales: new string[] { },
+            OutputStyle.IndexHtmlInSubFolders,
+            enableBrotliCompression: false,
+            enableGZipCompression: false,
+            logger: logger);
+        var result = await crawler.SaveToStaticFileAsync();
+
+        // Then
+        result.Is(StaticlizeCrawlingResult.Nothing);
+        File.ReadAllText(Path.Combine(outDir, "index.html")).Contains("<h1>Home</h1>").IsTrue();
+        File.ReadAllText(Path.Combine(outDir, "about", "index.html")).Contains("<h1>About</h1>").IsTrue();
+        File.ReadAllText(Path.Combine(outDir, "en", "index.html")).Contains("<h1>Home (EN)</h1>").IsTrue();
+        File.ReadAllText(Path.Combine(outDir, "es", "index.html")).Contains("<h1>Home (ES)</h1>").IsTrue();
+
+        logger.LogLines.OrderBy(line => line)
+            .Is($"Getting {baseUrl}/...",
+                $"Getting {baseUrl}/about...",
+                $"Getting {baseUrl}/en...",
+                $"Getting {baseUrl}/es...");
+    }
+
+    [Test]
     public async Task SaveToStaticFileAsync_JsInvokeOnServerError_Test()
     {
         // Given

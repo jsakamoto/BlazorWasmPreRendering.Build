@@ -166,6 +166,38 @@ internal class StaticlizeCrawler
         {
             await this.SaveToStaticFileAsync((link.Href, link.Protocol, link.PathName));
         }
+
+        // Also follow <link rel="alternate"> elements in the <head>
+        if (htmlDoc.Head is not null)
+        {
+            var alternateLinks = htmlDoc.Head.QuerySelectorAll("link[rel~=alternate][href]").OfType<IHtmlLinkElement>();
+            foreach (var altLink in alternateLinks)
+            {
+                var altHref = altLink.Href;
+                if (string.IsNullOrEmpty(altHref)) continue;
+
+                if (Uri.TryCreate(altHref, UriKind.Absolute, out var absoluteUri))
+                {
+                    if (absoluteUri.Scheme == "about")
+                    {
+                        await this.SaveToStaticFileAsync((altHref, "about:", absoluteUri.AbsolutePath));
+                    }
+                    else
+                    {
+                        var baseUri = new Uri(this.BaseUrl);
+                        if (absoluteUri.Host == baseUri.Host && absoluteUri.Port == baseUri.Port)
+                        {
+                            await this.SaveToStaticFileAsync(($"about://{absoluteUri.AbsolutePath}", "about:", absoluteUri.AbsolutePath));
+                        }
+                    }
+                }
+                else
+                {
+                    var path = altHref.StartsWith("/") ? altHref : "/" + altHref;
+                    await this.SaveToStaticFileAsync(($"about://{path}", "about:", path));
+                }
+            }
+        }
     }
 
     private void IndentedWriteLines(string content, int indentSize)

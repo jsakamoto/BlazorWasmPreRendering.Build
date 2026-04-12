@@ -30,6 +30,19 @@ public static class TestSites
         public void Dispose() => this._Action.Invoke();
     }
 
+    public static async ValueTask<IAsyncDisposable> StartTestSite3(string baseUrl)
+    {
+        var webRootPath = Path.Combine(GetTestSitesDir(), "Site3");
+        var webServer = WebApplication.CreateBuilder(new WebApplicationOptions
+        {
+            Args = ["--urls", baseUrl],
+            ContentRootPath = webRootPath
+        }).Build();
+        webServer.UseDefaultFiles().UseStaticFiles();
+        await webServer.StartAsync();
+        return webServer;
+    }
+
     public static async ValueTask<IDisposable> StartTestSite2(
         string baseUrl,
         bool serviceNotRegistered1 = false,
