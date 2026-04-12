@@ -185,7 +185,7 @@ When that MSBuild property is set to `true`, this package deletes the "Loading..
 
 ### Url path to explicit fetch
 
-By default, this package follows all of `<a>` links recursively inside the contents starting from the root index (`/`) page to save them statically.
+By default, this package follows all of `<a>` links and `<link rel="alternate">` elements recursively inside the contents starting from the root index (`/`) page to save them statically.
 
 However, in some cases, there are pages that are not linked from anywhere, such as an "Easter Egg" page.
 

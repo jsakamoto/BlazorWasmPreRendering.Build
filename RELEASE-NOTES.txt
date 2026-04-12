@@ -1,3 +1,6 @@
+v.7.1.0
+- Feature: Added support for following "link rel=alternate" elements during crawling to generate pre-rendered static HTML for alternate pages. (Issue #61)
+
 v.7.0.0
 - .NET 10.0 support.
 
