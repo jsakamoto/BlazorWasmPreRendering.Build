@@ -1,10 +1,9 @@
-﻿using System.Linq.Expressions;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
+using NSubstitute;
 using NUnit.Framework;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.WebHost;
@@ -34,16 +33,14 @@ public class StartupTest
             .BuildServiceProvider();
         var startUp = services.GetRequiredService<Startup>();
 
-        Expression<Func<IApplicationBuilder, IApplicationBuilder>> useMethod =
-            app => app.Use(It.IsAny<Func<RequestDelegate, RequestDelegate>>());
-        var appBuilderMock = new Mock<IApplicationBuilder>();
-        appBuilderMock.Setup(useMethod).Returns(appBuilderMock.Object);
-        appBuilderMock.SetupProperty(app => app.ApplicationServices, services);
+        var appBuilder = Substitute.For<IApplicationBuilder>();
+        appBuilder.Use(Arg.Any<Func<RequestDelegate, RequestDelegate>>()).Returns(appBuilder);
+        appBuilder.ApplicationServices = services;
 
         // When
-        startUp.ConfigureApplicationMiddleware(appBuilderMock.Object);
+        startUp.ConfigureApplicationMiddleware(appBuilder);
 
         // Then
-        appBuilderMock.Verify(useMethod, Times.Once);
+        appBuilder.Received(1).Use(Arg.Any<Func<RequestDelegate, RequestDelegate>>());
     }
 }
