@@ -26,7 +26,8 @@ jobs:
 
       # Publish the site
       - name: Publish
-        run: dotnet publish SampleApps/BlazorWasmApp1/BlazorWasmApp1.csproj -c Release -o public -p GHPages=true --nologo
+        run: dotnet publish BlazorWasmApp1.csproj -o ../../public -p GHPages=true --nologo
+        working-directory: ./SampleApps/BlazorWasmApp1
 
       # Deploy the site
       - name: Deploy
