@@ -211,7 +211,7 @@ Similarly, if you want to skip some URL paths during the crawling process, you c
   ...
   <PropertyGroup>
     <!--
-    👇 If you set this, each URL path matched with the regex
+    👇 If you set this, each URL path matched by the regex
        will be skipped during the crawling process.
     -->
     <BlazorWasmPrerenderingUrlPathRegexToIgnore>/(admin|private)</BlazorWasmPrerenderingUrlPathRegexToIgnore>
