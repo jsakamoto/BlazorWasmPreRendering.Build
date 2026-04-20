@@ -66,7 +66,7 @@ internal class StaticlizeCrawler
         {
             try
             {
-                this.UrlPathRegexToIgnore = new Regex(urlPathRegexToIgnore, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                this.UrlPathRegexToIgnore = new Regex(urlPathRegexToIgnore, RegexOptions.Compiled | RegexOptions.IgnoreCase, TimeSpan.FromSeconds(5));
             }
             catch (ArgumentException ex)
             {
