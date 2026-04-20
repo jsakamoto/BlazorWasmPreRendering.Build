@@ -64,7 +64,17 @@ internal class StaticlizeCrawler
 
         if (!string.IsNullOrEmpty(urlPathRegexToIgnore))
         {
-            this.UrlPathRegexToIgnore = new Regex(urlPathRegexToIgnore, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            try
+            {
+                this.UrlPathRegexToIgnore = new Regex(urlPathRegexToIgnore, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException(
+                    "Invalid regex pattern for --urlpathregextoignore / BlazorWasmPrerenderingUrlPathRegexToIgnore.",
+                    nameof(urlPathRegexToIgnore),
+                    ex);
+            }
         }
 
         if (locales.Any())
