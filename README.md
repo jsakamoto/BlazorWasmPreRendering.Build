@@ -203,6 +203,21 @@ To support that case, please **set the URL path list that you want to fetch expl
     <BlazorWasmPrerenderingUrlPathToExplicitFetch>/unkinked/page1;/unlinked/page2</BlazorWasmPrerenderingUrlPathToExplicitFetch>
     ...
 ```
+
+Similarly, if you want to skip some URL paths during the crawling process, you can **set a regular expression to the `BlazorWasmPrerenderingUrlPathRegexToIgnore` MSBuild property**.
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  ...
+  <PropertyGroup>
+    <!--
+    👇 If you set this, each URL path matched with the regex
+       will be skipped during the crawling process.
+    -->
+    <BlazorWasmPrerenderingUrlPathRegexToIgnore>/(admin|private)</BlazorWasmPrerenderingUrlPathRegexToIgnore>
+    ...
+```
+
 (* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
 
 ### Render mode

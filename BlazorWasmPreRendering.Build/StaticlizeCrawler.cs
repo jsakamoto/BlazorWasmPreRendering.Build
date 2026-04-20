@@ -32,6 +32,8 @@ internal class StaticlizeCrawler
 
     private IEnumerable<string> UrlPathToExplicitFetch { get; }
 
+    private Regex? UrlPathRegexToIgnore { get; }
+
     private readonly List<string> _StaticalizedFiles = new List<string>();
 
     public IEnumerable<string> StaticalizedFiles => this._StaticalizedFiles;
@@ -39,6 +41,7 @@ internal class StaticlizeCrawler
     public StaticlizeCrawler(
         string baseUrl,
         string? urlPathToExplicitFetch,
+        string? urlPathRegexToIgnore,
         string webRootPath,
         IEnumerable<string> locales,
         OutputStyle outputStyle,
@@ -58,6 +61,21 @@ internal class StaticlizeCrawler
             .Select(s => s.Trim())
             .Where(s => !string.IsNullOrEmpty(s))
             .ToArray();
+
+        if (!string.IsNullOrEmpty(urlPathRegexToIgnore))
+        {
+            try
+            {
+                this.UrlPathRegexToIgnore = new Regex(urlPathRegexToIgnore, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException(
+                    "Invalid regex pattern for --urlpathregextoignore / BlazorWasmPrerenderingUrlPathRegexToIgnore.",
+                    nameof(urlPathRegexToIgnore),
+                    ex);
+            }
+        }
 
         if (locales.Any())
         {
@@ -90,6 +108,14 @@ internal class StaticlizeCrawler
     {
         var href = args.Href.Split('#').FirstOrDefault() ?? "";
         if (this.SavedPathSet.Contains(href)) return;
+
+        if (this.UrlPathRegexToIgnore != null && this.UrlPathRegexToIgnore.IsMatch(args.PathName))
+        {
+            this.SavedPathSet.Add(href);
+            this.Logger.LogInformation($"Skipping {args.PathName} (matched by UrlPathRegexToIgnore)");
+            return;
+        }
+
         this.SavedPathSet.Add(href);
 
         // DEBUG: Console.WriteLine($"Protocol:[{args.Protocol}], PathName:[{args.PathName}], Href:[{args.Href}]");

@@ -41,6 +41,7 @@ public class Program
         var crawler = new StaticlizeCrawler(
             baseUrl,
             commandLineOptions.UrlPathToExplicitFetch,
+            commandLineOptions.UrlPathRegexToIgnore,
             prerenderingOptions.WebRootPath,
             prerenderingOptions.Locales,
             commandLineOptions.OutputStyle,
