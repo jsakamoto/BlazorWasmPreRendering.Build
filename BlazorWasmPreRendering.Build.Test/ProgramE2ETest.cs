@@ -156,7 +156,7 @@ public class ProgramE2ETest
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
             "-f", SampleSite.BlazorWasmApp1.TargetFramework,
             "-o", "AppendHtmlExtension",
-            "-u", "/easter-egg",
+            "--urlpathtoexplicitfetch", "/easter-egg",
             "--serverport", tcpPort,
             shouldDeleteLoadingContents? "-d" : ""
         });
