@@ -25,7 +25,9 @@ public class IndexHtmlFragmentsTest
         indexHtmlFragments.MiddlePart.Is(
             "</head>\n" +
             "<body>\n" +
-            "    <div id=\"app\">\n" +
+            "    <div id=\"app\">");
+        indexHtmlFragments.LoaderPart.Is(
+            "\n" +
             "        <div>Loading...</div>\n" +
             "        <img src=\"foo.png\"/>\n" +
             "    ");
@@ -53,7 +55,9 @@ public class IndexHtmlFragmentsTest
         indexHtmlFragments.MiddlePart.Is(
             "</head>\n" +
             "<body>\n" +
-            "    <div id=\"app\">\n" +
+            "    <div id=\"app\">");
+        indexHtmlFragments.LoaderPart.Is(
+            "\n" +
             "        <div>Loading...</div>\n" +
             "        <img src=\"foo.png\"/>\n" +
             "    ");
@@ -83,6 +87,8 @@ public class IndexHtmlFragmentsTest
             "</head>\n" +
             "<body>\n" +
             "    <div id=\"app\">");
+
+        indexHtmlFragments.LoaderPart.Is("");
 
         indexHtmlFragments.LastPart.Is(
             "</div>\n\n</body></html>");

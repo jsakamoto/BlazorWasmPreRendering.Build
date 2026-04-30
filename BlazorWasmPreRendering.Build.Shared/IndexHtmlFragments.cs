@@ -6,12 +6,15 @@ public class IndexHtmlFragments
 
     public string MiddlePart { get; }
 
+    public string LoaderPart { get; }
+
     public string LastPart { get; }
 
-    public IndexHtmlFragments(string firstPart, string middlePart, string lastPart)
+    public IndexHtmlFragments(string firstPart, string middlePart, string loaderPart, string lastPart)
     {
         this.FirstPart = firstPart;
         this.MiddlePart = middlePart;
+        this.LoaderPart = loaderPart;
         this.LastPart = lastPart;
     }
 }

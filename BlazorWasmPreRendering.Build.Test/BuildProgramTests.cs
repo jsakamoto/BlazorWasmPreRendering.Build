@@ -76,6 +76,7 @@ public class BuildProgramTests
             IndexHtmlFragments = new(
                 firstPart: "<html>\r\n<head>\r\n",
                 lastPart: "</body>\r\n</html>",
+                loaderPart: "",
                 middlePart: "</head>\r\n<body>\r\n"
             ),
             Locales = { "en", "ja" },
@@ -101,6 +102,7 @@ public class BuildProgramTests
                 "X_Environment|Production",
                 "X_IndexHtmlFragments:FirstPart|<html>\r\n<head>\r\n",
                 "X_IndexHtmlFragments:LastPart|</body>\r\n</html>",
+                "X_IndexHtmlFragments:LoaderPart|",
                 "X_IndexHtmlFragments:MiddlePart|</head>\r\n<body>\r\n",
                 "X_Locales:0|en",
                 "X_Locales:1|ja",
@@ -129,6 +131,7 @@ public class BuildProgramTests
             IndexHtmlFragments = new(
                 firstPart: "<html>\r\n<head>\r\n",
                 lastPart: "</body>\r\n</html>",
+                loaderPart: "",
                 middlePart: "</head>\r\n<body>\r\n"
             ),
             MiddlewareDllsDir = "C:\\project\\obj\\Release\\net6.0\\middleware",
@@ -149,6 +152,7 @@ public class BuildProgramTests
                 "~Environment|Development",
                 "~IndexHtmlFragments:FirstPart|<html>\r\n<head>\r\n",
                 "~IndexHtmlFragments:LastPart|</body>\r\n</html>",
+                "~IndexHtmlFragments:LoaderPart|",
                 "~IndexHtmlFragments:MiddlePart|</head>\r\n<body>\r\n",
                 "~MiddlewareDllsDir|C:\\project\\obj\\Release\\net6.0\\middleware",
                 "~RenderMode|Static",

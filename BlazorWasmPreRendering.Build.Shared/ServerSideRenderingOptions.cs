@@ -22,7 +22,7 @@ public class ServerSideRenderingOptions
 
     public RenderMode RenderMode { get; init; }
 
-    public IndexHtmlFragments IndexHtmlFragments { get; init; } = new("", "", "");
+    public IndexHtmlFragments IndexHtmlFragments { get; init; } = new("", "", "", "");
 
     public bool DeleteLoadingContents { get; init; }
 
