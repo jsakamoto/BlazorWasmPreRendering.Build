@@ -16,7 +16,7 @@
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="NUnit" Version="4.5.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="6.2.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
     <PackageReference Include="Toolbelt.Blazor.HeadElement.ServerPrerendering" Version="7.3.1" />
     <PackageReference Include="Toolbelt.WorkDirectory " Version="1.1.0.1" />
     <PackageReference Include="XProcess" Version="1.4.1" />
