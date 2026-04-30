@@ -73,11 +73,11 @@ public class BuildProgramTests
             DeleteLoadingContents = true,
             Environment = "Production",
             EmulateAuthMe = false,
-            IndexHtmlFragments = {
-                FirstPart = "<html>\r\n<head>\r\n",
-                LastPart = "</body>\r\n</html>",
-                MiddlePart = "</head>\r\n<body>\r\n",
-            },
+            IndexHtmlFragments = new(
+                firstPart: "<html>\r\n<head>\r\n",
+                lastPart: "</body>\r\n</html>",
+                middlePart: "</head>\r\n<body>\r\n"
+            ),
             Locales = { "en", "ja" },
             MiddlewareDllsDir = "C:\\project\\obj\\Release\\net6.0\\middleware",
             MiddlewarePackages = {
@@ -126,11 +126,11 @@ public class BuildProgramTests
             DeleteLoadingContents = false,
             Environment = "Development",
             EmulateAuthMe = true,
-            IndexHtmlFragments = {
-                FirstPart = "<html>\r\n<head>\r\n",
-                LastPart = "</body>\r\n</html>",
-                MiddlePart = "</head>\r\n<body>\r\n"
-            },
+            IndexHtmlFragments = new(
+                firstPart: "<html>\r\n<head>\r\n",
+                lastPart: "</body>\r\n</html>",
+                middlePart: "</head>\r\n<body>\r\n"
+            ),
             MiddlewareDllsDir = "C:\\project\\obj\\Release\\net6.0\\middleware",
             RenderMode = RenderMode.Static,
             RootComponentTypeName = "Project.App",
