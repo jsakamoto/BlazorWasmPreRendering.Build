@@ -9,16 +9,20 @@
 <body>
     <div id="app">
 <!-- %%-PRERENDERING-LOADER-BEGIN-%% -->
- <div style="position: fixed; inset: 0; z-index: 99999;">
+<div b-prerendering-loader style="position: fixed; inset: 0; z-index: 1; background-color: Canvas;">
 <!-- %%-PRERENDERING-LOADER-END-%% -->
         <div>Loading...</div>
         <img src="foo.png" />
 <!-- %%-PRERENDERING-LOADER-BEGIN-%% -->
+<div b-prerendering-container inert style="position: fixed; inset: 0; overflow: hidden;">
 </div>
 <!-- %%-PRERENDERING-LOADER-END-%% -->
 <!-- %%-PRERENDERING-BEGIN-%% -->
          <h1>Hello, World!</h1>
 <!-- %%-PRERENDERING-END-%% -->
     </div>
+<!-- %%-PRERENDERING-LOADER-BEGIN-%% -->
+</div>
+<!-- %%-PRERENDERING-LOADER-END-%% -->
 </body>
 </html>

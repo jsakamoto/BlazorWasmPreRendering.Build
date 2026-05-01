@@ -9,16 +9,27 @@
 if (PrerenderingContext.RenderMode != RenderMode.WebAssemblyPrerendered) {<!-- %%-PRERENDERING-HEADOUTLET-END-%% -->
 }}
 @Html.Raw(PrerenderingContext.IndexHtmlFragments.MiddlePart)
-<!-- %%-PRERENDERING-BEGIN-%% -->
 @if (PrerenderingContext.DeleteLoadingContents) {
-    @RenderBody()
+<!-- %%-PRERENDERING-BEGIN-%% -->
+@RenderBody()
+<!-- %%-PRERENDERING-END-%% -->
 }
 else
 {
-<div style="opacity: 0; position: fixed; z-index: -1; top: 0; left: 0; bottom: 0; right: 0;">
-    @RenderBody()
+<!-- %%-PRERENDERING-LOADER-BEGIN-%% -->
+<div b-prerendering-loader style="position: fixed; inset: 0; z-index: 1; background-color: Canvas;">
+<!-- %%-PRERENDERING-LOADER-END-%% -->
+@Html.Raw(PrerenderingContext.IndexHtmlFragments.LoaderPart)
+<!-- %%-PRERENDERING-LOADER-BEGIN-%% -->
 </div>
-}
+<div b-prerendering-container inert style="position: fixed; inset: 0; overflow: hidden;">
+<!-- %%-PRERENDERING-LOADER-END-%% -->
+<!-- %%-PRERENDERING-BEGIN-%% -->
+@RenderBody()
 <!-- %%-PRERENDERING-END-%% -->
+<!-- %%-PRERENDERING-LOADER-BEGIN-%% -->
+</div>
+<!-- %%-PRERENDERING-LOADER-END-%% -->
+}
 @if (PrerenderingContext.RenderMode == Microsoft.AspNetCore.Mvc.Rendering.RenderMode.WebAssemblyPrerendered && typeof(ComponentBase).Assembly.GetName().Version!.Major >= 6) {<persist-component-state />}
 @Html.Raw(PrerenderingContext.IndexHtmlFragments.LastPart)
