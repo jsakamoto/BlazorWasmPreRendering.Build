@@ -8,6 +8,7 @@
     <File Path="RELEASE-NOTES.txt" />
   </Folder>
   <Folder Name="/SampleApps/">
+    <File Path="SampleApps/MiddlewarePackageVersion.props" />
     <File Path="SampleApps/SAMPLE-APPS-README.md" />
     <Project Path="SampleApps/BlazorWasmApp0/BlazorWasmApp0.csproj" />
     <Project Path="SampleApps/BlazorWasmApp1/BlazorWasmApp1.csproj" />

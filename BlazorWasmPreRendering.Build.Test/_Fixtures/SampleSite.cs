@@ -96,6 +96,24 @@ public class SampleSite : IDisposable
         var solutionDir = FileIO.FindContainerDirToAncestor("*.slnx");
         var srcSampleAppsDir = Path.Combine(solutionDir, "SampleApps");
 
+        // Ensure the sample package files exist in the src sample apps directory. If not, create them.
+        var samplePackageDir = Path.Combine(srcSampleAppsDir, "_dist");
+        var packageFiles = Directory.GetFiles(samplePackageDir, "*.nupkg").Select(Path.GetFileName).ToArray();
+        var packages = new[] {
+            (Name: "MiddlewarePackage1", Version: MiddlewarePackageVersionInfo.MiddlewarePackage1Version),
+            (Name: "MiddlewarePackage2", Version: MiddlewarePackageVersionInfo.MiddlewarePackage2Version),
+        };
+        foreach (var (Name, Version) in packages)
+        {
+            var expectedPackageFileName = $"{Name}.{Version}.nupkg";
+            if (packageFiles.Contains(expectedPackageFileName)) continue;
+
+            var packageProjDir = Path.Combine(srcSampleAppsDir, Name);
+            var packProcess = XProcess.Start("dotnet", "pack -c:Release", workingDirectory: packageProjDir);
+            packProcess.WaitForExitAsync().Wait();
+            packProcess.ExitCode.Is(0, message: packProcess.Output);
+        }
+
         return WorkDirectory.CreateCopyFrom(srcSampleAppsDir, arg => arg.Name is (not "obj" and not "bin"));
     }
 
