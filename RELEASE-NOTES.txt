@@ -1,3 +1,6 @@
+v.8.0.0
+- Improve: Rendered the loading screen as an overlay so that pre-rendered content is visible to search engine crawlers. (Issue #64)
+
 v.7.2.0
 - Feature: Added the "UrlPathRegexToIgnore" argument for ignoring URL paths by regex during crawling. (PR #63 contributed by @axiom-nz)
 
