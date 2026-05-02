@@ -1,5 +1,5 @@
-v.8.0.0-preview.1
-- .NET 11.0 Preview 1 support.
+v.8.1.0-preview.1
+- .NET 11.0 Preview 3 support.
 
 v.8.0.0
 - Improve: Rendered the loading screen as an overlay so that pre-rendered content is visible to search engine crawlers. (Issue #64)
