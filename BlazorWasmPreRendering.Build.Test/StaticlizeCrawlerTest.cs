@@ -20,6 +20,7 @@ public class StaticlizeCrawlerTest
         var crawler = new StaticlizeCrawler(
             baseUrl,
             urlPathToExplicitFetch: null,
+            urlPathRegexToIgnore: null,
             webRootPath: outDir,
             locales: new string[] { },
             OutputStyle.IndexHtmlInSubFolders,
@@ -41,6 +42,40 @@ public class StaticlizeCrawlerTest
     }
 
     [Test]
+    public async Task SaveToStaticFileAsync_UrlPathRegexToIgnore_Test()
+    {
+        // Given
+        const string baseUrl = "http://127.0.0.1:5058";
+        await using var testSiteServer = await TestSites.StartTestSite1(baseUrl);
+        using var outDir = new WorkDirectory();
+        var logger = new TestLogger();
+
+        // When
+        var crawler = new StaticlizeCrawler(
+            baseUrl,
+            urlPathToExplicitFetch: null,
+            urlPathRegexToIgnore: "counter", // Skip "/counter"
+            webRootPath: outDir,
+            locales: new string[] { },
+            OutputStyle.IndexHtmlInSubFolders,
+            enableBrotliCompression: false,
+            enableGZipCompression: false,
+            logger: logger);
+        var result = await crawler.SaveToStaticFileAsync();
+
+        // Then
+        result.Is(StaticlizeCrawlingResult.Nothing);
+        File.Exists(Path.Combine(outDir, "index.html")).IsTrue();
+        File.Exists(Path.Combine(outDir, "counter", "index.html")).IsFalse();
+        File.Exists(Path.Combine(outDir, "fetchdata", "weather-forecast", "index.html")).IsTrue();
+
+        logger.LogLines.OrderBy(line => line)
+            .Is($"Getting {baseUrl}/...",
+                $"Getting {baseUrl}/fetchdata/weather-forecast...",
+                $"Skipping /counter (matched by UrlPathRegexToIgnore)");
+    }
+
+    [Test]
     public async Task SaveToStaticFileAsync_AppendHtmlExtension_Style_Test()
     {
         // Given
@@ -53,6 +88,7 @@ public class StaticlizeCrawlerTest
         var crawler = new StaticlizeCrawler(
             baseUrl,
             urlPathToExplicitFetch: null,
+            urlPathRegexToIgnore: null,
             webRootPath: outDir,
             locales: new[] { "en" },
             OutputStyle.AppendHtmlExtension,
@@ -87,6 +123,7 @@ public class StaticlizeCrawlerTest
         var crawler = new StaticlizeCrawler(
             baseUrl,
             urlPathToExplicitFetch: null,
+            urlPathRegexToIgnore: null,
             webRootPath: outDir,
             locales: new string[] { },
             OutputStyle.AppendHtmlExtension,
@@ -98,6 +135,42 @@ public class StaticlizeCrawlerTest
         // Then
         result.HasFlag(StaticlizeCrawlingResult.HasErrors).IsTrue();
         result.HasFlag(StaticlizeCrawlingResult.HasErrorsOfServiceNotRegistered).IsTrue();
+    }
+
+    [Test]
+    public async Task SaveToStaticFileAsync_FollowsAlternateLinks_Test()
+    {
+        // Given
+        const string baseUrl = "http://127.0.0.1:5057";
+        await using var testSiteServer = await TestSites.StartTestSite3(baseUrl);
+        using var outDir = new WorkDirectory();
+        var logger = new TestLogger();
+
+        // When
+        var crawler = new StaticlizeCrawler(
+            baseUrl,
+            urlPathToExplicitFetch: null,
+            urlPathRegexToIgnore: null,
+            webRootPath: outDir,
+            locales: new string[] { },
+            OutputStyle.IndexHtmlInSubFolders,
+            enableBrotliCompression: false,
+            enableGZipCompression: false,
+            logger: logger);
+        var result = await crawler.SaveToStaticFileAsync();
+
+        // Then
+        result.Is(StaticlizeCrawlingResult.Nothing);
+        File.ReadAllText(Path.Combine(outDir, "index.html")).Contains("<h1>Home</h1>").IsTrue();
+        File.ReadAllText(Path.Combine(outDir, "about", "index.html")).Contains("<h1>About</h1>").IsTrue();
+        File.ReadAllText(Path.Combine(outDir, "en", "index.html")).Contains("<h1>Home (EN)</h1>").IsTrue();
+        File.ReadAllText(Path.Combine(outDir, "es", "index.html")).Contains("<h1>Home (ES)</h1>").IsTrue();
+
+        logger.LogLines.OrderBy(line => line)
+            .Is($"Getting {baseUrl}/...",
+                $"Getting {baseUrl}/about...",
+                $"Getting {baseUrl}/en...",
+                $"Getting {baseUrl}/es...");
     }
 
     [Test]
@@ -113,6 +186,7 @@ public class StaticlizeCrawlerTest
         var crawler = new StaticlizeCrawler(
             baseUrl,
             urlPathToExplicitFetch: null,
+            urlPathRegexToIgnore: null,
             webRootPath: outDir,
             locales: new string[] { },
             OutputStyle.AppendHtmlExtension,

@@ -73,11 +73,12 @@ public class BuildProgramTests
             DeleteLoadingContents = true,
             Environment = "Production",
             EmulateAuthMe = false,
-            IndexHtmlFragments = {
-                FirstPart = "<html>\r\n<head>\r\n",
-                LastPart = "</body>\r\n</html>",
-                MiddlePart = "</head>\r\n<body>\r\n",
-            },
+            IndexHtmlFragments = new(
+                firstPart: "<html>\r\n<head>\r\n",
+                lastPart: "</body>\r\n</html>",
+                loaderPart: "",
+                middlePart: "</head>\r\n<body>\r\n"
+            ),
             Locales = { "en", "ja" },
             MiddlewareDllsDir = "C:\\project\\obj\\Release\\net6.0\\middleware",
             MiddlewarePackages = {
@@ -101,6 +102,7 @@ public class BuildProgramTests
                 "X_Environment|Production",
                 "X_IndexHtmlFragments:FirstPart|<html>\r\n<head>\r\n",
                 "X_IndexHtmlFragments:LastPart|</body>\r\n</html>",
+                "X_IndexHtmlFragments:LoaderPart|",
                 "X_IndexHtmlFragments:MiddlePart|</head>\r\n<body>\r\n",
                 "X_Locales:0|en",
                 "X_Locales:1|ja",
@@ -126,11 +128,12 @@ public class BuildProgramTests
             DeleteLoadingContents = false,
             Environment = "Development",
             EmulateAuthMe = true,
-            IndexHtmlFragments = {
-                FirstPart = "<html>\r\n<head>\r\n",
-                LastPart = "</body>\r\n</html>",
-                MiddlePart = "</head>\r\n<body>\r\n"
-            },
+            IndexHtmlFragments = new(
+                firstPart: "<html>\r\n<head>\r\n",
+                lastPart: "</body>\r\n</html>",
+                loaderPart: "",
+                middlePart: "</head>\r\n<body>\r\n"
+            ),
             MiddlewareDllsDir = "C:\\project\\obj\\Release\\net6.0\\middleware",
             RenderMode = RenderMode.Static,
             RootComponentTypeName = "Project.App",
@@ -149,6 +152,7 @@ public class BuildProgramTests
                 "~Environment|Development",
                 "~IndexHtmlFragments:FirstPart|<html>\r\n<head>\r\n",
                 "~IndexHtmlFragments:LastPart|</body>\r\n</html>",
+                "~IndexHtmlFragments:LoaderPart|",
                 "~IndexHtmlFragments:MiddlePart|</head>\r\n<body>\r\n",
                 "~MiddlewareDllsDir|C:\\project\\obj\\Release\\net6.0\\middleware",
                 "~RenderMode|Static",

@@ -3,14 +3,26 @@
 <head>
     <meta charset="utf-8" />
 <!-- %%-PRERENDERING-HEADOUTLET-BEGIN-%% -->
+    <title>Home</title> 
 <!-- %%-PRERENDERING-HEADOUTLET-END-%% -->
 </head>
 <body>
     <div id="app">
+<!-- %%-PRERENDERING-LOADER-BEGIN-%% -->
+<div b-prerendering-loader style="position: fixed; inset: 0; z-index: 1; background: var(--bp-loader-background, Canvas);">
+<!-- %%-PRERENDERING-LOADER-END-%% -->
         <div>Loading...</div>
         <img src="foo.png" />
+<!-- %%-PRERENDERING-LOADER-BEGIN-%% -->
+<div b-prerendering-container inert style="position: fixed; inset: 0; overflow: hidden;">
+</div>
+<!-- %%-PRERENDERING-LOADER-END-%% -->
 <!-- %%-PRERENDERING-BEGIN-%% -->
+         <h1>Hello, World!</h1>
 <!-- %%-PRERENDERING-END-%% -->
     </div>
+<!-- %%-PRERENDERING-LOADER-BEGIN-%% -->
+</div>
+<!-- %%-PRERENDERING-LOADER-END-%% -->
 </body>
 </html>

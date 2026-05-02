@@ -48,6 +48,8 @@ public class CommandLineOptions
 
     public string? UrlPathToExplicitFetch { get; set; }
 
+    public string? UrlPathRegexToIgnore { get; set; }
+
     public bool KeepRunning { get; init; }
 
     public static readonly string DefaultServerPort = "5050-5999";

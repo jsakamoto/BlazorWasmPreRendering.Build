@@ -1,6 +1,15 @@
 v.8.0.0-preview.1
 - .NET 11.0 Preview 1 support.
 
+v.8.0.0
+- Improve: Rendered the loading screen as an overlay so that pre-rendered content is visible to search engine crawlers. (Issue #64)
+
+v.7.2.0
+- Feature: Added the "UrlPathRegexToIgnore" argument for ignoring URL paths by regex during crawling. (PR #63 contributed by @axiom-nz)
+
+v.7.1.0
+- Feature: Added support for following "link rel=alternate" elements during crawling to generate pre-rendered static HTML for alternate pages. (Issue #61)
+
 v.7.0.0
 - .NET 10.0 support.
 
