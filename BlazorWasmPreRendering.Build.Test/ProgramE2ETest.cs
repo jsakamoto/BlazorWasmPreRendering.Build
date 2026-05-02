@@ -231,7 +231,7 @@ public class ProgramE2ETest
 
             appElement.InnerHtml.TrimStart().StartsWith(
                 "<!-- %%-PRERENDERING-LOADER-BEGIN-%% -->\n" +
-                "<div b-prerendering-loader=\"\" style=\"position: fixed; inset: 0; z-index: 1; background-color: Canvas;\">\n" +
+                "<div b-prerendering-loader=\"\" style=\"position: fixed; inset: 0; z-index: 1; background: var(--bp-loader-background, Canvas);\">\n" +
                 "<!-- %%-PRERENDERING-LOADER-END-%% -->\n" +
                 loadingContents + "\n" +
                 "<!-- %%-PRERENDERING-LOADER-BEGIN-%% -->\n" +
