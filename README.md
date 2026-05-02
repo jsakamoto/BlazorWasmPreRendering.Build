@@ -153,16 +153,49 @@ But if you **set the `BlazorWasmPrerenderingOutputStyle` MSBuild property to `Ap
 ```
 (* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
 
-### Delete the "Loading..." contents
+### Loading overlay and the "Loading..." contents
 
 By default, this package **keeps the "Loading..." contents** in the original fallback page (such as an `index.html`) into prerendered output static HTML files.
 
-And, **prerendered contents are invisible** on the browser screen.  
-(Only search engine crawlers can read them.)
+The "Loading..." contents are then **rendered as an overlay on top of the prerendered contents**, covering the entire viewport. As a result, **users see the loading screen while the Blazor WebAssembly runtime is warming up**, but the prerendered contents underneath remain part of the HTML document so that **search engine crawlers can read them**.
 
-That is by design because even if users can see the prerendered contents immediately after initial page loading, **that page can not interact with users for a few seconds** until the Blazor WebAssembly runtime has been warmed up.
+That is by design because even if users could see the prerendered contents immediately after initial page loading, **that page can not interact with users for a few seconds** until the Blazor WebAssembly runtime has been warmed up.
 
-However, in some cases, developers can control the user interactions completely until the Blazor WebAssembly runtime warmed up, and they would like to make the prerendered contents are visible immediately.
+> **Note:** Prior to v.8.0.0, the prerendered contents were instead hidden using `opacity: 0` and `position: fixed`. However, that approach caused some search engines (notably Google) to treat the prerendered contents as hidden and skip indexing them. The overlay-based approach in v.8.0.0 and later avoids that issue while preserving the same user experience.
+
+#### Customizing the loading overlay
+
+The loading overlay is implemented with two wrapper elements:
+
+- The element wrapping the **"Loading..." contents** has the `b-prerendering-loader` attribute.
+- The element wrapping the **prerendered contents** has the `b-prerendering-container` attribute.
+
+The overlay's background color defaults to the [`Canvas`](https://developer.mozilla.org/docs/Web/CSS/system-color) system color. You can override it by defining the `--bp-loader-background` CSS custom property:
+
+```css
+:root {
+    --bp-loader-background: #ffffff;
+}
+```
+
+You can also further adjust the styles of either wrapper element by writing CSS selectors that target these attributes, for example:
+
+```css
+/* Customize the loading overlay (e.g. add a blur effect) */
+[b-prerendering-loader] {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+/* Customize the prerendered content wrapper */
+[b-prerendering-container] {
+    /* your styles here */
+}
+```
+
+#### Disabling the loading overlay
+
+In some cases, developers can control the user interactions completely until the Blazor WebAssembly runtime warmed up, and they would like to display the prerendered contents directly without the loading overlay.
 
 For that case, set the `BlazorWasmPrerenderingDeleteLoadingContents` MSBuild property to `true`.
 
@@ -179,7 +212,7 @@ For that case, set the `BlazorWasmPrerenderingDeleteLoadingContents` MSBuild pro
     ...
 ```
 
-When that MSBuild property is set to `true`, this package deletes the "Loading..." contents from prerendered static HTML files and does not hide prerendered contents from users.
+When that MSBuild property is set to `true`, this package deletes the "Loading..." contents from prerendered static HTML files and does not render the loading overlay.
 
 (* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
 
@@ -238,7 +271,7 @@ And, **you can specify the render mode to `WebAssemblyPrerendered` via the `Blaz
 ```
 (* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
 
-As the side effect of using the `WebAssemblyPrerendered` render mode, even you specify any values to the "BlazorWasmPrerenderingDeleteLoadingContents" MSBuild property, the "Loading..." contents are always removed, and prerendered contents never are invisible.
+As the side effect of using the `WebAssemblyPrerendered` render mode, even you specify any values to the "BlazorWasmPrerenderingDeleteLoadingContents" MSBuild property, the "Loading..." contents are always removed, and the loading overlay is never rendered.
 
 When you use the `WebAssemblyPrerendered` render mode,  please pay attention to implementing a startup code of the Blazor WebAssembly app.
 
