@@ -40,6 +40,6 @@
 
 	protected override void OnInitialized()
 	{
-		this._Title = this.HtmlSanitizer.Sanitize(Configuration.GetValue("HomeTitle", ""));
+		this._Title = this.HtmlSanitizer.Sanitize(Configuration.GetValue<string>("HomeTitle") ?? "");
 	}
 }
