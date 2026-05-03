@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
@@ -33,4 +34,11 @@ public class ServerSideRenderingContext
     public string[] Locales { get; init; } = new string[0];
 
     public int ServerPort { get; init; }
+
+
+    public string BaseAddress => $"http://127.0.0.1:{this.ServerPort}/";
+
+    private IWebAssemblyHostEnvironment? _HostEnvironment = null;
+
+    public IWebAssemblyHostEnvironment HostEnvironment => this._HostEnvironment ??= new HostEnvironment(this.BaseAddress, this.Environment ?? "Prerendering");
 }

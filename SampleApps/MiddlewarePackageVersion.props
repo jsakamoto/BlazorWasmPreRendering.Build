@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <MiddlewarePackage1Version>8.0.0</MiddlewarePackage1Version>
+    <MiddlewarePackage2Version>8.0.0</MiddlewarePackage2Version>
+  </PropertyGroup>
+</Project>
