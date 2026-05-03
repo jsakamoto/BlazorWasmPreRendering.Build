@@ -9,6 +9,7 @@
     <EnableNUnitRunner>true</EnableNUnitRunner>
     <OutputType>Exe</OutputType>
     <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+    <PrepareForBuildDependsOn>$(PrepareForBuildDependsOn);_GenerateMiddlewarePackageVersionInfoClass</PrepareForBuildDependsOn>    
   </PropertyGroup>
 
   <ItemGroup>
@@ -37,4 +38,17 @@
     <None Include="_Fixtures\TestSites\**\*" Exclude="_Fixtures\TestSites\Site2-ServerErrors\bin\**\*;_Fixtures\TestSites\Site2-ServerErrors\obj\**\*;" />
   </ItemGroup>
 
+  <Import Project="../SampleApps/MiddlewarePackageVersion.props" />
+  
+  <Target Name="_GenerateMiddlewarePackageVersionInfoClass" Inputs="../SampleApps/MiddlewarePackageVersion.props" Outputs="MiddlewarePackageVersionInfo.cs">
+    <ItemGroup>
+      <VersionInfoLines Include="namespace $(RootNamespace)%3b%0a"/>
+      <VersionInfoLines Include="internal static class MiddlewarePackageVersionInfo"/>
+      <VersionInfoLines Include="{"/>
+      <VersionInfoLines Include="%20%20%20%20internal static string MiddlewarePackage1Version = &quot;$(MiddlewarePackage1Version)&quot;%3b"/>
+      <VersionInfoLines Include="%20%20%20%20internal static string MiddlewarePackage2Version = &quot;$(MiddlewarePackage2Version)&quot;%3b"/>
+      <VersionInfoLines Include="}"/>
+    </ItemGroup>
+    <WriteLinesToFile File="MiddlewarePackageVersionInfo.cs" Overwrite="true" Lines="@(VersionInfoLines)"></WriteLinesToFile>
+  </Target>
 </Project>

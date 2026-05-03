@@ -1,5 +1,5 @@
 ﻿using BlazorWasmApp0;
-using Ganss.XSS;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
