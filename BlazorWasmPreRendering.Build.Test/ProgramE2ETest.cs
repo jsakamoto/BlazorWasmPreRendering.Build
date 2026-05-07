@@ -236,7 +236,7 @@ public class ProgramE2ETest
                 loadingContents + "\n" +
                 "<!-- %%-PRERENDERING-LOADER-BEGIN-%% -->\n" +
                 "</div>\n" +
-                "<div b-prerendering-container=\"\" inert=\"\" style=\"position: fixed; inset: 0; overflow: hidden;\">\n" +
+                "<div b-prerendering-container=\"\" inert=\"\" style=\"position: fixed; inset: 0; overflow: auto;\">\n" +
                 "<!-- %%-PRERENDERING-LOADER-END-%% -->\n" +
                 "<!-- %%-PRERENDERING-BEGIN-%% -->\n" +
                 prerenderedContents
