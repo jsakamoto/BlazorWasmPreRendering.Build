@@ -11,7 +11,7 @@ public class StaticlizeCrawlerTest
     public async Task SaveToStaticFileAsync_IndexHtmlInSubFolder_Style_Test()
     {
         // Given
-        const string baseUrl = "http://127.0.0.1:5051";
+        var baseUrl = $"http://127.0.0.1:{TcpPortPool.GetAvailableTcpPort()}";
         await using var testSiteServer = await TestSites.StartTestSite1(baseUrl);
         using var outDir = new WorkDirectory();
         var logger = new TestLogger();
@@ -45,7 +45,7 @@ public class StaticlizeCrawlerTest
     public async Task SaveToStaticFileAsync_UrlPathRegexToIgnore_Test()
     {
         // Given
-        const string baseUrl = "http://127.0.0.1:5058";
+        var baseUrl = $"http://127.0.0.1:{TcpPortPool.GetAvailableTcpPort()}";
         await using var testSiteServer = await TestSites.StartTestSite1(baseUrl);
         using var outDir = new WorkDirectory();
         var logger = new TestLogger();
@@ -79,7 +79,7 @@ public class StaticlizeCrawlerTest
     public async Task SaveToStaticFileAsync_AppendHtmlExtension_Style_Test()
     {
         // Given
-        const string baseUrl = "http://127.0.0.1:5052";
+        var baseUrl = $"http://127.0.0.1:{TcpPortPool.GetAvailableTcpPort()}";
         await using var testSiteServer = await TestSites.StartTestSite1(baseUrl);
         using var outDir = new WorkDirectory();
 
@@ -141,7 +141,7 @@ public class StaticlizeCrawlerTest
     public async Task SaveToStaticFileAsync_FollowsAlternateLinks_Test()
     {
         // Given
-        const string baseUrl = "http://127.0.0.1:5057";
+        var baseUrl = $"http://127.0.0.1:{TcpPortPool.GetAvailableTcpPort()}";
         await using var testSiteServer = await TestSites.StartTestSite3(baseUrl);
         using var outDir = new WorkDirectory();
         var logger = new TestLogger();
@@ -177,7 +177,7 @@ public class StaticlizeCrawlerTest
     public async Task SaveToStaticFileAsync_JsInvokeOnServerError_Test()
     {
         // Given
-        const string baseUrl = "http://127.0.0.1:5054";
+        var baseUrl = $"http://127.0.0.1:{TcpPortPool.GetAvailableTcpPort()}";
         using var site = await TestSites.StartTestSite2(baseUrl, jsInvokeOnServer: true);
         using var outDir = new WorkDirectory();
 
