@@ -174,6 +174,40 @@ public class StaticlizeCrawlerTest
     }
 
     [Test]
+    public async Task SaveToStaticFileAsync_HandlesNonRootBaseHref_Test()
+    {
+        // Given
+        var baseUrl = $"http://127.0.0.1:{TcpPortPool.GetAvailableTcpPort()}/foo/bar/";
+        await using var testSiteServer = await TestSites.StartTestSite4(baseUrl);
+        using var outDir = new WorkDirectory();
+        var logger = new TestLogger();
+
+        // When
+        var crawler = new StaticlizeCrawler(
+            baseUrl,
+            urlPathToExplicitFetch: null,
+            urlPathRegexToIgnore: null,
+            webRootPath: outDir,
+            locales: [],
+            OutputStyle.IndexHtmlInSubFolders,
+            enableBrotliCompression: false,
+            enableGZipCompression: false,
+            logger: logger);
+        var result = await crawler.SaveToStaticFileAsync();
+
+        // Then
+        result.Is(StaticlizeCrawlingResult.Nothing);
+        File.ReadAllText(Path.Combine(outDir, "index.html")).Contains("<h1>Home</h1>").IsTrue();
+        File.ReadAllText(Path.Combine(outDir, "counter", "index.html")).Contains("<h1>Counter</h1>").IsTrue();
+        File.ReadAllText(Path.Combine(outDir, "fetchdata", "weather-forecast", "index.html")).Contains("<h1>Fetch Data</h1>").IsTrue();
+
+        logger.LogLines.OrderBy(line => line)
+            .Is($"Getting {baseUrl}...",
+                $"Getting {baseUrl}counter...",
+                $"Getting {baseUrl}fetchdata/weather-forecast...");
+    }
+
+    [Test]
     public async Task SaveToStaticFileAsync_JsInvokeOnServerError_Test()
     {
         // Given
