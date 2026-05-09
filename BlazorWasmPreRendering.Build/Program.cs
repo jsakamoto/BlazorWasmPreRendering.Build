@@ -17,6 +17,10 @@ public class Program
     public static async Task<int> Main(string[] args)
     {
         var commandLineOptions = CommandLineSwitch.Parse<CommandLineOptions>(ref args, options => options.EnumParserStyle = EnumParserStyle.OriginalCase);
+        commandLineOptions.PathBase ??= "/";
+        if (!commandLineOptions.PathBase.StartsWith("/")) commandLineOptions.PathBase = "/" + commandLineOptions.PathBase;
+        if (!commandLineOptions.PathBase.EndsWith("/")) commandLineOptions.PathBase += "/";
+
         var prerenderingOptions = BuildPrerenderingOptions(commandLineOptions);
 
         var crawlingResult = await PreRenderToStaticFilesAsync(commandLineOptions, prerenderingOptions);
@@ -26,7 +30,7 @@ public class Program
     private static async Task<StaticlizeCrawlingResult> PreRenderToStaticFilesAsync(CommandLineOptions commandLineOptions, BlazorWasmPrerenderingOptions prerenderingOptions)
     {
         var serverPort = GetAvailableTcpPort(commandLineOptions.ServerPort);
-        var baseUrl = $"http://127.0.0.1:{serverPort}";
+        var baseUrl = $"http://127.0.0.1:{serverPort}{commandLineOptions.PathBase}";
 
         using var webHostProcess = await StartWebHostAsync(commandLineOptions, prerenderingOptions, serverPort, baseUrl);
         if (webHostProcess.Process.HasExited)
@@ -264,6 +268,7 @@ public class Program
             EmulateAuthMe = commandLineOptions.EmulateAuthMe,
             Locales = prerenderingOptions.Locales,
             ServerPort = serverPort,
+            PathBase = commandLineOptions.PathBase ?? "/",
             BWAPOptionsDllExt = commandLineOptions.BWAPOptionsDllExt
         };
         StoreOptionsToEnvironment(webHostOptions, Constants.ConfigurationPrefix, webHostStartInfo.Environment);
@@ -272,7 +277,8 @@ public class Program
         var dotnetVer = proc.Output;
 
         var webHostProcess = XProcess.Start(webHostStartInfo);
-        await webHostProcess.WaitForOutputAsync(predicate: output => output.Contains(baseUrl), millsecondsTimeout: 20000);
+        var listenUrl = new Uri(baseUrl).GetLeftPart(UriPartial.Scheme | UriPartial.Authority);
+        await webHostProcess.WaitForOutputAsync(predicate: output => output.Contains(listenUrl), millsecondsTimeout: 20000);
         return webHostProcess;
     }
 

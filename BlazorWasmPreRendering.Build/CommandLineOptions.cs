@@ -58,6 +58,8 @@ public class CommandLineOptions
 
     public string ServerPort { get => this._ServerPort; set { this._ServerPort = string.IsNullOrEmpty(value) ? DefaultServerPort : value; } }
 
+    public string? PathBase { get; set; } = "/";
+
     /// <summary>Options for Blazor Wasm Antivirus Protection - Dll Extension</summary>
     public string? BWAPOptionsDllExt { get; set; }
 }

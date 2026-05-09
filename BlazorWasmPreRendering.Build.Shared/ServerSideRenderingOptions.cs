@@ -32,6 +32,8 @@ public class ServerSideRenderingOptions
 
     public int ServerPort { get; init; }
 
+    public string PathBase { get; init; } = "/";
+
     /// <summary>Options for Blazor Wasm Antivirus Protection - Dll Extension</summary>
     public string? BWAPOptionsDllExt { get; set; }
 

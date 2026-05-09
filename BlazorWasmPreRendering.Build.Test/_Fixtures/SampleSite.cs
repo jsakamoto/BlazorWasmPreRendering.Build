@@ -70,7 +70,7 @@ public class SampleSite : IDisposable
         this.PublishSrcDir = Path.Combine(this.TargetDir, "publish");
     }
 
-    public async ValueTask<WorkDirectory> PublishAsync()
+    public async ValueTask<WorkDirectory> PublishAsync(string additionalArgs = "")
     {
         await this._Syncer.WaitAsync();
         try
@@ -79,7 +79,7 @@ public class SampleSite : IDisposable
             {
                 var publishProcess = XProcess.Start(
                     "dotnet",
-                    $"publish -c:{this.Configuration} -p:BlazorWasmPrerendering=disable -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false",
+                    $"publish -c:{this.Configuration} -p:BlazorWasmPrerendering=disable -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false {additionalArgs}",
                     workingDirectory: this.ProjectDir);
                 await publishProcess.WaitForExitAsync();
                 publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);

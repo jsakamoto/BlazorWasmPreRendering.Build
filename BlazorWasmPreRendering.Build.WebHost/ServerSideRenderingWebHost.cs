@@ -32,7 +32,7 @@ internal static class ServerSideRenderingWebHost
         hostBuilder.WebHost
             .UseConfiguration(configuration)
             .UseKestrel()
-            .UseUrls(context.BaseAddress);
+            .UseUrls(new Uri(context.BaseAddress).GetLeftPart(UriPartial.Scheme | UriPartial.Authority));
         var webHost = hostBuilder.Build();
 
         webHost.Configure(context);
@@ -48,6 +48,10 @@ internal static class ServerSideRenderingWebHost
         services.AddSingleton(context.HostEnvironment);
         services.AddSingleton(context); // Pre-rendering context is used from _Host.cshtml and _Layout.cshtml via DI container.
         services.AddSingleton(context.AssemblyLoader);
+        services.Configure<RouteOptions>(options =>
+        {
+            options.ConstraintMap["notstaticfile"] = typeof(NotStaticFileConstraint);
+        });
 
         services.ConfigureApplicationServices(context, configuration);
 
@@ -89,7 +93,7 @@ internal static class ServerSideRenderingWebHost
             }
             else if (methodParameter.ParameterType == typeof(string) && string.Equals(methodParameter.Name, "baseAddress", StringComparison.InvariantCultureIgnoreCase))
             {
-                arguments.Add(context.BaseAddress.ToString().TrimEnd('/'));
+                arguments.Add(context.BaseAddress.ToString());
             }
             else if (methodParameter.ParameterType == typeof(Uri))
             {
@@ -110,6 +114,8 @@ internal static class ServerSideRenderingWebHost
 
     private static void Configure(this IApplicationBuilder app, ServerSideRenderingContext context)
     {
+        app.UsePathBase(context.PathBase != "/" ? context.PathBase.TrimEnd('/') : context.PathBase);
+
         app.UseDeveloperExceptionPage();
 
         ConfigureApplicationMiddleware(app, context);
@@ -143,9 +149,9 @@ internal static class ServerSideRenderingWebHost
                 return Task.CompletedTask;
             });
 
-            MapAuthMe(endpoints, context);
+            endpoints.MapAuthMe(context);
             endpoints.MapRazorPages();
-            endpoints.MapFallbackToPage(pattern: "/{*catch-all}", "/_Host");
+            endpoints.MapFallbackToPage(pattern: "/{*catch-all:notstaticfile}", "/_Host");
         });
     }
 
@@ -175,7 +181,7 @@ internal static class ServerSideRenderingWebHost
         }
     }
 
-    private static void MapAuthMe(IEndpointRouteBuilder endpoints, ServerSideRenderingContext context)
+    private static void MapAuthMe(this IEndpointRouteBuilder endpoints, ServerSideRenderingContext context)
     {
         if (context.EmulateAuthMe)
         {

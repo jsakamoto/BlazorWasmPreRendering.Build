@@ -29,7 +29,7 @@ public class ProgramE2ETest
             "-t", "BlazorWasmApp0.App",
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
-            "-p", publishDir,
+            "--publisheddir", publishDir,
             "-i", intermediateDir,
             "--assemblydir", SampleSite.BlazorWasmApp0.TargetDir,
             "-m", "",
@@ -62,7 +62,7 @@ public class ProgramE2ETest
             "-t", "BlazorWasmApp1.App",
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
-            "-p", publishDir,
+            "--publisheddir", publishDir,
             "-i", intermediateDir,
             "--assemblydir", SampleSite.BlazorWasmApp1.TargetDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
@@ -150,7 +150,7 @@ public class ProgramE2ETest
             "-t", "BlazorWasmApp1.App",
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
-            "-p", publishDir,
+            "--publisheddir", publishDir,
             "-i", intermediateDir,
             "--assemblydir", SampleSite.BlazorWasmApp1.TargetDir,
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
@@ -188,6 +188,59 @@ public class ProgramE2ETest
         Validate(actualHtmlFiles[6], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[0], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!", shouldDeleteLoadingContents);
+    }
+
+    [Test]
+    public async Task PathBase_TestAsync()
+    {
+        // Given
+        using var intermediateDir = new WorkDirectory();
+        using var publishDir = await SampleSite.BlazorWasmApp1.PublishAsync("-p:GHPages=true -p:GHPagesBase=/fizz/buzz/");
+        using var tcpPort = TcpPortPool.GetAvailableTcpPort();
+
+        // When
+        // Execute prerenderer
+        var exitCode = await Program.Main(new[] {
+            "--assemblyname", "BlazorWasmApp1",
+            "-t", "BlazorWasmApp1.App",
+            "--selectorofrootcomponent", "#app,app",
+            "--selectorofheadoutletcomponent", "head::after",
+            "--publisheddir", publishDir,
+            "-i", intermediateDir,
+            "--assemblydir", SampleSite.BlazorWasmApp1.TargetDir,
+            "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
+            "-f", SampleSite.BlazorWasmApp1.TargetFramework,
+            "-o", "AppendHtmlExtension",
+            "--serverport", tcpPort,
+            "--pathbase", "/fizz/buzz/"
+        });
+        exitCode.Is(0);
+
+        // Then
+
+        // Validate prerendered contents.
+
+        var wwwrootDir = Path.Combine(publishDir, "wwwroot");
+        var expectedHtmlFiles = GetFullPathList(baseDir: wwwrootDir, pathList: [
+            "404.html",
+            "about.html",
+            "about/.net.html",
+            "counter.html",
+            "fetchdata.html",
+            "index.html",
+            "lazy-loading-page.html"]);
+
+        var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
+        actualHtmlFiles.Is(expectedHtmlFiles);
+
+        // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
+        const string prerenderedContents = "<div class=\"page\" ";
+        Validate(actualHtmlFiles[5], prerenderedContents, title_is: "Home", h1_is: "Hello, world!");
+        Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Counter", h1_is: "Counter");
+        Validate(actualHtmlFiles[4], prerenderedContents, title_is: "Weather forecast", h1_is: "Weather forecast");
+        Validate(actualHtmlFiles[2], prerenderedContents, title_is: "About .NET", h1_is: "About .NET");
+        Validate(actualHtmlFiles[6], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page");
+        Validate(actualHtmlFiles[1], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.");
     }
 
     private static string[] GetFullPathList(string baseDir, params string[] pathList)
@@ -262,7 +315,7 @@ public class ProgramE2ETest
             "-t", "BlazorWasmApp2.Components.App, BlazorWasmApp2.Components", // INCLUDES ASSEMBLY NAME
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
-            "-p", publishDir,
+            "--publisheddir", publishDir,
             "-i", intermediateDir,
             "--assemblydir", SampleSite.BlazorWasmApp2.TargetDir,
             "-m", "",
@@ -306,7 +359,7 @@ public class ProgramE2ETest
             "-t", "BlazorWasmApp2.Client.App", // INVALID TYPE NAME OF ROOT COMPONENT
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
-            "-p", publishDir,
+            "--publisheddir", publishDir,
             "-i", intermediateDir,
             "--assemblydir", SampleSite.BlazorWasmApp2.TargetDir,
             "-m", "",
@@ -563,7 +616,7 @@ public class ProgramE2ETest
             "-t", "BlazorWasmApp0.App",
             "--selectorofrootcomponent", "#app,app",
             "--selectorofheadoutletcomponent", "head::after",
-            "-p", publishDir,
+            "--publisheddir", publishDir,
             "-i", intermediateDir,
             "--assemblydir", SampleSite.BlazorWasmApp0.TargetDir,
             "-m", "",
