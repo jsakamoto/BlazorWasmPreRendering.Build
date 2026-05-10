@@ -29,4 +29,6 @@ public class BlazorWasmPrerenderingOptions
     public string MiddlewareDllsDir { get; init; } = "";
 
     public List<string> Locales { get; init; } = new();
+
+    public string PathBase { get; init; } = "/";
 }

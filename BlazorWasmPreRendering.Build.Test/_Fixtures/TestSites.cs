@@ -10,37 +10,45 @@ public static class TestSites
 
     private static string GetTestSitesDir() => Path.Combine(GetProjectDir(), "_Fixtures", "TestSites");
 
-    public static async ValueTask<IAsyncDisposable> StartTestSite1(string baseUrl)
+    private static async ValueTask<IAsyncDisposable> StartTestSite(string dirName, string baseUrl)
     {
-        var webRootPath = Path.Combine(GetTestSitesDir(), "Site1");
+        var baseUrlObject = new Uri(baseUrl);
+        var listenAddress = baseUrlObject.GetLeftPart(UriPartial.Scheme | UriPartial.Authority);
+
+        var webRootPath = Path.Combine(GetTestSitesDir(), dirName);
         var webServer = WebApplication.CreateBuilder(new WebApplicationOptions
         {
-            Args = ["--urls", baseUrl],
+            Args = ["--urls", listenAddress],
             ContentRootPath = webRootPath
         }).Build();
-        webServer.UseDefaultFiles().UseStaticFiles();
+        webServer
+            .UsePathBase(baseUrlObject.AbsolutePath)
+            .UseDefaultFiles()
+            .UseStaticFiles();
         await webServer.StartAsync();
         return webServer;
     }
+
+    /// <summary>
+    /// Start a test site that is a very standard
+    /// </summary>
+    public static async ValueTask<IAsyncDisposable> StartTestSite1(string baseUrl) => await StartTestSite("Site1", baseUrl);
+
+    /// <summary>
+    /// Start a test site that has &lt;link rel="alternate" href="..."&gt; in the head, which should be crawled by StaticlizeCrawler.
+    /// </summary>
+    public static async ValueTask<IAsyncDisposable> StartTestSite3(string baseUrl) => await StartTestSite("Site3", baseUrl);
+
+    /// <summary>
+    /// Start a test site that has a non-root base href, which should be handled by StaticlizeCrawler.
+    /// </summary>
+    public static async ValueTask<IAsyncDisposable> StartTestSite4(string baseUrl) => await StartTestSite("Site4-nonRootBaseHref", baseUrl);
 
     private class Disposer : IDisposable
     {
         private readonly Action _Action;
         public Disposer(Action action) { this._Action = action; }
         public void Dispose() => this._Action.Invoke();
-    }
-
-    public static async ValueTask<IAsyncDisposable> StartTestSite3(string baseUrl)
-    {
-        var webRootPath = Path.Combine(GetTestSitesDir(), "Site3");
-        var webServer = WebApplication.CreateBuilder(new WebApplicationOptions
-        {
-            Args = ["--urls", baseUrl],
-            ContentRootPath = webRootPath
-        }).Build();
-        webServer.UseDefaultFiles().UseStaticFiles();
-        await webServer.StartAsync();
-        return webServer;
     }
 
     public static async ValueTask<IDisposable> StartTestSite2(

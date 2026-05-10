@@ -35,8 +35,9 @@ public class ServerSideRenderingContext
 
     public int ServerPort { get; init; }
 
+    public string PathBase { get; init; } = "/";
 
-    public string BaseAddress => $"http://127.0.0.1:{this.ServerPort}/";
+    public string BaseAddress => $"http://127.0.0.1:{this.ServerPort}{this.PathBase}";
 
     private IWebAssemblyHostEnvironment? _HostEnvironment = null;
 

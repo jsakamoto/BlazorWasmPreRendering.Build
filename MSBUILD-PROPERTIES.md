@@ -16,6 +16,7 @@ BlazorWasmPrerenderingEnvironment           | `Prerendering` | Set a name of a h
 BlazorWasmPrerenderingEmulateAuthMe         | `true`         | When it is set to `true`, prerendering server emulates Azure App Services Auth. That means the ULR endpoint **"/.auth/me"** will return the JSON content `{"clientPrincipal":null}`
 BlazorWasmPrerenderingLocale                | `en`           | Set a comma-separated locale list such as "en", "ja-JP,en-US", etc., those used when crawling. **⚠️Attention:** when you specify this MSBuild property via "dotnet" command line, you have to replace `,` (comma) with `%2c`.
 BlazorWasmPrerenderingMode                  | `Static`       | Set the render mode in which `Static` or `WebAssemblyPrerendered`.
+BlazorWasmPrerenderingPathBase              |                | Set the base path (e.g. `/repo/`) for apps hosted under a sub path. If not set, the base path is auto-detected from the `href` attribute of the `<base>` element in `index.html`.
 BlazorWasmPrerenderingKeepServer            | `false`        | When it is set to `true`, the `dotnet publish` command will not be exited, and the prerendering server process will keep running until `Ctrl` + `C` is pressed.
 
 

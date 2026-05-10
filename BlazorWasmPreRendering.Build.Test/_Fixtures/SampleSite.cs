@@ -51,6 +51,8 @@ public class SampleSite : IDisposable
 
     private bool PublishedOnce { get; set; } = false;
 
+    private Dictionary<string, WorkDirectory> PublishedCopies { get; } = new();
+
     private readonly SemaphoreSlim _Syncer = new(1, 1);
 
     public SampleSite()
@@ -70,25 +72,29 @@ public class SampleSite : IDisposable
         this.PublishSrcDir = Path.Combine(this.TargetDir, "publish");
     }
 
-    public async ValueTask<WorkDirectory> PublishAsync()
+    public async ValueTask<WorkDirectory> PublishAsync(string additionalArgs = "")
     {
         await this._Syncer.WaitAsync();
         try
         {
-            if (!this.PublishedOnce)
+            if (!this.PublishedCopies.TryGetValue(additionalArgs, out var publishedCopy))
             {
+                if (Directory.Exists(this.PublishSrcDir)) Directory.Delete(this.PublishSrcDir, recursive: true);
+
                 var publishProcess = XProcess.Start(
                     "dotnet",
-                    $"publish -c:{this.Configuration} -p:BlazorWasmPrerendering=disable -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false",
+                    $"publish -c:{this.Configuration} -p:BlazorWasmPrerendering=disable -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false {additionalArgs}",
                     workingDirectory: this.ProjectDir);
                 await publishProcess.WaitForExitAsync();
                 publishProcess.ExitCode.Is(0, message: publishProcess.StdOutput + publishProcess.StdError);
-                this.PublishedOnce = true;
+
+                publishedCopy = WorkDirectory.CreateCopyFrom(this.PublishSrcDir, _ => true);
+                this.PublishedCopies[additionalArgs] = publishedCopy;
             }
+
+            return WorkDirectory.CreateCopyFrom(publishedCopy, _ => true);
         }
         finally { this._Syncer.Release(); }
-
-        return WorkDirectory.CreateCopyFrom(this.PublishSrcDir, _ => true);
     }
 
     public static WorkDirectory CreateSampleAppsWorkDir()
@@ -120,6 +126,7 @@ public class SampleSite : IDisposable
     public void Dispose()
     {
         this.SampleAppsWorkDir?.Dispose();
+        foreach (var publishedCopy in this.PublishedCopies.Values) publishedCopy.Dispose();
     }
 
     [OneTimeTearDown]
