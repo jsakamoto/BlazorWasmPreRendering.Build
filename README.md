@@ -153,6 +153,28 @@ But if you **set the `BlazorWasmPrerenderingOutputStyle` MSBuild property to `Ap
 ```
 (* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
 
+### Base path (non-root base href)
+
+When your Blazor WebAssembly app is hosted under a sub path (for example, `https://username.github.io/repo/` on GitHub Pages), the `<base href="...">` element in `index.html` is typically set to a non-root path such as `/repo/`.
+
+By default, this package **automatically detects the base path by reading the `href` attribute of the `<base>` element in `index.html`**, and pre-renders pages at the correct locations accordingly. In most cases, no extra configuration is required.
+
+However, if the auto-detection does not work for your scenario (e.g., the `<base>` element is generated dynamically, or you need to override it), you can **explicitly specify the base path via the `BlazorWasmPrerenderingPathBase` MSBuild property**.
+
+```xml
+<!-- This is the .csproj file of your Blazor WebAssembly app -->
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  ...
+  <PropertyGroup>
+    <!-- 👇 Explicitly specify the base path to override the auto-detection. -->
+    <BlazorWasmPrerenderingPathBase>/repo/</BlazorWasmPrerenderingPathBase>
+    ...
+```
+
+When this MSBuild property is set, the auto-detection from `index.html` is skipped, and the specified value is used as the base path during pre-rendering.
+
+(* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
+
 ### Loading overlay and the "Loading..." contents
 
 By default, this package **keeps the "Loading..." contents** in the original fallback page (such as an `index.html`) into prerendered output static HTML files.
