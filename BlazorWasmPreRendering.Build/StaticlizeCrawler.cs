@@ -93,7 +93,12 @@ internal class StaticlizeCrawler
 
         foreach (var urlPathToExplicitFetch in this.UrlPathToExplicitFetch)
         {
-            await this.SaveToStaticFileAsync(urlPathToExplicitFetch);
+            var url = urlPathToExplicitFetch;
+            if (!url.TrimStart('/').StartsWith(this.BaseUri.AbsolutePath.TrimStart('/')))
+            {
+                url = this.BaseUri.AbsolutePath.TrimEnd('/') + "/" + url.TrimStart('/');
+            }
+            await this.SaveToStaticFileAsync(url);
         }
 
         return this.CrawlingResult;

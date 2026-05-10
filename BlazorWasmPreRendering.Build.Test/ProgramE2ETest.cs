@@ -212,6 +212,7 @@ public class ProgramE2ETest
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
             "-f", SampleSite.BlazorWasmApp1.TargetFramework,
             "-o", "AppendHtmlExtension",
+            "--urlpathtoexplicitfetch", "/easter-egg",
             "--serverport", "5050-5999",
             "--pathbase", pathBaseCLIOption
         ]);
@@ -227,6 +228,7 @@ public class ProgramE2ETest
             "about.html",
             "about/.net.html",
             "counter.html",
+            "easter-egg.html",
             "fetchdata.html",
             "index.html",
             "lazy-loading-page.html"]);
@@ -236,12 +238,13 @@ public class ProgramE2ETest
 
         // NOTICE: The document title was rendered by the Toolbelt.Blazor.HeadElement
         const string prerenderedContents = "<div class=\"page\" ";
-        Validate(actualHtmlFiles[5], prerenderedContents, title_is: "Home", h1_is: "Hello, world!");
+        Validate(actualHtmlFiles[6], prerenderedContents, title_is: "Home", h1_is: "Hello, world!");
         Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Counter", h1_is: "Counter");
-        Validate(actualHtmlFiles[4], prerenderedContents, title_is: "Weather forecast", h1_is: "Weather forecast");
+        Validate(actualHtmlFiles[5], prerenderedContents, title_is: "Weather forecast", h1_is: "Weather forecast");
         Validate(actualHtmlFiles[2], prerenderedContents, title_is: "About .NET", h1_is: "About .NET");
-        Validate(actualHtmlFiles[6], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page");
+        Validate(actualHtmlFiles[7], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page");
         Validate(actualHtmlFiles[1], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.");
+        Validate(actualHtmlFiles[4], prerenderedContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!");
     }
 
     private static string[] GetFullPathList(string baseDir, params string[] pathList)
