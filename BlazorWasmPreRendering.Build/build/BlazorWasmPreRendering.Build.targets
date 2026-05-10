@@ -31,7 +31,7 @@
       <BlazorWasmPrerenderingKeepServer Condition=" '$(BlazorWasmPrerenderingKeepServer)' == '' ">false</BlazorWasmPrerenderingKeepServer>
       <BlazorWasmPrerenderingDeleteLoadingContents Condition=" '$(BlazorWasmPrerenderingKeepServer)' == '' ">false</BlazorWasmPrerenderingDeleteLoadingContents>
       <BlazorWasmPrerenderingServerPort Condition=" '$(BlazorWasmPrerenderingServerPort)' == '' ">5050-5999</BlazorWasmPrerenderingServerPort>
-      <BlazorWasmPrerenderingPathBase Condition=" '$(BlazorWasmPrerenderingPathBase)' == '' ">/</BlazorWasmPrerenderingPathBase>
+      <BlazorWasmPrerenderingPathBase Condition=" '$(BlazorWasmPrerenderingPathBase)' == '' "></BlazorWasmPrerenderingPathBase>
       <BlazorWasmPrerenderingUrlPathRegexToIgnore Condition=" '$(BlazorWasmPrerenderingUrlPathRegexToIgnore)' == '' "></BlazorWasmPrerenderingUrlPathRegexToIgnore>
       <BlazorWasmPrerenderingDotNetHost Condition=" '$(BlazorWasmPrerenderingDotNetHost)' == '' ">$(DOTNET_HOST_PATH)</BlazorWasmPrerenderingDotNetHost>
       <BlazorWasmPrerenderingDotNetHost Condition=" '$(BlazorWasmPrerenderingDotNetHost)' == '' ">$(_DotNetHostDirectory)$(_DotNetHostFileName)</BlazorWasmPrerenderingDotNetHost>

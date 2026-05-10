@@ -190,17 +190,18 @@ public class ProgramE2ETest
         Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!", shouldDeleteLoadingContents);
     }
 
-    [Test]
-    public async Task PathBase_TestAsync()
+    [TestCase("/foo/", "")]
+    [TestCase("/fizz/buzz/", "/fizz/buzz/")]
+    [Parallelizable(ParallelScope.Children)]
+    public async Task PathBase_TestAsync(string pathBase, string pathBaseCLIOption)
     {
         // Given
         using var intermediateDir = new WorkDirectory();
-        using var publishDir = await SampleSite.BlazorWasmApp1.PublishAsync("-p:GHPages=true -p:GHPagesBase=/fizz/buzz/");
-        using var tcpPort = TcpPortPool.GetAvailableTcpPort();
+        using var publishDir = await SampleSite.BlazorWasmApp1.PublishAsync($"-p:GHPages=true -p:GHPagesBase={pathBase}");
 
         // When
         // Execute prerenderer
-        var exitCode = await Program.Main(new[] {
+        var exitCode = await Program.Main([
             "--assemblyname", "BlazorWasmApp1",
             "-t", "BlazorWasmApp1.App",
             "--selectorofrootcomponent", "#app,app",
@@ -211,9 +212,9 @@ public class ProgramE2ETest
             "-m", "Toolbelt.Blazor.HeadElement.ServerPrerendering,,1.5.2",
             "-f", SampleSite.BlazorWasmApp1.TargetFramework,
             "-o", "AppendHtmlExtension",
-            "--serverport", tcpPort,
-            "--pathbase", "/fizz/buzz/"
-        });
+            "--serverport", "5050-5999",
+            "--pathbase", pathBaseCLIOption
+        ]);
         exitCode.Is(0);
 
         // Then
