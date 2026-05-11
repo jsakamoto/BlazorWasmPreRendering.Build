@@ -16,7 +16,7 @@ internal class StaticlizeCrawler
 
     private HashSet<string> SavedPathSet { get; } = new();
 
-    private string BaseUrl { get; }
+    private Uri BaseUri { get; }
 
     private HttpClient HttpClient { get; } = new();
 
@@ -49,7 +49,7 @@ internal class StaticlizeCrawler
         bool enableBrotliCompression,
         ILogger logger)
     {
-        this.BaseUrl = baseUrl.TrimEnd('/');
+        this.BaseUri = new Uri(baseUrl);
         this.WebRootPath = webRootPath;
         this.OutputStyle = outputStyle;
         this.EnableGZipCompression = enableGZipCompression;
@@ -89,11 +89,16 @@ internal class StaticlizeCrawler
 
     public async Task<StaticlizeCrawlingResult> SaveToStaticFileAsync()
     {
-        await this.SaveToStaticFileAsync("/");
+        await this.SaveToStaticFileAsync(this.BaseUri.AbsolutePath);
 
         foreach (var urlPathToExplicitFetch in this.UrlPathToExplicitFetch)
         {
-            await this.SaveToStaticFileAsync(urlPathToExplicitFetch);
+            var url = urlPathToExplicitFetch;
+            if (!url.TrimStart('/').StartsWith(this.BaseUri.AbsolutePath.TrimStart('/')))
+            {
+                url = this.BaseUri.AbsolutePath.TrimEnd('/') + "/" + url.TrimStart('/');
+            }
+            await this.SaveToStaticFileAsync(url);
         }
 
         return this.CrawlingResult;
@@ -126,7 +131,7 @@ internal class StaticlizeCrawler
             return;
         }
 
-        var requestUrl = this.BaseUrl + args.PathName;
+        var requestUrl = this.BaseUri.GetLeftPart(UriPartial.Scheme | UriPartial.Authority) + args.PathName;
         this.Logger.LogInformation($"Getting {requestUrl}...");
 
         if (!Uri.TryCreate(requestUrl, UriKind.Absolute, out var _))
@@ -208,8 +213,7 @@ internal class StaticlizeCrawler
                 }
                 else
                 {
-                    var baseUri = new Uri(this.BaseUrl);
-                    if (absoluteUri.Host == baseUri.Host && absoluteUri.Port == baseUri.Port)
+                    if (absoluteUri.Host == this.BaseUri.Host && absoluteUri.Port == this.BaseUri.Port)
                     {
                         await this.SaveToStaticFileAsync(($"about://{absoluteUri.AbsolutePath}", "about:", absoluteUri.AbsolutePath));
                     }
@@ -240,6 +244,10 @@ internal class StaticlizeCrawler
         {
             path = path.Replace(invalidChar.ToString(), $"%{((int)invalidChar):x2}");
         }
+
+        // Remove the base URI's absolute path from the beginning of the path
+        if (!path.StartsWith(this.BaseUri.AbsolutePath)) throw new ArgumentException($"The path ({path}) must start with the base URI's absolute path ({this.BaseUri.AbsolutePath}).", nameof(path));
+        path = path.Substring(this.BaseUri.AbsolutePath.Length).Trim('/');
 
         var indexHtmlPath = default(string);
         if (this.OutputStyle == OutputStyle.IndexHtmlInSubFolders)

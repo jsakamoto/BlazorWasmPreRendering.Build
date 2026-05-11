@@ -55,7 +55,8 @@ public class Program
             Environment = options.Environment,
             EmulateAuthMe = options.EmulateAuthMe,
             Locales = options.Locales.ToArray(),
-            ServerPort = options.ServerPort
+            ServerPort = options.ServerPort,
+            PathBase = options.PathBase
         };
         return context;
     }

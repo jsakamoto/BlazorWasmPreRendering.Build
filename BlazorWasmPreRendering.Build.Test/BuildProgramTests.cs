@@ -76,6 +76,7 @@ public class BuildProgramTests
             IndexHtmlFragments = new(
                 firstPart: "<html>\r\n<head>\r\n",
                 lastPart: "</body>\r\n</html>",
+                loaderPart: "",
                 middlePart: "</head>\r\n<body>\r\n"
             ),
             Locales = { "en", "ja" },
@@ -88,6 +89,7 @@ public class BuildProgramTests
             RootComponentTypeName = "Project.App",
             ServerPort = 5678,
             WebRootPath = "C:\\project\\bin\\Release\\net6.0\\wwwroot",
+            PathBase = "/",
         };
         var environment = new Dictionary<string, string?>();
         BuildProgram.StoreOptionsToEnvironment(webHostOptions, "X_", environment);
@@ -101,6 +103,7 @@ public class BuildProgramTests
                 "X_Environment|Production",
                 "X_IndexHtmlFragments:FirstPart|<html>\r\n<head>\r\n",
                 "X_IndexHtmlFragments:LastPart|</body>\r\n</html>",
+                "X_IndexHtmlFragments:LoaderPart|",
                 "X_IndexHtmlFragments:MiddlePart|</head>\r\n<body>\r\n",
                 "X_Locales:0|en",
                 "X_Locales:1|ja",
@@ -111,6 +114,7 @@ public class BuildProgramTests
                 "X_MiddlewarePackages:1:Assembly|Buzz",
                 "X_MiddlewarePackages:1:PackageIdentity|Fizz",
                 "X_MiddlewarePackages:1:Version|2.0.1",
+                "X_PathBase|/",
                 "X_RenderMode|WebAssemblyPrerendered",
                 "X_RootComponentTypeName|Project.App",
                 "X_ServerPort|5678",
@@ -129,6 +133,7 @@ public class BuildProgramTests
             IndexHtmlFragments = new(
                 firstPart: "<html>\r\n<head>\r\n",
                 lastPart: "</body>\r\n</html>",
+                loaderPart: "",
                 middlePart: "</head>\r\n<body>\r\n"
             ),
             MiddlewareDllsDir = "C:\\project\\obj\\Release\\net6.0\\middleware",
@@ -136,6 +141,7 @@ public class BuildProgramTests
             RootComponentTypeName = "Project.App",
             ServerPort = 5987,
             WebRootPath = "C:\\project\\bin\\Release\\net6.0\\wwwroot",
+            PathBase = "/let/it/go/",
         };
         var environment = new Dictionary<string, string?>();
         BuildProgram.StoreOptionsToEnvironment(webHostOptions, "~", environment);
@@ -149,8 +155,10 @@ public class BuildProgramTests
                 "~Environment|Development",
                 "~IndexHtmlFragments:FirstPart|<html>\r\n<head>\r\n",
                 "~IndexHtmlFragments:LastPart|</body>\r\n</html>",
+                "~IndexHtmlFragments:LoaderPart|",
                 "~IndexHtmlFragments:MiddlePart|</head>\r\n<body>\r\n",
                 "~MiddlewareDllsDir|C:\\project\\obj\\Release\\net6.0\\middleware",
+                "~PathBase|/let/it/go/",
                 "~RenderMode|Static",
                 "~RootComponentTypeName|Project.App",
                 "~ServerPort|5987",

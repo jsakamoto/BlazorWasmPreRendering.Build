@@ -2,6 +2,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using CommandLineSwitchParser;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -26,7 +27,7 @@ public class Program
     private static async Task<StaticlizeCrawlingResult> PreRenderToStaticFilesAsync(CommandLineOptions commandLineOptions, BlazorWasmPrerenderingOptions prerenderingOptions)
     {
         var serverPort = GetAvailableTcpPort(commandLineOptions.ServerPort);
-        var baseUrl = $"http://127.0.0.1:{serverPort}";
+        var baseUrl = $"http://127.0.0.1:{serverPort}{prerenderingOptions.PathBase}";
 
         using var webHostProcess = await StartWebHostAsync(commandLineOptions, prerenderingOptions, serverPort, baseUrl);
         if (webHostProcess.Process.HasExited)
@@ -110,6 +111,17 @@ public class Program
                 .Where(locale => !string.IsNullOrEmpty(locale)));
         }
 
+        // If the pathbase option is empty, infer it from the base element in index.html.
+        var pathBase = commandLineOptions.PathBase;
+        if (string.IsNullOrEmpty(pathBase))
+        {
+            var match = Regex.Match(htmlFragment.FirstPart, "<base[ \\t]+href=[\"'](?<pathbase>[^\"']*)[\"']");
+            if (match.Success) pathBase = match.Groups["pathbase"].Value;
+        }
+        if (string.IsNullOrEmpty(pathBase)) pathBase = "/";
+        if (!pathBase.StartsWith("/")) pathBase = "/" + pathBase;
+        if (!pathBase.EndsWith("/")) pathBase += "/";
+
         var options = new BlazorWasmPrerenderingOptions
         {
             WebRootPath = webRootPath,
@@ -123,7 +135,8 @@ public class Program
             MiddlewarePackages = middlewarePackages.ToList(),
             MiddlewareDllsDir = middlewareDllsDir,
 
-            Locales = locales
+            Locales = locales,
+            PathBase = pathBase
         };
         return options;
     }
@@ -264,6 +277,7 @@ public class Program
             EmulateAuthMe = commandLineOptions.EmulateAuthMe,
             Locales = prerenderingOptions.Locales,
             ServerPort = serverPort,
+            PathBase = prerenderingOptions.PathBase,
             BWAPOptionsDllExt = commandLineOptions.BWAPOptionsDllExt
         };
         StoreOptionsToEnvironment(webHostOptions, Constants.ConfigurationPrefix, webHostStartInfo.Environment);
@@ -272,7 +286,8 @@ public class Program
         var dotnetVer = proc.Output;
 
         var webHostProcess = XProcess.Start(webHostStartInfo);
-        await webHostProcess.WaitForOutputAsync(predicate: output => output.Contains(baseUrl), millsecondsTimeout: 20000);
+        var listenUrl = new Uri(baseUrl).GetLeftPart(UriPartial.Scheme | UriPartial.Authority);
+        await webHostProcess.WaitForOutputAsync(predicate: output => output.Contains(listenUrl), millsecondsTimeout: 20000);
         return webHostProcess;
     }
 

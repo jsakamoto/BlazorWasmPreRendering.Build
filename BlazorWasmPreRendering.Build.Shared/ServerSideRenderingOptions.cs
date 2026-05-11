@@ -22,7 +22,7 @@ public class ServerSideRenderingOptions
 
     public RenderMode RenderMode { get; init; }
 
-    public IndexHtmlFragments IndexHtmlFragments { get; init; } = new("", "", "");
+    public IndexHtmlFragments IndexHtmlFragments { get; init; } = new("", "", "", "");
 
     public bool DeleteLoadingContents { get; init; }
 
@@ -31,6 +31,8 @@ public class ServerSideRenderingOptions
     public List<string> Locales { get; init; } = new();
 
     public int ServerPort { get; init; }
+
+    public string PathBase { get; init; } = "/";
 
     /// <summary>Options for Blazor Wasm Antivirus Protection - Dll Extension</summary>
     public string? BWAPOptionsDllExt { get; set; }
