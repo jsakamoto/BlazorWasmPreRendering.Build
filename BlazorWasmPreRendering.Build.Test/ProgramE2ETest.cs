@@ -1,8 +1,10 @@
 ﻿using System.Security.Cryptography;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using NUnit.Framework;
 using Toolbelt;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build;
@@ -396,16 +398,24 @@ public class ProgramE2ETest
         using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
         var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp0");
 
-        var expectedHomeTitles = new Dictionary<int, string> { [1] = "Home", [2] = "My Home" };
-        var expectedEnvNames = new Dictionary<int, string> { [1] = "Prerendering", [2] = "Foo" };
+        var expectations = new[] {
+            (Title: "Home", Environment: "Prerendering", RenderMode: RenderMode.Static),
+            (Title: "My Home", Environment: "Foo", RenderMode: RenderMode.WebAssemblyPrerendered)
+        };
+
         for (var i = 1; i <= 2; i++)
         {
             Console.WriteLine($"{(i == 1 ? "1st" : "2nd")} time publishing...");
 
             // When
+            var expectation = expectations[i - 1];
             var arg = "publish -c:Release -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false -o:bin/publish";
-            // if 2nd time publishing, override the environment name.
-            if (i == 2) arg += " -p:BlazorWasmPrerenderingEnvironment=" + expectedEnvNames[2];
+            // if 2nd time publishing, override the environment name and prerendering mode.
+            if (i == 2)
+            {
+                arg += " -p:BlazorWasmPrerenderingEnvironment=" + expectation.Environment;
+                arg += " -p:BlazorWasmPrerenderingMode=" + expectation.RenderMode;
+            }
 
             var dotnetCLI = await Start("dotnet", arg, projectDir).WaitForExitAsync();
             dotnetCLI.ExitCode.Is(0, message: dotnetCLI.StdOutput + dotnetCLI.StdError);
@@ -416,8 +426,10 @@ public class ProgramE2ETest
             var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
             ValidatePrerenderedContentsOfApp0(
                 wwwrootDir,
-                homeTitle: expectedHomeTitles[i],
-                environment: expectedEnvNames[i]);
+                homeTitle: expectation.Title,
+                environment: expectation.Environment,
+                serverEnvironment: "Production",
+                renderMode: expectation.RenderMode);
 
             // Validate PWA assets manifest.
             var indexHtmlBytes = File.ReadAllBytes(Path.Combine(wwwrootDir, "index.html"));
@@ -674,27 +686,45 @@ public class ProgramE2ETest
         }
     }
 
-    private record PageExpectation(string RouteName, string Title, string[] Links, string Environment = "");
+    private record PageExpectation(string RouteName, string Title, string[] Links, string Environment = "", string ServerEnvironment = "", RenderMode? RenderMode = null);
 
-    private static void ValidatePrerenderedContentsOfApp0(string wwwrootDir, string homeTitle = "Home", string aboutTitle = "About", string environment = "Prerendering", OutputStyle outputStyle = OutputStyle.AppendHtmlExtension)
+    private static void ValidatePrerenderedContentsOfApp0(
+        string wwwrootDir,
+        string homeTitle = "Home",
+        string aboutTitle = "About",
+        string environment = "Prerendering",
+        string serverEnvironment = "",
+        OutputStyle outputStyle = OutputStyle.AppendHtmlExtension,
+        RenderMode? renderMode = null)
     {
-        ValidatePrerenderedContents(outputStyle, wwwrootDir, new PageExpectation[] {
-            new("/", homeTitle, new[]{
-                "<a href=/about>about</a>",
-                "<a href=/lazy-loading-page>lazy loading page</a>",
-                "<a href=https://blazor.net/>About Blazor</a>",
-                "<a href=/foo/bar/fizz:buzz>Invalid File Name</a>",
-                "<a href=/foo:bar/fizz/buzz>Invalid Directory Name</a>",
-            }, environment),
-            new("/about", aboutTitle, new[]{
-                "<a href=/>home</a>",
-                "<a href=/lazy-loading-page>lazy loading page</a>",
-            }),
-            new("/lazy-loading-page", "Lazy Loading Page", new[]{
-                "<a href=/>home</a>",
-                "<a href=/about>about</a>",
-            }),
-        });
+        ValidatePrerenderedContents(outputStyle, wwwrootDir, [
+            new(RouteName: "/",
+                Title: homeTitle,
+                Links: [
+                    "<a href=/about>about</a>",
+                    "<a href=/lazy-loading-page>lazy loading page</a>",
+                    "<a href=https://blazor.net/>About Blazor</a>",
+                    "<a href=/foo/bar/fizz:buzz>Invalid File Name</a>",
+                    "<a href=/foo:bar/fizz/buzz>Invalid Directory Name</a>",
+                ],
+                Environment: environment,
+                ServerEnvironment: serverEnvironment,
+                RenderMode: renderMode),
+            new(RouteName: "/about",
+                Title: aboutTitle,
+                Links: [
+                    "<a href=/>home</a>",
+                    "<a href=/lazy-loading-page>lazy loading page</a>",
+                ],
+                RenderMode: renderMode),
+            new(RouteName: "/lazy-loading-page",
+                Title: "Lazy Loading Page",
+                Links: [
+                    "<a href=/>home</a>",
+                    "<a href=/about>about</a>",
+                ],
+                RenderMode: renderMode),
+        ]);
     }
 
     private static void ValidatePrerenderedContents(OutputStyle outputStyle, string wwwrootDir, IEnumerable<PageExpectation> pageExpectations)
@@ -725,7 +755,8 @@ public class ProgramE2ETest
             File.Exists(htmlPath).IsTrue(message: $"The HTML file \"{fileName}\" was not found.");
 
             // 2. Validate the page title
-            using var htmlDocument = htmlParser.ParseDocument(File.ReadAllText(htmlPath));
+            var htmlText = File.ReadAllText(htmlPath);
+            using var htmlDocument = htmlParser.ParseDocument(htmlText);
             htmlDocument.Title
                 .IsNotNull(message: $"The page title in {pageExpectation.RouteName} was not found.")
                 .StartsWith($"{pageExpectation.Title} | Blazor Wasm App")
@@ -747,6 +778,27 @@ public class ProgramE2ETest
                     .TextContent
                     .Trim()
                     .Is($"Environment: {pageExpectation.Environment}");
+            }
+
+            // 6. Validate that the server host environment name should be always "Production", because it is different from the hosting environment name of the Blazor WebAssembly app.
+            if (!string.IsNullOrEmpty(pageExpectation.ServerEnvironment))
+            {
+                htmlDocument.QuerySelector(".server-environment")
+                    .IsNotNull(message: $"The .server-environment element in {pageExpectation.RouteName} was not found.")
+                    .TextContent
+                    .Trim()
+                    .Is($"Server Environment: {pageExpectation.ServerEnvironment}");
+            }
+
+            // 7. Validate the page-embedded environment name when the prerendering mode is WebAssemblyPrerendered
+            //    - it should be always "Production" as below, because it is different from the hosting environment name of the prerendering process.
+            //      `<!--Blazor-WebAssembly:{"environmentName":"Production","environmentVariables":{}}-->`
+            if (pageExpectation.RenderMode == RenderMode.WebAssemblyPrerendered)
+            {
+                var m = Regex.Match(htmlText, "<!--Blazor-WebAssembly:(?<json>.*?)-->");
+                m.Success.IsTrue();
+                var environmentData = JsonObject.Parse(m.Groups["json"].Value).IsNotNull();
+                (environmentData["environmentName"]?.ToString()).Is("Production", message: $"The page-embedded environment name in {pageExpectation.RouteName} was not 'Production'.");
             }
         }
     }

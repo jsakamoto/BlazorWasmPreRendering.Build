@@ -14,6 +14,7 @@
     <PackageReference Include="BlazorWasmBrotliLoader.Build" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="11.0.0-preview.3.*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="11.0.0-preview.3.*" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="11.0.0-preview.3.*" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="11.0.0-preview.3.*" />
     <PackageReference Include="HtmlSanitizer" Version="9.0.892" />
   </ItemGroup>

@@ -23,7 +23,10 @@ internal static class ServerSideRenderingWebHost
 
         var hostBuilder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
-            EnvironmentName = context.HostEnvironment.Environment,
+            // NOTICE: Don't set the EnvironmentName here, because it is different from the Blazor WebAssembly host environment. 
+            // Otherwise, the Blazor WebAssembly host environment will be set to the same as the server-side environment when the render mode is WebAssemblyPrerendered.
+            // That is not expected in the Static Prerendering scenario.
+
             ContentRootPath = Path.Combine(context.WebRootPath, "_framework"),
             WebRootPath = context.WebRootPath
         });
