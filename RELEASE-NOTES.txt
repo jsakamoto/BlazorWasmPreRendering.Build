@@ -1,5 +1,5 @@
-v.8.1.0-preview.4
-- .NET 11.0 Preview 3 support.
+v.8.1.0-preview.5
+- .NET 11.0 Preview 5 support.
 
 v.8.0.1
 - Fix: Resolved an issue where the hosting environment name was incorrectly "Prerendering" instead of "Production" in "WebAssemblyPrerendered" mode.
