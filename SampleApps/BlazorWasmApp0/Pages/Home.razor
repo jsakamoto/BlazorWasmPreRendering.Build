@@ -1,5 +1,7 @@
 ﻿@page "/"
+@using Microsoft.Extensions.Hosting
 @inject IConfiguration Configuration
+@inject IHostEnvironment ServerHostEnv
 @inject IWebAssemblyHostEnvironment HostEnv
 @inject IHtmlSanitizer HtmlSanitizer
 
@@ -28,6 +30,10 @@
 
 <div class="environment">
 	Environment: @HostEnv.Environment
+</div>
+
+<div class="server-environment">
+	Server Environment: @ServerHostEnv.EnvironmentName
 </div>
 
 <RazorClassLib1.Component1 Name="@Me?.UserDetails" />
