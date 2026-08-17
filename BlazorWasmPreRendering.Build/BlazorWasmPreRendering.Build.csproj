@@ -71,6 +71,7 @@
   <PropertyGroup>
     <CrossTargetingIncludeStaticWebAssetsDependsOn>PublishForPackage;$(CrossTargetingIncludeStaticWebAssetsDependsOn)</CrossTargetingIncludeStaticWebAssetsDependsOn>
     <NuspecFile>$(PackageId).nuspec</NuspecFile>
+    <GenerateNuspecDependsOn>SetupNuspecProperties;$(GenerateNuspecDependsOn)</GenerateNuspecDependsOn>
   </PropertyGroup>
 
   <Target Name="PublishForPackage">
