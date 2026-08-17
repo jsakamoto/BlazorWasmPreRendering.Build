@@ -168,7 +168,19 @@ public class Program
         foreach (var package in middlewarePackages)
         {
             var packageRef = new XElement("PackageReference", new XAttribute("Include", package.PackageIdentity));
-            if (!string.IsNullOrEmpty(package.Version)) packageRef.Add(new XAttribute("Version", package.Version));
+            if (!string.IsNullOrEmpty(package.Version))
+            {
+                // [NOTE]: The "Version" attribute is used when the project does not use central package management.
+                //         The "VersionOverride" attribute is used when the project uses central package management.
+                packageRef.Add(
+                    new XAttribute("Version", package.Version),
+                    new XAttribute("Condition", " '$(ManagePackageVersionsCentrally)' != 'true' "));
+
+                itemGroup.Add(new XElement("PackageReference",
+                    new XAttribute("Include", package.PackageIdentity),
+                    new XAttribute("VersionOverride", package.Version),
+                    new XAttribute("Condition", " '$(ManagePackageVersionsCentrally)' == 'true' ")));
+            }
             itemGroup.Add(packageRef);
         }
 

@@ -5,6 +5,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Toolbelt.Blazor.HeadElement.ServerPrerendering" Version="1.5.1" />
+    <PackageReference Include="Toolbelt.Blazor.HeadElement.ServerPrerendering" VersionOverride="1.5.1" Condition=" '$(ManagePackageVersionsCentrally)' == 'true' " />
+    <PackageReference Include="Toolbelt.Blazor.HeadElement.ServerPrerendering" Version="1.5.1" Condition=" '$(ManagePackageVersionsCentrally)' != 'true' " />
   </ItemGroup>
 </Project>
