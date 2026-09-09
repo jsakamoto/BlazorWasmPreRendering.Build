@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorWasmPreRendering.Build" Version="8.1.0-preview.6" />
+    <PackageReference Include="BlazorWasmPreRendering.Build" Version="11.0.0-rc.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.31" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.31" PrivateAssets="all" />
     <PackageReference Include="BlazorWasmAntivirusProtection" Version="2.4.5" />
