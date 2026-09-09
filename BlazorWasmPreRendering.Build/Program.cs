@@ -192,6 +192,12 @@ public class Program
         return projectFileDir;
     }
 
+    private static readonly string[] MSBuildEnvironmentVariableNames = new[] {
+        "MSBUILD_EXE_PATH",
+        "MSBuildExtensionsPath",
+        "MSBuildLoadMicrosoftTargetsReadOnly",
+        "MSBuildSDKsPath" };
+
     internal static string GetMiddlewareDlls(string projectDir, string frameworkName)
     {
         var binDir = Path.Combine(projectDir, "bin");
@@ -199,12 +205,18 @@ public class Program
         foreach (var dir in new[] { binDir, objDir }.Where(d => Directory.Exists(d))) Directory.Delete(dir, recursive: true);
         try
         {
-            using var buildProcess = Process.Start(new ProcessStartInfo
+            var buildStartInfo = new ProcessStartInfo
             {
                 FileName = DotNetCLI.Path,
                 ArgumentList = { "build", "-c:Release", "-v:q", "--nologo" },
                 WorkingDirectory = projectDir
-            });
+            };
+            // [NOTE]: When this process is launched from inside an MSBuild process, MSBuild-specific environment
+            //         variables are inherited. Leaving them set makes the nested "dotnet build" resolve the SDK
+            //         through the outer build's state, which breaks launching MSBuild task hosts. (ex: MSB4216)
+            foreach (var name in MSBuildEnvironmentVariableNames) buildStartInfo.Environment.Remove(name);
+
+            using var buildProcess = Process.Start(buildStartInfo);
             if (buildProcess == null) throw new Exception("Starting \"dotnet build\" for retreive middle ware dlls was failed.");
 
             buildProcess.WaitForExit();

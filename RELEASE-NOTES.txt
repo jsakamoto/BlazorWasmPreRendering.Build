@@ -1,3 +1,8 @@
+v.10.0.0
+- Starting with this release, the package's version number is aligned with the latest supported .NET major version.
+- Fix: Resolved a potential issue that could cause an error depending on the installed .NET SDK version.
+- Improve: The NuGet package now lists its supported .NET target framework versions in its dependency metadata, making it easier to tell which versions of the package support which .NET version.
+
 v.8.1.0-preview.6
 - .NET 11.0 Preview 7 support.
 

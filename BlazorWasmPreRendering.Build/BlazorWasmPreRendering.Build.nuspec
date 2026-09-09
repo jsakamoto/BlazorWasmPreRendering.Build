@@ -15,10 +15,18 @@
     <releaseNotes>$releaseNotes$</releaseNotes>
     <readme>README.md</readme>
     <repository type="$repositoryType$" url="$repositoryUrl$" />
+    <dependencies>
+      <group targetFramework="net6.0" />
+      <group targetFramework="net7.0" />
+      <group targetFramework="net8.0" />
+      <group targetFramework="net9.0" />
+      <group targetFramework="net10.0" />
+    </dependencies>
   </metadata>
   <files>
     <file src="..\.assets\nupkg-icon.png" target="Icon.png" />
     <file src="..\README.md" target="README.md" />
+    <file src="..\THIRD-PARTY-NOTICES.txt" target="THIRD-PARTY-NOTICES.txt" />
 
     <file src="build\**" target="build" />
     <file src="$projectDir$obj\$configuration$\net9.0\staticwebassets\msbuild.BlazorWasmPreRendering.Build.Microsoft.AspNetCore.StaticWebAssetEndpoints.props" target="build\Microsoft.AspNetCore.StaticWebAssetEndpoints.props" />
