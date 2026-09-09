@@ -520,3 +520,5 @@ This tells search engine bots to skip the `_framework` folder while still allowi
 ## 📢License
 
 [Mozilla Public License Version 2.0](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/LICENSE)
+
+This package also uses third-party libraries; see [THIRD-PARTY-NOTICES.txt](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/THIRD-PARTY-NOTICES.txt) for details.

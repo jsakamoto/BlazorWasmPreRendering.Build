@@ -26,6 +26,7 @@
   <files>
     <file src="..\.assets\nupkg-icon.png" target="Icon.png" />
     <file src="..\README.md" target="README.md" />
+    <file src="..\THIRD-PARTY-NOTICES.txt" target="THIRD-PARTY-NOTICES.txt" />
 
     <file src="build\**" target="build" />
     <file src="$projectDir$obj\$configuration$\net9.0\staticwebassets\msbuild.BlazorWasmPreRendering.Build.Microsoft.AspNetCore.StaticWebAssetEndpoints.props" target="build\Microsoft.AspNetCore.StaticWebAssetEndpoints.props" />
