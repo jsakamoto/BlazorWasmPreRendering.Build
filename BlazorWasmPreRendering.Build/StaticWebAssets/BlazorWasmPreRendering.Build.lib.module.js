@@ -13,7 +13,6 @@ const setup = () => {
                 break;
             }
         }
-        Array.from(document.querySelectorAll('script')).pop()?.remove();
     })(document, node => /^%%-PRERENDERING-HEADOUTLET-(BEGIN|END)-%%$/.test(node.textContent.trim()));
 }
 export function afterStarted() {
