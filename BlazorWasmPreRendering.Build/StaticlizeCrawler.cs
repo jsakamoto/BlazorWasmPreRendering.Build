@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Internal;
 using static Toolbelt.Blazor.WebAssembly.PreRendering.Build.StaticlizeCrawlingResult;
 
 namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build;
@@ -179,7 +180,7 @@ internal class StaticlizeCrawler
             return;
         }
 
-        var htmlContent = await response.Content.ReadAsStringAsync();
+        var htmlContent = StaticTitleStash.Stash(await response.Content.ReadAsStringAsync());
         var outputPath = this.GetOutputPath(args.PathName);
 
         File.WriteAllText(outputPath, htmlContent);

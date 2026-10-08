@@ -49,7 +49,15 @@ Pre-rendering happens at publish time via two separate executables, both shipped
 
 **Packaging** is non-standard: `dotnet pack` uses a hand-written `.nuspec`, and a `PublishForPackage` target first runs `dotnet publish` of both the build program and the WebHost for every TFM (net6.0–net11.0), pruning framework DLLs. Package release notes are extracted from the latest entry in `RELEASE-NOTES.txt`; version/author live in `VersionInfo.props`.
 
+## Prerendered HeadOutlet contents
+
+In the `Static` render mode, the HeadOutlet contents (`<PageTitle>`, `<HeadContent>`) are prerendered between `%%-PRERENDERING-HEADOUTLET-BEGIN/END-%%` comments. At build time, `StaticTitleStash` moves the static `<title>` of `index.html` into a comment, so each served page has only one title. At run time, the JavaScript initializer `BlazorWasmPreRendering.Build/StaticWebAssets/BlazorWasmPreRendering.Build.lib.module.js` restores that title and removes each prerendered element only after Blazor renders its counterpart, so the title and stylesheets don't flicker. It depends on details of Blazor's own `HeadOutlet` behavior and has known limits.
+
+Read `docs/head-outlet-prerendering.md` before you change any of this. It explains the problems, how the code solves them, the limits, and how to regenerate the minified `.js` file (the bundler in the project never runs).
+
 ## Directory notes
+
+- `docs/` holds design notes for complex parts of the code.
 
 - `SampleApps/` — Blazor WASM apps used as E2E test fixtures (plus `MiddlewarePackage1/2` test middleware packages; their versions come from `SampleApps/MiddlewarePackageVersion.props`). `BlazorWasmApp1` is also deployed to GitHub Pages by CI.
 - `work/` — scratch area with ad-hoc repro projects for GitHub/Discord issues; not part of the build or tests. Don't treat it as production code.
