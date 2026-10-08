@@ -41,7 +41,7 @@
       <BlazorWasmPrerenderingLocale Condition=" '$(BlazorWasmPrerenderingLocale)' == '' ">en</BlazorWasmPrerenderingLocale>
       <BlazorWasmPrerenderingOutputStyle Condition=" '$(BlazorWasmPrerenderingOutputStyle)' == '' ">IndexHtmlInSubFolders</BlazorWasmPrerenderingOutputStyle>
       <BlazorWasmPrerenderingKeepServer Condition=" '$(BlazorWasmPrerenderingKeepServer)' == '' ">false</BlazorWasmPrerenderingKeepServer>
-      <BlazorWasmPrerenderingDeleteLoadingContents Condition=" '$(BlazorWasmPrerenderingKeepServer)' == '' ">false</BlazorWasmPrerenderingDeleteLoadingContents>
+      <BlazorWasmPrerenderingDeleteLoadingContents Condition=" '$(BlazorWasmPrerenderingDeleteLoadingContents)' == '' ">false</BlazorWasmPrerenderingDeleteLoadingContents>
       <BlazorWasmPrerenderingServerPort Condition=" '$(BlazorWasmPrerenderingServerPort)' == '' ">5050-5999</BlazorWasmPrerenderingServerPort>
       <BlazorWasmPrerenderingPathBase Condition=" '$(BlazorWasmPrerenderingPathBase)' == '' "></BlazorWasmPrerenderingPathBase>
       <BlazorWasmPrerenderingUrlPathRegexToIgnore Condition=" '$(BlazorWasmPrerenderingUrlPathRegexToIgnore)' == '' "></BlazorWasmPrerenderingUrlPathRegexToIgnore>
