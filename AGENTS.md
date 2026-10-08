@@ -18,8 +18,8 @@ dotnet build BlazorWasmPreRendering.Build.slnx
 # Run all tests (NUnit on Microsoft.Testing.Platform; net11.0 only)
 dotnet test BlazorWasmPreRendering.Build.Test
 
-# Run a single test (Microsoft.Testing.Platform tree-node filter syntax)
-dotnet test BlazorWasmPreRendering.Build.Test -- --treenode-filter "/*/*/StaticlizeCrawlerTest/*"
+# Run a single test (NUnit runner filter syntax)
+dotnet test BlazorWasmPreRendering.Build.Test -- --filter "FullyQualifiedName~StaticlizeCrawlerTest"
 
 # Create the NuGet package (Release build auto-packs into _dist/)
 dotnet build BlazorWasmPreRendering.Build -c Release
