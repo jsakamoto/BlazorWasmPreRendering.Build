@@ -18,8 +18,8 @@ dotnet build BlazorWasmPreRendering.Build.slnx
 # Run all tests (NUnit on Microsoft.Testing.Platform; net11.0 only)
 dotnet test BlazorWasmPreRendering.Build.Test
 
-# Run a single test (Microsoft.Testing.Platform tree-node filter syntax)
-dotnet test BlazorWasmPreRendering.Build.Test -- --treenode-filter "/*/*/StaticlizeCrawlerTest/*"
+# Run a single test (NUnit runner filter syntax)
+dotnet test BlazorWasmPreRendering.Build.Test -- --filter "FullyQualifiedName~StaticlizeCrawlerTest"
 
 # Create the NuGet package (Release build auto-packs into _dist/)
 dotnet build BlazorWasmPreRendering.Build -c Release
@@ -47,9 +47,19 @@ Pre-rendering happens at publish time via two separate executables, both shipped
 
 **MSBuild integration** lives in `BlazorWasmPreRendering.Build/build/BlazorWasmPreRendering.Build.targets`: it runs after `Publish` (skipped for wasm-tools nested publish), computes all `BlazorWasmPrerendering*` property defaults, and invokes the build program. Every user-facing MSBuild property is documented in `MSBUILD-PROPERTIES.md` — keep that file in sync when adding options (an option typically threads through: .targets → `CommandLineOptions` → `BlazorWasmPrerenderingOptions` → `ServerSideRenderingOptions`/env vars → WebHost).
 
-**Packaging** is non-standard: `dotnet pack` uses a hand-written `.nuspec`, and a `PublishForPackage` target first runs `dotnet publish` of both the build program and the WebHost for every TFM (net6.0–net11.0), pruning framework DLLs. Package release notes are extracted from the latest entry in `RELEASE-NOTES.txt`; version/author live in `VersionInfo.props`.
+**Packaging** is non-standard: `dotnet pack` uses a hand-written `.nuspec`, and a `PublishForPackage` target first runs `dotnet publish` of both the build program and the WebHost for every TFM (net6.0–net11.0), pruning framework DLLs. Package release notes are extracted from the latest entry in `RELEASE-NOTES.txt`; version/author live in `VersionInfo.props`. The steps to release a new version are in `docs/release-procedure.md`.
+
+## Prerendered HeadOutlet contents
+
+In the `Static` render mode, the HeadOutlet contents (`<PageTitle>`, `<HeadContent>`) are prerendered between `%%-PRERENDERING-HEADOUTLET-BEGIN/END-%%` comments. At build time, `StaticTitleStash` moves the static `<title>` of `index.html` into a comment, so each served page has only one title. At run time, the JavaScript initializer `BlazorWasmPreRendering.Build/StaticWebAssets/BlazorWasmPreRendering.Build.lib.module.js` restores that title and removes each prerendered element only after Blazor renders its counterpart, so the title and stylesheets don't flicker. It depends on details of Blazor's own `HeadOutlet` behavior and has known limits.
+
+Read `docs/head-outlet-prerendering.md` before you change any of this. It explains the problems, how the code solves them, the limits, the coding rules for the `.js` file (it is written to minify well), and how to regenerate the minified file (the bundler in the project never runs).
+
+No automated test covers the browser side of this yet. `docs/head-outlet-browser-verification.md` describes how it was checked by hand with Playwright. It covers the test app, the probe script, the scenarios, and their expected results. Use it to verify a change, and as the specification when you turn these checks into tests.
 
 ## Directory notes
+
+- `docs/` holds design notes for complex parts of the code.
 
 - `SampleApps/` — Blazor WASM apps used as E2E test fixtures (plus `MiddlewarePackage1/2` test middleware packages; their versions come from `SampleApps/MiddlewarePackageVersion.props`). `BlazorWasmApp1` is also deployed to GitHub Pages by CI.
 - `work/` — scratch area with ad-hoc repro projects for GitHub/Discord issues; not part of the build or tests. Don't treat it as production code.

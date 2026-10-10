@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
+using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Internal;
 using Toolbelt.Blazor.WebAssembly.PreRendering.Build.Shared;
 
 namespace Toolbelt.Blazor.WebAssembly.PreRendering.Build;
@@ -10,6 +11,7 @@ public class IndexHtmlParser
     {
         var indexHtmlText = File.ReadAllText(indexHtmlPath);
         indexHtmlText = indexHtmlText.Replace("\r\n", "\n");
+        indexHtmlText = StaticTitleStash.Restore(indexHtmlText);
 
         // Sweep the pre-rendered contents inside the index.html that was rendered when the last time publishing.
         var prerenderMarkers = new[] {

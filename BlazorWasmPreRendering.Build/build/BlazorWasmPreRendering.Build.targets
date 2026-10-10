@@ -6,6 +6,18 @@
 
   <!-- Define Properties -->
   <Target Name="BlazorWasmPrerendering_DefineProperties" DependsOnTargets="$(BeforeBlazorWasmPrerendering)">
+
+    <!--
+    Remove line breaks and tabs from the multi-value properties embedded in the Exec command line below,
+    because Exec on Windows runs it from a .cmd file, where a line break splits the command. (Issue #69)
+    -->
+    <PropertyGroup>
+      <_BlazorWasmPrerenderingLineBreakPattern>\s*[\r\n\t]\s*</_BlazorWasmPrerenderingLineBreakPattern>
+      <BlazorWasmPrerenderingUrlPathToExplicitFetch>$([System.Text.RegularExpressions.Regex]::Replace('$(BlazorWasmPrerenderingUrlPathToExplicitFetch)', '$(_BlazorWasmPrerenderingLineBreakPattern)', ' ').Trim())</BlazorWasmPrerenderingUrlPathToExplicitFetch>
+      <!-- Drop them instead of using a space, so that a pattern split after "|" keeps its meaning. -->
+      <BlazorWasmPrerenderingUrlPathRegexToIgnore>$([System.Text.RegularExpressions.Regex]::Replace('$(BlazorWasmPrerenderingUrlPathRegexToIgnore)', '$(_BlazorWasmPrerenderingLineBreakPattern)', '').Trim())</BlazorWasmPrerenderingUrlPathRegexToIgnore>
+    </PropertyGroup>
+
     <PropertyGroup>
       <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net6')) ">net6.0</BlazorWasmPrerenderingTFM>
       <BlazorWasmPrerenderingTFM Condition=" '$(BlazorWasmPrerenderingTFM)' == '' AND $(TargetFramework.StartsWith('net7')) ">net7.0</BlazorWasmPrerenderingTFM>
@@ -30,7 +42,7 @@
       <BlazorWasmPrerenderingLocale Condition=" '$(BlazorWasmPrerenderingLocale)' == '' ">en</BlazorWasmPrerenderingLocale>
       <BlazorWasmPrerenderingOutputStyle Condition=" '$(BlazorWasmPrerenderingOutputStyle)' == '' ">IndexHtmlInSubFolders</BlazorWasmPrerenderingOutputStyle>
       <BlazorWasmPrerenderingKeepServer Condition=" '$(BlazorWasmPrerenderingKeepServer)' == '' ">false</BlazorWasmPrerenderingKeepServer>
-      <BlazorWasmPrerenderingDeleteLoadingContents Condition=" '$(BlazorWasmPrerenderingKeepServer)' == '' ">false</BlazorWasmPrerenderingDeleteLoadingContents>
+      <BlazorWasmPrerenderingDeleteLoadingContents Condition=" '$(BlazorWasmPrerenderingDeleteLoadingContents)' == '' ">false</BlazorWasmPrerenderingDeleteLoadingContents>
       <BlazorWasmPrerenderingServerPort Condition=" '$(BlazorWasmPrerenderingServerPort)' == '' ">5050-5999</BlazorWasmPrerenderingServerPort>
       <BlazorWasmPrerenderingPathBase Condition=" '$(BlazorWasmPrerenderingPathBase)' == '' "></BlazorWasmPrerenderingPathBase>
       <BlazorWasmPrerenderingUrlPathRegexToIgnore Condition=" '$(BlazorWasmPrerenderingUrlPathRegexToIgnore)' == '' "></BlazorWasmPrerenderingUrlPathRegexToIgnore>

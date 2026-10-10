@@ -38,6 +38,17 @@ You can specify MSBuild properties and their values inside of a project file (.c
   ...
 ```
 
+You can also write a property value across several lines, like this.
+
+```xml
+<BlazorWasmPrerenderingUrlPathToExplicitFetch>
+  /events;
+  /articles;
+</BlazorWasmPrerenderingUrlPathToExplicitFetch>
+```
+
+This is supported for `BlazorWasmPrerenderingUrlPathToExplicitFetch` and `BlazorWasmPrerenderingUrlPathRegexToIgnore`. In the former, line breaks and tabs are replaced with a single space. In the latter, they are removed, so a long regular expression can be split into several lines.
+
 ### 2. Specify it in command-line arguments when the  `dotnet publish` command executing
 
 When you execute the `dotnet publish` command, you can specify MSBuild properties and their values by the `-p` command-line option with `-p:{name}={value}` syntax like this: 

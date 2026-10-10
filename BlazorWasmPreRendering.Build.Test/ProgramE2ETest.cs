@@ -97,7 +97,7 @@ public class ProgramE2ETest
         Validate(actualHtmlFiles[2], prerenderedContents, title_is: "Counter", h1_is: "Counter", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Weather forecast", h1_is: "Weather forecast", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[0], prerenderedContents, title_is: "About .NET", h1_is: "About .NET", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[5], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[5], prerenderedContents, title_is: "Lazy Loading Page | Blazor Wasm App 0", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[1], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.", shouldDeleteLoadingContents);
     }
 
@@ -188,7 +188,7 @@ public class ProgramE2ETest
         Validate(actualHtmlFiles[2], prerenderedContents, title_is: "Counter", h1_is: "Counter", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[4], prerenderedContents, title_is: "Weather forecast", h1_is: "Weather forecast", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[1], prerenderedContents, title_is: "About .NET", h1_is: "About .NET", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[6], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[6], prerenderedContents, title_is: "Lazy Loading Page | Blazor Wasm App 0", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[0], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!", shouldDeleteLoadingContents);
     }
@@ -245,7 +245,7 @@ public class ProgramE2ETest
         Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Counter", h1_is: "Counter");
         Validate(actualHtmlFiles[5], prerenderedContents, title_is: "Weather forecast", h1_is: "Weather forecast");
         Validate(actualHtmlFiles[2], prerenderedContents, title_is: "About .NET", h1_is: "About .NET");
-        Validate(actualHtmlFiles[7], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page");
+        Validate(actualHtmlFiles[7], prerenderedContents, title_is: "Lazy Loading Page | Blazor Wasm App 0", h1_is: "Lazy Loading Page");
         Validate(actualHtmlFiles[1], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.");
         Validate(actualHtmlFiles[4], prerenderedContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!");
     }
@@ -267,6 +267,7 @@ public class ProgramE2ETest
         using var html = new HtmlParser().ParseDocument(trimmedHtml);
 
         html.Title.Is(title_is);
+        html.Head.IsNotNull().QuerySelectorAll("title").Length.Is(1);
 
         if (h1_is is not null) html.QuerySelector("h1")!.TextContent.Trim().Is(h1_is);
 
@@ -526,6 +527,63 @@ public class ProgramE2ETest
             var wwwrootDir = Path.Combine(app0Dir, "bin", "publish", "wwwroot");
             ValidatePrerenderedContentsOfApp0(wwwrootDir);
         }
+    }
+
+    [Test]
+    public async Task Publish_with_MultiLine_Property_Values_Test()
+    {
+        // Given
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp1");
+
+        // Write the property values across several lines with tabs, as users often do in a .csproj file. (Issue #69)
+        var projectFilePath = Path.Combine(projectDir, "BlazorWasmApp1.csproj");
+        var projectFileText = File.ReadAllText(projectFilePath);
+        var singleLineProperty = "<BlazorWasmPrerenderingUrlPathToExplicitFetch>/easter-egg</BlazorWasmPrerenderingUrlPathToExplicitFetch>";
+        projectFileText.Contains(singleLineProperty).IsTrue();
+        File.WriteAllText(projectFilePath, projectFileText.Replace(singleLineProperty,
+            "<BlazorWasmPrerenderingUrlPathToExplicitFetch>\r\n" +
+            "\t\t\t/easter-egg;\r\n" +
+            "\t\t</BlazorWasmPrerenderingUrlPathToExplicitFetch>\r\n" +
+            "\t\t<BlazorWasmPrerenderingUrlPathRegexToIgnore>\r\n" +
+            "\t\t\t^/fetchdata$|\r\n" +
+            "\t\t\t^/about/\\.net$\r\n" +
+            "\t\t</BlazorWasmPrerenderingUrlPathRegexToIgnore>"));
+
+        // Use the .targets file and the build program in this repository instead of the ones in the published package.
+        var solutionDir = FileIO.FindContainerDirToAncestor("*.slnx");
+        var targetsFilePath = Path.Combine(solutionDir, "BlazorWasmPreRendering.Build", "build", "BlazorWasmPreRendering.Build.targets");
+        var buildProgramDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BlazorWasmPreRendering.Build.dll");
+        File.WriteAllText(Path.Combine(projectDir, "Directory.Build.targets"), $"""
+            <Project>
+              <Import Project="{targetsFilePath}" />
+              <PropertyGroup>
+                <BlazorWasmPrerenderingServerDll>{buildProgramDllPath}</BlazorWasmPrerenderingServerDll>
+              </PropertyGroup>
+            </Project>
+            """);
+
+        // When
+        var dotnetCLI = await Start("dotnet", "publish -c:Release -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false -o:bin/publish", projectDir).WaitForExitAsync();
+
+        // Then
+        dotnetCLI.ExitCode.Is(0, message: dotnetCLI.Output);
+
+        // Validate prerendered contents: "/easter-egg" was fetched explicitly, and the paths that match the regex were ignored.
+        var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
+        var expectedHtmlFiles = GetFullPathList(baseDir: wwwrootDir, pathList: [
+            "about/index.html",
+            "counter/index.html",
+            "easter-egg/index.html",
+            "index.html",
+            "lazy-loading-page/index.html"]);
+
+        var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
+        actualHtmlFiles.Is(expectedHtmlFiles);
+
+        const string prerenderedContents = "<div class=\"page\" ";
+        Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Home", h1_is: "Hello, world!");
+        Validate(actualHtmlFiles[2], prerenderedContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!");
     }
 
     [TestCase("ExceptionTest", false, false)]
