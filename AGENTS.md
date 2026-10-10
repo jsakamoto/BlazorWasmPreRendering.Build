@@ -55,6 +55,8 @@ In the `Static` render mode, the HeadOutlet contents (`<PageTitle>`, `<HeadConte
 
 Read `docs/head-outlet-prerendering.md` before you change any of this. It explains the problems, how the code solves them, the limits, the coding rules for the `.js` file (it is written to minify well), and how to regenerate the minified file (the bundler in the project never runs).
 
+No automated test covers the browser side of this yet. `docs/head-outlet-browser-verification.md` describes how it was checked by hand with Playwright. It covers the test app, the probe script, the scenarios, and their expected results. Use it to verify a change, and as the specification when you turn these checks into tests.
+
 ## Directory notes
 
 - `docs/` holds design notes for complex parts of the code.
