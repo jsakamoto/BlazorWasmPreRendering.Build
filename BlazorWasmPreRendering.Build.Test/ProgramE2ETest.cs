@@ -96,7 +96,7 @@ public class ProgramE2ETest
         Validate(actualHtmlFiles[2], prerenderedContents, title_is: "Counter", h1_is: "Counter", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Weather forecast", h1_is: "Weather forecast", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[0], prerenderedContents, title_is: "About .NET", h1_is: "About .NET", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[5], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[5], prerenderedContents, title_is: "Lazy Loading Page | Blazor Wasm App 0", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[1], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.", shouldDeleteLoadingContents);
     }
 
@@ -187,7 +187,7 @@ public class ProgramE2ETest
         Validate(actualHtmlFiles[2], prerenderedContents, title_is: "Counter", h1_is: "Counter", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[4], prerenderedContents, title_is: "Weather forecast", h1_is: "Weather forecast", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[1], prerenderedContents, title_is: "About .NET", h1_is: "About .NET", shouldDeleteLoadingContents);
-        Validate(actualHtmlFiles[6], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
+        Validate(actualHtmlFiles[6], prerenderedContents, title_is: "Lazy Loading Page | Blazor Wasm App 0", h1_is: "Lazy Loading Page", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[0], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.", shouldDeleteLoadingContents);
         Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!", shouldDeleteLoadingContents);
     }
@@ -244,7 +244,7 @@ public class ProgramE2ETest
         Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Counter", h1_is: "Counter");
         Validate(actualHtmlFiles[5], prerenderedContents, title_is: "Weather forecast", h1_is: "Weather forecast");
         Validate(actualHtmlFiles[2], prerenderedContents, title_is: "About .NET", h1_is: "About .NET");
-        Validate(actualHtmlFiles[7], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Lazy Loading Page");
+        Validate(actualHtmlFiles[7], prerenderedContents, title_is: "Lazy Loading Page | Blazor Wasm App 0", h1_is: "Lazy Loading Page");
         Validate(actualHtmlFiles[1], prerenderedContents, title_is: "BlazorWasmApp1", h1_is: "Sorry, there's nothing at this address.");
         Validate(actualHtmlFiles[4], prerenderedContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!");
     }
@@ -266,6 +266,7 @@ public class ProgramE2ETest
         using var html = new HtmlParser().ParseDocument(trimmedHtml);
 
         html.Title.Is(title_is);
+        html.Head.IsNotNull().QuerySelectorAll("title").Length.Is(1);
 
         if (h1_is is not null) html.QuerySelector("h1")!.TextContent.Trim().Is(h1_is);
 
