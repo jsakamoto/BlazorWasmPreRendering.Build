@@ -1,10 +1,11 @@
 const BEGIN_MARKER = "%%-PRERENDERING-HEADOUTLET-BEGIN-%%";
 const END_MARKER = "%%-PRERENDERING-HEADOUTLET-END-%%";
 const STASHED_TITLE_MARKER = /^%%-PRERENDERING-DEFAULT-TITLE-%%(?:\s+(\S*))?$/;
+const CLEANUP_DELAY = 3000;
 
 const markerOf = node => node.nodeType === Node.COMMENT_NODE ? node.textContent.trim() : "";
 const urlOf = href => href.split("#")[0];
-const isStylesheet = element => element.tagName === "LINK" && element.relList.contains("stylesheet");
+const isStylesheet =element => element.tagName === "LINK" && element.relList.contains("stylesheet");
 
 // Elements with the same key are counterparts of each other, even if their contents differ.
 const keyOf = element => {
@@ -43,56 +44,40 @@ const findPrerenderedRange = () => {
 class PrerenderedHeadCleaner {
     constructor(range, defaultTitleText) {
         const elements = range.nodes.filter(node => node.nodeType === Node.ELEMENT_NODE);
-        this.range = range;
+        this.begin = range.begin;
+        this.nodesToClean = new Set([range.begin, ...range.nodes, range.end]);
         this.defaultTitleText = defaultTitleText;
         this.title = elements.find(element => element.tagName === "TITLE") ?? null;
         this.remainingElements = elements.filter(element => element !== this.title);
-        this.loadingElements = new Set();
         this.initialUrl = urlOf(location.href);
+        // The head observer is created first, so that it handles the changes of a navigation before the body observer cleans up.
         this.headObserver = new MutationObserver(records => this.onHeadChanged(records));
+        this.headObserver.observe(document.head, { childList: true });
         this.bodyObserver = new MutationObserver(() => this.finishIfNavigated());
-    }
-
-    start() {
-        this.headObserver.observe(document.head, { childList: true, subtree: true, characterData: true });
         this.bodyObserver.observe(document.body, { childList: true, subtree: true });
-        this.finishIfDone();
     }
 
     onHeadChanged(records) {
         for (const record of records) {
-            for (const node of record.removedNodes) this.forget(node);
             for (const node of record.addedNodes) {
                 if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== "TITLE") this.removeCounterpartOf(node);
             }
         }
-        // Match the elements of the new page before the cleanup, so that shared stylesheets wait for loading too.
-        if (this.finishIfNavigated()) return;
-        this.keepTitleUntilRendered();
-        this.finishIfDone();
-    }
-
-    forget(prerenderedElement) {
-        const index = this.remainingElements.indexOf(prerenderedElement);
-        if (index !== -1) this.remainingElements.splice(index, 1);
+        if (!this.finishIfNavigated()) this.keepTitleUntilRendered();
     }
 
     removeCounterpartOf(renderedElement) {
         const key = keyOf(renderedElement);
-        const prerenderedElement = this.remainingElements.find(element => keyOf(element) === key);
-        if (prerenderedElement === undefined) return;
-        this.forget(prerenderedElement);
+        const index = this.remainingElements.findIndex(element => keyOf(element) === key);
+        if (index === -1) return;
+        const [prerenderedElement] = this.remainingElements.splice(index, 1);
         if (!isStylesheet(renderedElement)) return prerenderedElement.remove();
 
-        // Keep the prerendered stylesheet until the rendered one is loaded, to avoid a flash of unstyled content.
-        this.loadingElements.add(prerenderedElement);
-        const onLoaded = () => {
-            prerenderedElement.remove();
-            this.loadingElements.delete(prerenderedElement);
-            this.finishIfDone();
-        };
-        renderedElement.addEventListener("load", onLoaded, { once: true });
-        renderedElement.addEventListener("error", onLoaded, { once: true });
+        // Keep the prerendered stylesheet until the rendered one is loaded, even through the cleanup, to avoid a flash of unstyled content.
+        this.nodesToClean.delete(prerenderedElement);
+        const removePrerenderedElement = () => prerenderedElement.remove();
+        renderedElement.addEventListener("load", removePrerenderedElement, { once: true });
+        renderedElement.addEventListener("error", removePrerenderedElement, { once: true });
     }
 
     // HeadOutlet removes the prerendered title and shows its default title until the page renders its own one.
@@ -103,17 +88,13 @@ class PrerenderedHeadCleaner {
             this.title.remove();
             this.title = null;
         }
-        else if (!this.title.isConnected) this.range.begin.after(this.title);
+        else if (!this.title.isConnected) this.begin.after(this.title);
     }
 
     hasRenderedTitle() {
         // HeadOutlet's default title does not count, unless it reads the same as the prerendered one.
         const isRendered = title => title.textContent !== this.defaultTitleText || title.textContent === this.title.textContent;
         return Array.from(document.head.getElementsByTagName("title")).some(title => title !== this.title && isRendered(title));
-    }
-
-    finishIfDone() {
-        if (this.remainingElements.length === 0 && this.loadingElements.size === 0 && this.title === null) this.finish();
     }
 
     // On the first page navigation, the prerendered contents left are not for the current page anymore.
@@ -126,19 +107,21 @@ class PrerenderedHeadCleaner {
     finish() {
         this.headObserver.disconnect();
         this.bodyObserver.disconnect();
-        const { begin, nodes, end } = this.range;
-        for (const node of [begin, ...nodes, end]) {
-            if (!this.loadingElements.has(node)) node.remove();
-        }
+        for (const node of this.nodesToClean) node.remove();
     }
 }
+
+let cleaner = null;
 
 const setup = () => {
     if (typeof WorkerGlobalScope !== "undefined") return;
     const defaultTitleText = restoreStaticTitles();
     const range = findPrerenderedRange();
-    if (range !== null) new PrerenderedHeadCleaner(range, defaultTitleText).start();
+    if (range !== null) cleaner = new PrerenderedHeadCleaner(range, defaultTitleText);
 };
+
+// The prerendered contents that Blazor has not rendered by then are not for the current page.
+const scheduleCleanup = () => setTimeout(() => cleaner?.finish(), CLEANUP_DELAY);
 
 export function beforeStart() {
     setup();
@@ -146,4 +129,12 @@ export function beforeStart() {
 
 export function beforeWebStart() {
     setup();
+}
+
+export function afterStarted() {
+    scheduleCleanup();
+}
+
+export function afterWebStarted() {
+    scheduleCleanup();
 }

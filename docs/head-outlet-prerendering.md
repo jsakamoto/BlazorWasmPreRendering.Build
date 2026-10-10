@@ -40,9 +40,7 @@ The old JavaScript initializer removed the whole range in `afterStarted`. But `a
 - On its first render, `HeadOutlet` calls the JavaScript function `getAndRemoveExistingTitle`. It removes every title in `<head>` that Blazor did not render, and remembers the text of the last one as the default title. `HeadOutlet` shows this default title while the page has no `<PageTitle>`.
 - A title counts as rendered by Blazor when its previous sibling is a comment that Blazor tracks.
 - When a root component is attached with the `::after` selector, Blazor adopts all existing child nodes of that element (here, `<head>`) as its own logical nodes. So every comment that is already in `<head>`, including our markers, counts as a comment that Blazor tracks.
-- `blazor.webassembly.js` has no public event for client side navigation. It changes the URL with `history.pushState`, which fires no event. (`blazor.web.js` has `enhancednavigationstart` and similar events, but they are only for enhanced navigation.)
-- `blazor.webassembly.js` calls only `beforeStart`. `blazor.web.js` calls only `beforeWebStart` when the module exports it.
-
+- `blazor.webassembly.js` calls only `beforeStart` and `afterStarted`. `blazor.web.js` calls only `beforeWebStart` and `afterWebStarted` when the module exports them.
 ## How it works
 
 ### At build time
@@ -74,7 +72,7 @@ Now the served HTML has only one title, the page's own one. Pages whose HeadOutl
 | Others | Same `outerHTML`. |
 | `<title>` | Handled separately. See below. |
 
-A prerendered stylesheet is removed only after the new `<link>` fires `load` or `error`. This avoids a flash of unstyled content.
+A prerendered stylesheet is removed only after the new `<link>` fires `load` or `error`. This avoids a flash of unstyled content. The cleanup below does not remove it earlier.
 
 **Keeping the title**
 
@@ -92,22 +90,21 @@ A timeline for a page that renders its title 1.5 seconds after start.
 | 3' | lib.module.js | Puts `<title>Slow</title>` back after the BEGIN marker. | Slow |
 | 4 | HeadOutlet | Appends the default `<title>MyApp</title>` at the end of `<head>`. | Slow |
 | 5 | HeadOutlet | Replaces the default title with `<title>Slow</title>`, and appends the meta and link. | Slow |
-| 5' | lib.module.js | Removes the prerendered title, meta, and link (the link after the new one loads), then the markers. | Slow |
+| 5' | lib.module.js | Removes the prerendered title, meta, and link (the link after the new one loads). | Slow |
+| 6 | lib.module.js | Three seconds after `afterStarted`, removes the markers and anything left between them. | Slow |
+**Cleanup**
 
-**Cleanup on the first navigation**
+Some prerendered elements may never get a counterpart. This happens when the prerendered head differs from the head in the browser. Some examples are a `<HeadContent>` shown only when the environment is `Prerendering`, data that cannot be fetched in the browser, a different login state, and a `href` that changes on every render. The cleaner removes everything left in the range, including the markers, and stops watching, at whichever of these two moments comes first.
 
-Some prerendered elements may never get a counterpart. When the user moves to another page, they belong to the old page, so they must go.
+- **Three seconds after `afterStarted` (or `afterWebStarted`).** Anything Blazor has not rendered by then is treated as not for the current page.
+- **On the first page navigation.** The leftovers belong to the old page, so they must go at once. `blazor.webassembly.js` has no public navigation event, and `history.pushState` fires no event. So the cleaner watches `<body>` and compares `location.href` (without the hash) with the first URL on every change. Blazor always changes the body when it moves to another page.
 
-There is no navigation event (see above), so the cleaner also watches `<body>` and compares `location.href` (without the hash) with the first URL on every change. Blazor always changes the body when it moves to another page. On the first change of the URL, the cleaner removes everything left in the range, including the markers, and stops both observers.
-
-The head changes are matched before this cleanup. So when the new page uses the same stylesheet, the prerendered one still waits for the new one to load.
+The head observer is created before the body observer, so it handles the head changes of a navigation first. This way, when the new page uses the same stylesheet, the prerendered one still waits for the new one to load.
 
 ## Limits
 
-- **Elements without a counterpart stay until the first navigation.** This happens when the prerendered head differs from the head in the browser. Some examples are a `<HeadContent>` shown only when the environment is `Prerendering`, data that cannot be fetched in the browser, a different login state, and a `href` that changes on every render. This was accepted as a known limit.
-- **The same applies to the title.** If the page never renders a title that differs from the default one, the prerendered title stays on top until the first navigation.
-- **Navigation is detected only through a change of `<body>`.** A URL change without a body change is noticed at the next body change. A change of the hash only is not treated as navigation.
-- **The cleanup may run before the new stylesheet is matched.** This can happen if Blazor changes the body and the head in separate render batches, body first. Then the page may lose its styles for a moment. This was not seen in tests.
+- **The three seconds are a guess.** If a page renders its head contents later than that (for example, after a slow fetch), the prerendered ones are already gone. The tab shows the default title, and the page may lose its stylesheet until Blazor renders the head.
+- **Navigation is detected only through a change of `<body>`.** A URL change without a body change is noticed at the next body change or at the three second cleanup. A change of the hash only is not treated as navigation.
 - **Comments must reach the browser as they are.** An HTML minifier that removes comments (for example, on a CDN) breaks this mechanism, and the older markers as well.
 
 ## Maintenance notes
@@ -123,4 +120,4 @@ The head changes are matched before this cleanup. So when the new page uses the 
   1. Packed the package with a unique prerelease version (`-p:Version=... -p:PackageOutputPath=...`).
   2. Published a test app with a static title, a page with `<PageTitle>` and `<HeadContent>` (a meta and a stylesheet), a page that renders them after `await Task.Delay(1500)`, and a page without a title.
   3. Served the output and opened it with Playwright. A script added by `page.addInitScript` logged `document.title` and the computed style of an element on every animation frame.
-  4. Checked direct loads, and navigation from the slow page while it was still loading and after it loaded.
+  4. Checked direct loads, and navigation from the slow page while it was still loading and after it loaded. Waited more than three seconds before checking the final state of `<head>`.
