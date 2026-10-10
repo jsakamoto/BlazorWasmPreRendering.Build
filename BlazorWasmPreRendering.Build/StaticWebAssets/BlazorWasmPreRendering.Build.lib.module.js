@@ -3,11 +3,21 @@ const END_MARKER = "%%-PRERENDERING-HEADOUTLET-END-%%";
 const STASHED_TITLE_MARKER = /^%%-PRERENDERING-DEFAULT-TITLE-%%(?:\s+(\S*))?$/;
 const CLEANUP_DELAY = 3000;
 
-const markerOf = node => node.nodeType === Node.COMMENT_NODE ? node.textContent.trim() : "";
-const urlOf = href => href.split("#")[0];
-const isStylesheet =element => element.tagName === "LINK" && element.relList.contains("stylesheet");
+/** @typedef {{ begin: ChildNode, end: ChildNode, nodes: ChildNode[] }} PrerenderedRange */
 
-// Elements with the same key are counterparts of each other, even if their contents differ.
+/** @type {(node: Node) => string} */
+const markerOf = node => node.nodeType === Node.COMMENT_NODE ? node.textContent.trim() : "";
+
+/** @type {(href: string) => string} */
+const urlOf = href => href.split("#")[0];
+
+/** @type {(element: Element) => boolean} */
+const isStylesheet = element => element instanceof HTMLLinkElement && element.relList.contains("stylesheet");
+
+/**
+ * Elements with the same key are counterparts of each other, even if their contents differ.
+ * @type {(element: Element) => string}
+ */
 const keyOf = element => {
     const { tagName } = element;
     const name = tagName === "META" && ["name", "property", "http-equiv", "charset"].find(name => element.hasAttribute(name));
@@ -16,10 +26,13 @@ const keyOf = element => {
     return element.outerHTML;
 };
 
-/** Turns the stashed static titles back into title elements, and returns the text that HeadOutlet will take as its default title. */
+/**
+ * Turns the stashed static titles back into title elements, and returns the text that HeadOutlet will take as its default title.
+ * @returns {string | null}
+ */
 const restoreStaticTitles = () => {
     let defaultTitleText = null;
-    for (const node of Array.from(document.head.childNodes)) {
+    for (const node of [...document.head.childNodes]) {
         const match = STASHED_TITLE_MARKER.exec(markerOf(node));
         if (match === null) continue;
         const title = document.createElement("title");
@@ -32,9 +45,12 @@ const restoreStaticTitles = () => {
     return defaultTitleText;
 };
 
-/** Returns the markers of the prerendered HeadOutlet contents and the nodes between them, or null if there are none. */
+/**
+ * Returns the markers of the prerendered HeadOutlet contents and the nodes between them, or null if there are none.
+ * @returns {PrerenderedRange | null}
+ */
 const findPrerenderedRange = () => {
-    const nodes = Array.from(document.head.childNodes);
+    const nodes = [...document.head.childNodes];
     const begin = nodes.findIndex(node => markerOf(node) === BEGIN_MARKER);
     const end = nodes.findIndex(node => markerOf(node) === END_MARKER);
     return begin === -1 || end < begin ? null : { begin: nodes[begin], end: nodes[end], nodes: nodes.slice(begin + 1, end) };
@@ -42,8 +58,12 @@ const findPrerenderedRange = () => {
 
 /** Removes the prerendered HeadOutlet contents one by one, only when Blazor renders their counterparts, so that nothing flickers. */
 class PrerenderedHeadCleaner {
+    /**
+     * @param {PrerenderedRange} range
+     * @param {string | null} defaultTitleText
+     */
     constructor(range, defaultTitleText) {
-        const elements = range.nodes.filter(node => node.nodeType === Node.ELEMENT_NODE);
+        const elements = /** @type {Element[]} */ (range.nodes.filter(node => node.nodeType === Node.ELEMENT_NODE));
         this.begin = range.begin;
         this.nodesToClean = new Set([range.begin, ...range.nodes, range.end]);
         this.defaultTitleText = defaultTitleText;
@@ -57,15 +77,15 @@ class PrerenderedHeadCleaner {
         this.bodyObserver.observe(document.body, { childList: true, subtree: true });
     }
 
+    /** @param {MutationRecord[]} records */
     onHeadChanged(records) {
-        for (const record of records) {
-            for (const node of record.addedNodes) {
-                if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== "TITLE") this.removeCounterpartOf(node);
-            }
+        for (const node of records.flatMap(record => [...record.addedNodes])) {
+            if (node instanceof Element && node.tagName !== "TITLE") this.removeCounterpartOf(node);
         }
         if (!this.finishIfNavigated()) this.keepTitleUntilRendered();
     }
 
+    /** @param {Element} renderedElement */
     removeCounterpartOf(renderedElement) {
         const key = keyOf(renderedElement);
         const index = this.remainingElements.findIndex(element => keyOf(element) === key);
@@ -91,13 +111,18 @@ class PrerenderedHeadCleaner {
         else if (!this.title.isConnected) this.begin.after(this.title);
     }
 
+    /** @returns {boolean} */
     hasRenderedTitle() {
         // HeadOutlet's default title does not count, unless it reads the same as the prerendered one.
+        /** @type {(title: HTMLTitleElement) => boolean} */
         const isRendered = title => title.textContent !== this.defaultTitleText || title.textContent === this.title.textContent;
-        return Array.from(document.head.getElementsByTagName("title")).some(title => title !== this.title && isRendered(title));
+        return [...document.head.getElementsByTagName("title")].some(title => title !== this.title && isRendered(title));
     }
 
-    // On the first page navigation, the prerendered contents left are not for the current page anymore.
+    /**
+     * On the first page navigation, the prerendered contents left are not for the current page anymore.
+     * @returns {boolean} true if the page has navigated and the cleanup is done.
+     */
     finishIfNavigated() {
         if (urlOf(location.href) === this.initialUrl) return false;
         this.finish();
@@ -111,6 +136,7 @@ class PrerenderedHeadCleaner {
     }
 }
 
+/** @type {PrerenderedHeadCleaner | null} */
 let cleaner = null;
 
 const setup = () => {
@@ -123,18 +149,4 @@ const setup = () => {
 // The prerendered contents that Blazor has not rendered by then are not for the current page.
 const scheduleCleanup = () => setTimeout(() => cleaner?.finish(), CLEANUP_DELAY);
 
-export function beforeStart() {
-    setup();
-}
-
-export function beforeWebStart() {
-    setup();
-}
-
-export function afterStarted() {
-    scheduleCleanup();
-}
-
-export function afterWebStarted() {
-    scheduleCleanup();
-}
+export { setup as beforeStart, setup as beforeWebStart, scheduleCleanup as afterStarted, scheduleCleanup as afterWebStarted };
