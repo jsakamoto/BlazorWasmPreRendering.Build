@@ -1,3 +1,6 @@
+v.11.0.0-rc.1.1
+- .NET 11.0 RC 1 support.
+
 v.10.0.2-preview.1
 - Fix: Resolved an issue where the browser tab title briefly changed and the styles added by "HeadContent" were briefly lost when a pre-rendered page started up.
 - Improve: Made each pre-rendered page contain only its own "title" element, so that search engines and link previews see the page title instead of the one in "index.html".
@@ -5,9 +8,6 @@ v.10.0.2-preview.1
 
 v.10.0.1
 - Fix: Resolved an issue where the build failed on Windows when the value of the "UrlPathToExplicitFetch" or "UrlPathRegexToIgnore" property was written across multiple lines. (Issue #69)
-
-v.11.0.0-rc.1
-- .NET 11.0 RC 1 support.
 
 v.10.0.0
 - Starting with this release, the package's version number is aligned with the latest supported .NET major version.
