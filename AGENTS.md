@@ -47,7 +47,7 @@ Pre-rendering happens at publish time via two separate executables, both shipped
 
 **MSBuild integration** lives in `BlazorWasmPreRendering.Build/build/BlazorWasmPreRendering.Build.targets`: it runs after `Publish` (skipped for wasm-tools nested publish), computes all `BlazorWasmPrerendering*` property defaults, and invokes the build program. Every user-facing MSBuild property is documented in `MSBUILD-PROPERTIES.md` — keep that file in sync when adding options (an option typically threads through: .targets → `CommandLineOptions` → `BlazorWasmPrerenderingOptions` → `ServerSideRenderingOptions`/env vars → WebHost).
 
-**Packaging** is non-standard: `dotnet pack` uses a hand-written `.nuspec`, and a `PublishForPackage` target first runs `dotnet publish` of both the build program and the WebHost for every TFM (net6.0–net11.0), pruning framework DLLs. Package release notes are extracted from the latest entry in `RELEASE-NOTES.txt`; version/author live in `VersionInfo.props`.
+**Packaging** is non-standard: `dotnet pack` uses a hand-written `.nuspec`, and a `PublishForPackage` target first runs `dotnet publish` of both the build program and the WebHost for every TFM (net6.0–net11.0), pruning framework DLLs. Package release notes are extracted from the latest entry in `RELEASE-NOTES.txt`; version/author live in `VersionInfo.props`. The steps to release a new version are in `docs/release-procedure.md`.
 
 ## Prerendered HeadOutlet contents
 
