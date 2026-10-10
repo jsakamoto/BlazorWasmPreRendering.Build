@@ -53,7 +53,7 @@ Pre-rendering happens at publish time via two separate executables, both shipped
 
 In the `Static` render mode, the HeadOutlet contents (`<PageTitle>`, `<HeadContent>`) are prerendered between `%%-PRERENDERING-HEADOUTLET-BEGIN/END-%%` comments. At build time, `StaticTitleStash` moves the static `<title>` of `index.html` into a comment, so each served page has only one title. At run time, the JavaScript initializer `BlazorWasmPreRendering.Build/StaticWebAssets/BlazorWasmPreRendering.Build.lib.module.js` restores that title and removes each prerendered element only after Blazor renders its counterpart, so the title and stylesheets don't flicker. It depends on details of Blazor's own `HeadOutlet` behavior and has known limits.
 
-Read `docs/head-outlet-prerendering.md` before you change any of this. It explains the problems, how the code solves them, the limits, and how to regenerate the minified `.js` file (the bundler in the project never runs).
+Read `docs/head-outlet-prerendering.md` before you change any of this. It explains the problems, how the code solves them, the limits, the coding rules for the `.js` file (it is written to minify well), and how to regenerate the minified file (the bundler in the project never runs).
 
 ## Directory notes
 

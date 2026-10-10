@@ -61,7 +61,7 @@ Now the served HTML has only one title, the page's own one. Pages whose HeadOutl
 
 1. `restoreStaticTitles()` turns the stash comment back into `<title>MyApp</title>` and appends it at the end of `<head>`, below the END marker. The tab still shows the prerendered title because it comes first. When `HeadOutlet` runs `getAndRemoveExistingTitle`, the restored title is the last one, so `MyApp` becomes the default title as it should. A text node is put just before the restored title. Without it, the previous sibling would be the END marker, and Blazor would treat the restored title as its own title.
 2. `findPrerenderedRange()` finds the markers and the nodes between them.
-3. `PrerenderedHeadCleaner` watches `<head>` with a `MutationObserver` and removes the prerendered elements one by one, only after Blazor renders their counterparts. The observer callback runs before the next paint, so the user never sees a moment without the element.
+3. `startCleaner()` (called "the cleaner" below) watches `<head>` with a `MutationObserver` and removes the prerendered elements one by one, only after Blazor renders their counterparts. The observer callback runs before the next paint, so the user never sees a moment without the element.
 
 **Matching rules**
 
@@ -107,6 +107,22 @@ The head observer is created before the body observer, so it handles the head ch
 - **Navigation is detected only through a change of `<body>`.** A URL change without a body change is noticed at the next body change or at the three second cleanup. A change of the hash only is not treated as navigation.
 - **Comments must reach the browser as they are.** An HTML minifier that removes comments (for example, on a CDN) breaks this mechanism, and the older markers as well.
 
+## How the JavaScript is written
+
+The `.js` file follows these rules, so that the minified file stays small. Keep them when you change it.
+
+- **No classes.** Terser does not shorten property and method names, so a class keeps all its member names in the minified file. `startCleaner()` keeps its state in local variables and its steps in inner functions instead. Terser shortens all of them. For the same reason, do not keep state in the properties of an object.
+- **Frequent objects and values go into module level constants.** For example, `document`, `head`, the strings `"title"`, `"TITLE"`, and `"LINK"`, and even `null` (`NULL`). The minified file then refers to them by short names. The marker strings are also built from a shared prefix.
+- **Frequent calls go into small functions.** For example, `attrOf()` for `getAttribute()` and `createMutationObserver()` for `new MutationObserver()`.
+- **Do not touch `window` or `document` directly at the module level.** Blazor may import this module in a Web Worker, which has neither of them. So the module reads `globalThis.document?.head`, and `setup()` does nothing when it is undefined. Accessing `window.document` there makes the import itself fail.
+- **Modern syntax is welcome** when it makes the code simpler, such as spread syntax on a `NodeList`, `flatMap`, optional chaining, and `export { ... as ... }`. Blazor WebAssembly runs only on recent browsers.
+- **No code golf.** Do not use tricks that make the code hard to read. Shorten the code by organizing the order of steps and the size of functions.
+- **Types are written in JSDoc**, because the file is plain JavaScript. You can check them with the command below. One error is expected and harmless. It says `relList` does not exist on `Element`, because `isStylesheet()` checks the tag name instead of using `instanceof`.
+
+  ```shell
+  npx -p typescript tsc --noEmit --allowJs --checkJs --target es2022 --module es2022 --lib dom,dom.iterable,es2022 StaticWebAssets/BlazorWasmPreRendering.Build.lib.module.js
+  ```
+
 ## Maintenance notes
 
 - **The minified file is made by hand.** The project references `BuildBundlerMinifier2022`, but its targets file is named `BuildBundlerMinifier.targets`, so NuGet never imports it and `bundleconfig.json` is never processed. After you edit the `.js` file, regenerate the minified file and copy it to `wwwroot`.
@@ -121,3 +137,6 @@ The head observer is created before the body observer, so it handles the head ch
   2. Published a test app with a static title, a page with `<PageTitle>` and `<HeadContent>` (a meta and a stylesheet), a page that renders them after `await Task.Delay(1500)`, and a page without a title.
   3. Served the output and opened it with Playwright. A script added by `page.addInitScript` logged `document.title` and the computed style of an element on every animation frame.
   4. Checked direct loads, and navigation from the slow page while it was still loading and after it loaded. Waited more than three seconds before checking the final state of `<head>`.
+  5. Imported the module inside a module Web Worker, called all four exported functions, and waited for the timer, to make sure nothing throws there.
+
+  To try a changed `.js` file without packing again, use `page.route()` in Playwright to answer the request for `BlazorWasmPreRendering.Build.*.lib.module.js` with the new file.
