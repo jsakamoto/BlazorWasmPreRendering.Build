@@ -43,6 +43,7 @@ public class Program
             baseUrl,
             commandLineOptions.UrlPathToExplicitFetch,
             commandLineOptions.UrlPathRegexToIgnore,
+            commandLineOptions.SkipNofollowLinks,
             prerenderingOptions.WebRootPath,
             prerenderingOptions.Locales,
             commandLineOptions.OutputStyle,
