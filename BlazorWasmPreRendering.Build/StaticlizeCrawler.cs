@@ -35,6 +35,8 @@ internal class StaticlizeCrawler
 
     private Regex? UrlPathRegexToIgnore { get; }
 
+    private bool SkipNofollowLinks { get; }
+
     private readonly List<string> _StaticalizedFiles = new List<string>();
 
     public IEnumerable<string> StaticalizedFiles => this._StaticalizedFiles;
@@ -43,6 +45,7 @@ internal class StaticlizeCrawler
         string baseUrl,
         string? urlPathToExplicitFetch,
         string? urlPathRegexToIgnore,
+        bool skipNofollowLinks,
         string webRootPath,
         IEnumerable<string> locales,
         OutputStyle outputStyle,
@@ -51,6 +54,7 @@ internal class StaticlizeCrawler
         ILogger logger)
     {
         this.BaseUri = new Uri(baseUrl);
+        this.SkipNofollowLinks = skipNofollowLinks;
         this.WebRootPath = webRootPath;
         this.OutputStyle = outputStyle;
         this.EnableGZipCompression = enableGZipCompression;
@@ -192,6 +196,7 @@ internal class StaticlizeCrawler
             .OfType<IHtmlAnchorElement>()
             .Where(link => string.IsNullOrEmpty(link.Origin))
             .Where(link => !string.IsNullOrEmpty(link.PathName))
+            .Where(link => !(this.SkipNofollowLinks && link.RelationList.Contains("nofollow")))
             .ToArray();
 
         foreach (var link in links)

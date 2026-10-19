@@ -44,6 +44,11 @@ public static class TestSites
     /// </summary>
     public static async ValueTask<IAsyncDisposable> StartTestSite4(string baseUrl) => await StartTestSite("Site4-nonRootBaseHref", baseUrl);
 
+    /// <summary>
+    /// Start a test site that has &lt;a rel="nofollow" href="..."&gt; links, which StaticlizeCrawler should skip when it is told to.
+    /// </summary>
+    public static async ValueTask<IAsyncDisposable> StartTestSite5(string baseUrl) => await StartTestSite("Site5-nofollow", baseUrl);
+
     private class Disposer : IDisposable
     {
         private readonly Action _Action;

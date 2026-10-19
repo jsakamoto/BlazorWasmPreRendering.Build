@@ -50,6 +50,8 @@ public class CommandLineOptions
 
     public string? UrlPathRegexToIgnore { get; set; }
 
+    public bool SkipNofollowLinks { get; set; }
+
     public bool KeepRunning { get; init; }
 
     public static readonly string DefaultServerPort = "5050-5999";

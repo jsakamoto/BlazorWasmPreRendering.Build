@@ -273,6 +273,22 @@ Similarly, if you want to skip some URL paths during the crawling process, you c
     ...
 ```
 
+If you don't want the crawler to follow `<a>` links that have the `rel="nofollow"` attribute, such as links to a login page, you can **set the `BlazorWasmPrerenderingSkipNofollowLinks` MSBuild property to `true`**.
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  ...
+  <PropertyGroup>
+    <!--
+    👇 If you set this, <a> links with rel="nofollow"
+       will not be followed during the crawling process.
+    -->
+    <BlazorWasmPrerenderingSkipNofollowLinks>true</BlazorWasmPrerenderingSkipNofollowLinks>
+    ...
+```
+
+Please note that a page is still saved if another link without `rel="nofollow"` points to it.
+
 (* See also: [_MSBuild properties reference for the "BlazorWasmPreRendering.Build"_](https://github.com/jsakamoto/BlazorWasmPreRendering.Build/blob/master/MSBUILD-PROPERTIES.md))
 
 ### Render mode
