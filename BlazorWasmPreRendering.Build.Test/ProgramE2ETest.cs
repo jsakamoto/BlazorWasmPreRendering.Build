@@ -550,18 +550,7 @@ public class ProgramE2ETest
             "\t\t\t^/about/\\.net$\r\n" +
             "\t\t</BlazorWasmPrerenderingUrlPathRegexToIgnore>"));
 
-        // Use the .targets file and the build program in this repository instead of the ones in the published package.
-        var solutionDir = FileIO.FindContainerDirToAncestor("*.slnx");
-        var targetsFilePath = Path.Combine(solutionDir, "BlazorWasmPreRendering.Build", "build", "BlazorWasmPreRendering.Build.targets");
-        var buildProgramDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BlazorWasmPreRendering.Build.dll");
-        File.WriteAllText(Path.Combine(projectDir, "Directory.Build.targets"), $"""
-            <Project>
-              <Import Project="{targetsFilePath}" />
-              <PropertyGroup>
-                <BlazorWasmPrerenderingServerDll>{buildProgramDllPath}</BlazorWasmPrerenderingServerDll>
-              </PropertyGroup>
-            </Project>
-            """);
+        UseTargetsAndBuildProgramInThisRepository(projectDir);
 
         // When
         var dotnetCLI = await Start("dotnet", "publish -c:Release -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false -o:bin/publish", projectDir).WaitForExitAsync();
@@ -584,6 +573,52 @@ public class ProgramE2ETest
         const string prerenderedContents = "<div class=\"page\" ";
         Validate(actualHtmlFiles[3], prerenderedContents, title_is: "Home", h1_is: "Hello, world!");
         Validate(actualHtmlFiles[2], prerenderedContents, title_is: "Easter Egg", h1_is: "Hello, Easter Egg!");
+    }
+
+    [Test]
+    public async Task Publish_with_SkipNofollowLinks_Test()
+    {
+        // Given
+        using var sampleAppWorkDir = SampleSite.CreateSampleAppsWorkDir();
+        var projectDir = Path.Combine(sampleAppWorkDir, "BlazorWasmApp1");
+        UseTargetsAndBuildProgramInThisRepository(projectDir);
+
+        // When
+        var dotnetCLI = await Start("dotnet", "publish -c:Release -p:CompressionEnabled=true -p:UsingBrowserRuntimeWorkload=false -p:BlazorWasmPrerenderingSkipNofollowLinks=true -o:bin/publish", projectDir).WaitForExitAsync();
+
+        // Then
+        dotnetCLI.ExitCode.Is(0, message: dotnetCLI.Output);
+
+        // Validate prerendered contents: "/lazy-loading-page", which is linked only with rel="nofollow", was skipped,
+        // and so was "/about", which is linked only from that page.
+        var wwwrootDir = Path.Combine(projectDir, "bin", "publish", "wwwroot");
+        var expectedHtmlFiles = GetFullPathList(baseDir: wwwrootDir, pathList: [
+            "about/.net/index.html",
+            "counter/index.html",
+            "easter-egg/index.html",
+            "fetchdata/index.html",
+            "index.html"]);
+
+        var actualHtmlFiles = Directory.GetFiles(wwwrootDir, "*.html", SearchOption.AllDirectories).OrderBy(path => path).ToArray();
+        actualHtmlFiles.Is(expectedHtmlFiles);
+    }
+
+    /// <summary>
+    /// Makes the project use the .targets file and the build program in this repository instead of the ones in the published package.
+    /// </summary>
+    private static void UseTargetsAndBuildProgramInThisRepository(string projectDir)
+    {
+        var solutionDir = FileIO.FindContainerDirToAncestor("*.slnx");
+        var targetsFilePath = Path.Combine(solutionDir, "BlazorWasmPreRendering.Build", "build", "BlazorWasmPreRendering.Build.targets");
+        var buildProgramDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BlazorWasmPreRendering.Build.dll");
+        File.WriteAllText(Path.Combine(projectDir, "Directory.Build.targets"), $"""
+            <Project>
+              <Import Project="{targetsFilePath}" />
+              <PropertyGroup>
+                <BlazorWasmPrerenderingServerDll>{buildProgramDllPath}</BlazorWasmPrerenderingServerDll>
+              </PropertyGroup>
+            </Project>
+            """);
     }
 
     [TestCase("ExceptionTest", false, false)]

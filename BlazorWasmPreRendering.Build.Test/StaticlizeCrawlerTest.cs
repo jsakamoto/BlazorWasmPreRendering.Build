@@ -21,6 +21,7 @@ public class StaticlizeCrawlerTest
             baseUrl,
             urlPathToExplicitFetch: null,
             urlPathRegexToIgnore: null,
+            skipNofollowLinks: false,
             webRootPath: outDir,
             locales: new string[] { },
             OutputStyle.IndexHtmlInSubFolders,
@@ -55,6 +56,7 @@ public class StaticlizeCrawlerTest
             baseUrl,
             urlPathToExplicitFetch: null,
             urlPathRegexToIgnore: "counter", // Skip "/counter"
+            skipNofollowLinks: false,
             webRootPath: outDir,
             locales: new string[] { },
             OutputStyle.IndexHtmlInSubFolders,
@@ -76,6 +78,78 @@ public class StaticlizeCrawlerTest
     }
 
     [Test]
+    public async Task SaveToStaticFileAsync_FollowsNofollowLinks_ByDefault_Test()
+    {
+        // Given
+        var baseUrl = $"http://127.0.0.1:{TcpPortPool.GetAvailableTcpPort()}";
+        await using var testSiteServer = await TestSites.StartTestSite5(baseUrl);
+        using var outDir = new WorkDirectory();
+        var logger = new TestLogger();
+
+        // When
+        var crawler = new StaticlizeCrawler(
+            baseUrl,
+            urlPathToExplicitFetch: null,
+            urlPathRegexToIgnore: null,
+            skipNofollowLinks: false,
+            webRootPath: outDir,
+            locales: [],
+            OutputStyle.IndexHtmlInSubFolders,
+            enableBrotliCompression: false,
+            enableGZipCompression: false,
+            logger: logger);
+        var result = await crawler.SaveToStaticFileAsync();
+
+        // Then
+        result.Is(StaticlizeCrawlingResult.Nothing);
+        File.Exists(Path.Combine(outDir, "index.html")).IsTrue();
+        File.Exists(Path.Combine(outDir, "counter", "index.html")).IsTrue();
+        File.Exists(Path.Combine(outDir, "login", "index.html")).IsTrue();
+        File.Exists(Path.Combine(outDir, "profile", "index.html")).IsTrue();
+
+        logger.LogLines.OrderBy(line => line)
+            .Is($"Getting {baseUrl}/...",
+                $"Getting {baseUrl}/counter...",
+                $"Getting {baseUrl}/login...",
+                $"Getting {baseUrl}/profile...");
+    }
+
+    [Test]
+    public async Task SaveToStaticFileAsync_SkipNofollowLinks_Test()
+    {
+        // Given
+        var baseUrl = $"http://127.0.0.1:{TcpPortPool.GetAvailableTcpPort()}";
+        await using var testSiteServer = await TestSites.StartTestSite5(baseUrl);
+        using var outDir = new WorkDirectory();
+        var logger = new TestLogger();
+
+        // When
+        var crawler = new StaticlizeCrawler(
+            baseUrl,
+            urlPathToExplicitFetch: null,
+            urlPathRegexToIgnore: null,
+            skipNofollowLinks: true,
+            webRootPath: outDir,
+            locales: [],
+            OutputStyle.IndexHtmlInSubFolders,
+            enableBrotliCompression: false,
+            enableGZipCompression: false,
+            logger: logger);
+        var result = await crawler.SaveToStaticFileAsync();
+
+        // Then
+        result.Is(StaticlizeCrawlingResult.Nothing);
+        File.Exists(Path.Combine(outDir, "index.html")).IsTrue();
+        File.Exists(Path.Combine(outDir, "counter", "index.html")).IsTrue();
+        File.Exists(Path.Combine(outDir, "login", "index.html")).IsFalse();
+        File.Exists(Path.Combine(outDir, "profile", "index.html")).IsFalse();
+
+        logger.LogLines.OrderBy(line => line)
+            .Is($"Getting {baseUrl}/...",
+                $"Getting {baseUrl}/counter...");
+    }
+
+    [Test]
     public async Task SaveToStaticFileAsync_AppendHtmlExtension_Style_Test()
     {
         // Given
@@ -89,6 +163,7 @@ public class StaticlizeCrawlerTest
             baseUrl,
             urlPathToExplicitFetch: null,
             urlPathRegexToIgnore: null,
+            skipNofollowLinks: false,
             webRootPath: outDir,
             locales: new[] { "en" },
             OutputStyle.AppendHtmlExtension,
@@ -124,6 +199,7 @@ public class StaticlizeCrawlerTest
             baseUrl,
             urlPathToExplicitFetch: null,
             urlPathRegexToIgnore: null,
+            skipNofollowLinks: false,
             webRootPath: outDir,
             locales: new string[] { },
             OutputStyle.AppendHtmlExtension,
@@ -151,6 +227,7 @@ public class StaticlizeCrawlerTest
             baseUrl,
             urlPathToExplicitFetch: null,
             urlPathRegexToIgnore: null,
+            skipNofollowLinks: false,
             webRootPath: outDir,
             locales: new string[] { },
             OutputStyle.IndexHtmlInSubFolders,
@@ -187,6 +264,7 @@ public class StaticlizeCrawlerTest
             baseUrl,
             urlPathToExplicitFetch: null,
             urlPathRegexToIgnore: null,
+            skipNofollowLinks: false,
             webRootPath: outDir,
             locales: [],
             OutputStyle.IndexHtmlInSubFolders,
@@ -221,6 +299,7 @@ public class StaticlizeCrawlerTest
             baseUrl,
             urlPathToExplicitFetch: null,
             urlPathRegexToIgnore: null,
+            skipNofollowLinks: false,
             webRootPath: outDir,
             locales: new string[] { },
             OutputStyle.AppendHtmlExtension,
