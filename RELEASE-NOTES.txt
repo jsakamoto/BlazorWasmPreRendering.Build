@@ -1,4 +1,5 @@
-v.10.0.2-preview.1
+v.10.0.2
+- Feature: Added the "BlazorWasmPrerenderingSkipNofollowLinks" MSBuild property. When it is set to "true", the crawler no longer follows "a" links that have the rel="nofollow" attribute. (Issue #53)
 - Fix: Resolved an issue where the browser tab title briefly changed and the styles added by "HeadContent" were briefly lost when a pre-rendered page started up.
 - Improve: Made each pre-rendered page contain only its own "title" element, so that search engines and link previews see the page title instead of the one in "index.html".
 - Fix: Resolved an issue where the last "script" element in the document was removed after the app started.
