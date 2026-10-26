@@ -1,3 +1,6 @@
+v.11.0.0-rc.3
+- .NET 11.0 RC 3 support.
+
 v.11.0.0-rc.2.1
 - Feature: Added the "BlazorWasmPrerenderingSkipNofollowLinks" MSBuild property. When it is set to "true", the crawler no longer follows "a" links that have the rel="nofollow" attribute. (Issue #53)
 
