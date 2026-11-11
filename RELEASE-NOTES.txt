@@ -1,3 +1,15 @@
+v.11.0.0-rc.3
+- .NET 11.0 RC 3 support.
+
+v.11.0.0-rc.2.1
+- Feature: Added the "BlazorWasmPrerenderingSkipNofollowLinks" MSBuild property. When it is set to "true", the crawler no longer follows "a" links that have the rel="nofollow" attribute. (Issue #53)
+
+v.11.0.0-rc.2
+- .NET 11.0 RC 2 support.
+
+v.11.0.0-rc.1.1
+- .NET 11.0 RC 1 support.
+
 v.10.0.2
 - Feature: Added the "BlazorWasmPrerenderingSkipNofollowLinks" MSBuild property. When it is set to "true", the crawler no longer follows "a" links that have the rel="nofollow" attribute. (Issue #53)
 - Fix: Resolved an issue where the browser tab title briefly changed and the styles added by "HeadContent" were briefly lost when a pre-rendered page started up.
@@ -11,6 +23,12 @@ v.10.0.0
 - Starting with this release, the package's version number is aligned with the latest supported .NET major version.
 - Fix: Resolved a potential issue that could cause an error depending on the installed .NET SDK version.
 - Improve: The NuGet package now lists its supported .NET target framework versions in its dependency metadata, making it easier to tell which versions of the package support which .NET version.
+
+v.8.1.0-preview.6
+- .NET 11.0 Preview 7 support.
+
+v.8.1.0-preview.5
+- .NET 11.0 Preview 5 support.
 
 v.8.0.2
 - Fix: Resolved an issue where pre-rendering could fail in projects with Central Package Management enabled.

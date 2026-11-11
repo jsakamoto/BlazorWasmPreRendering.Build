@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Buffers.Text;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
@@ -122,10 +123,10 @@ public class ProgramE2ETest
             httpResponse.EnsureSuccessStatusCode();
 
             httpResponse.Headers.TryGetValues("X-Middleware1-Version", out var values1).IsTrue();
-            values1.Is("1.0.0.0");
+            values1.Is("8.0.0.0");
 
             httpResponse.Headers.TryGetValues("X-Middleware2-Version", out var values2).IsTrue();
-            values2.Is("2.0.0.0");
+            values2.Is("8.0.0.0");
         }
         finally
         {
@@ -888,11 +889,31 @@ public class ProgramE2ETest
             //      `<!--Blazor-WebAssembly:{"environmentName":"Production","environmentVariables":{}}-->`
             if (pageExpectation.RenderMode == RenderMode.WebAssemblyPrerendered)
             {
-                var m = Regex.Match(htmlText, "<!--Blazor-WebAssembly:(?<json>.*?)-->");
-                m.Success.IsTrue();
-                var environmentData = JsonObject.Parse(m.Groups["json"].Value).IsNotNull();
-                (environmentData["environmentName"]?.ToString()).Is("Production", message: $"The page-embedded environment name in {pageExpectation.RouteName} was not 'Production'.");
+                GetPageEmbeddedEnvironmentName(htmlText).Is("Production",
+                    message: $"The page-embedded environment name in {pageExpectation.RouteName} was not 'Production'.");
             }
         }
+    }
+
+    private static string GetPageEmbeddedEnvironmentName(string htmlText)
+    {
+        // .NET 10 or earlier, the environment name is embedded in the HTML as a JSON string in the comment like below:
+        var markerV1 = Regex.Match(htmlText, "<!--Blazor-WebAssembly:(?<json>.*?)-->");
+        if (markerV1.Success)
+        {
+            var environmentData = JsonObject.Parse(markerV1.Groups["json"].Value).IsNotNull();
+            return environmentData["environmentName"]?.ToString() ?? "";
+        }
+
+        // .NET 11 or later, the environment name is embedded in the HTML as a Base64-encoded JSON string in the comment like below:
+        var markerV2 = Regex.Match(htmlText, "<!--Blazor-Configuration:(?<base64>.*?)-->");
+        if (markerV2.Success)
+        {
+            var configJson = Base64.DecodeFromChars(markerV2.Groups["base64"].Value);
+            var environmentData = JsonObject.Parse(configJson).IsNotNull()["webAssembly"].IsNotNull();
+            return environmentData["environmentName"]?.ToString() ?? "";
+        }
+
+        return "";
     }
 }
