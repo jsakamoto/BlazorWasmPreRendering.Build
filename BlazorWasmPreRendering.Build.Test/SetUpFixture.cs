@@ -7,13 +7,23 @@ namespace BlazorWasmPreRendering.Build.Test;
 [SetUpFixture]
 public class SetUpFixture
 {
+    // Inherited by every child "dotnet" process; they pin it to the parent's SDK (ex: MSB4216) or, from the VS Code
+    // C# Dev Kit, inject targets that a pinned older SDK cannot load (ex: MSB4062 in the BlazorWasmAVP sample).
+    private static readonly string[] _VariablesToClear = [
+        "MSBuildSDKsPath",
+        "MSBuildExtensionsPath",
+        "MSBUILD_EXE_PATH",
+        "DOTNET_HOST_PATH",
+        "CustomAfterMicrosoftCommonTargets",
+        "CustomAfterMicrosoftCommonCrossTargetingTargets",
+        "EnableProjectDataOnBuild",
+        "EnableProjectDataInProjectFolder",
+        "CSDEVKIT_PROJECTDATA_TASKS_ASSEMBLY"];
+
     [OneTimeSetUp]
     public async Task OneTimeSetup()
     {
-        // [NOTE]: "dotnet test" launches this test process from inside MSBuild, so MSBuild-specific environment
-        //         variables are inherited. Every "dotnet build"/"dotnet publish" process that the tests start
-        //         would inherit them too, which breaks launching MSBuild task hosts. (ex: MSB4216)
-        Environment.SetEnvironmentVariable("MSBuildSDKsPath", null);
+        foreach (var name in _VariablesToClear) Environment.SetEnvironmentVariable(name, null);
 
         var slnDir = FileIO.FindContainerDirToAncestor("*.slnx");
         var webHostProjDir = Path.Combine(slnDir, "BlazorWasmPreRendering.Build.WebHost");
